@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Api</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/scrollup/2.4.1/jquery.scrollUp.min.js"></script>
+</head>
+<body class="container" style="padding-bottom: 2em;">
+<h1 style="text-align: center;margin: 1em;">
+    Api（共 <span class="text-danger">{$api_count}</span> 个）<small style="margin-left: 2em;">{$create_time}</small>
+</h1>
+<hr>
+<div class="row">
+    <div class="col-md-9">
+        {$api_items}
+    </div>
+    <div class="col-md-3">
+        <!--垂直排列按钮组begin-->
+        <div class="btn-group-vertical bs-docs-sidebar hidden-print hidden-xs hidden-sm affix">
+            <foreach name="menu" item="v" key="k">
+                <div class="btn-group">
+                    <button id="id_{$v['controller']}" type="button" class="btn {$k%2 == 0 ? 'btn-success' : 'btn-default'} dropdown-toggle" data-toggle="dropdown" style="text-align: left;">
+                        {$k+1}. {$v['name']}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="id_{$v['controller']}">
+                        <foreach name="v['sons']" item="v_son" key="k_son">
+                            <li><a href="#{$v_son['href']}">{$v_son['id']}. {$v_son['name']}</a></li>
+                        </foreach>
+                    </ul>
+                </div>
+            </foreach>
+        </div>
+        <!--垂直排列按钮组end-->
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<div>
+    <a name="{$a_name}"></a>
+    <if condition="$item_index eq 0">
+        <h2 style="padding-top:1em;">{$id}. {$api_desc}</h2>
+        <else/>
+        <h2 style="border-top: 1px #CCCCCC solid;padding-top:1em;margin-top: 1em;">{$id}. {$api_desc}</h2>
+    </if>
+    <h3 style="padding-top: 0.5em;">请求地址:</h3>
+    <p class="text-danger" style="border: 1px #CCCCCC dashed;padding: 0.5em;">
+        {$url}
+    </p>
+    <notempty name="params">
+        <h3 style="padding-top: 0.5em;">参数:</h3>
+        <!--表格begin-->
+        <table class="table table-striped table-hover table-bordered table-condensed"
+               style="margin-top: 1em;table-layout: fixed;">
+            <thead>
+            <tr>
+                <th style="width: 20%;">名称</th>
+                <th style="width: 30%;">校验条件</th>
+                <th style="width: 50%;">描述</th>
+            </tr>
+            </thead>
+            <tbody>
+            <foreach name="params" item="vo">
+                <tr>
+                    <td style="width: 20%;"><span class="text-primary">{$vo['name']}</span></td>
+                    <td style="width: 30%;word-wrap:break-word;word-break:break-all;"><span class="text-danger">{$vo['filters']}</span>
+                    </td>
+                    <td style="width: 50%;word-wrap:break-word;word-break:break-all;"><span class="text-info">{$vo['remark']}</span>
+                    </td>
+                </tr>
+            </foreach>
+            </tbody>
+        </table>
+        <!--表格end-->
+    </notempty>
+    <h3 style="padding-top: 0.5em;">返回值:</h3>
+    <empty name="ar_returns">
+        <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
+            无
+        </p>
+    </empty>
+    <foreach name="ar_returns" item="vo">
+        <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
+            {:empty($vo) ? '无' : $vo}
+        </p>
+    </foreach>
+</div>

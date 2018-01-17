@@ -1,0 +1,25 @@
+{
+  "name": "skj198568/tp5_smart",
+  "description": "tp5 smart 开发模式",
+  "type": "library",
+  "license": "MIT",
+  "version": "0.1",
+  "authors": [
+    {
+      "name": "宋可敬",
+      "email": "597481334@qq.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "skj198568/class_library": "*"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "php create_files.php"
+    ],
+    "post-update-cmd": [
+      "php create_files.php"
+    ]
+  }
+}
