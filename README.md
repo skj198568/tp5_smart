@@ -19,3 +19,8 @@
 #### 执行命令
 ```
 composer require "skj198568/tp5_smart"
+```
+#### 帮助手册
+```
+    http://
+```
