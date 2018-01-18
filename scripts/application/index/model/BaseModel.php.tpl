@@ -261,7 +261,6 @@ class BaseModel extends Query
      */
     public function update(array $data = [])
     {
-        log_info($data);
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance());
         //自动完成字段
