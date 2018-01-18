@@ -22,5 +22,5 @@ composer require "skj198568/tp5_smart"
 ```
 #### 帮助手册
 ```
-    http://
+    https://www.kancloud.cn/songkejing/tp5-smart/506234
 ```
