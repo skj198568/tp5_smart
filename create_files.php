@@ -7,9 +7,9 @@
  * Date: 2017/12/06
  * Time: 15:56
  */
-include_once "ClassLibrary/ClFile.php";
-include_once "ClassLibrary/ClSystem.php";
-include_once "ClassLibrary/ClString.php";
+include_once "../class_library/ClassLibrary/ClFile.php";
+include_once "../class_library/ClassLibrary/ClSystem.php";
+include_once "../class_library/ClassLibrary/ClString.php";
 
 $files = \ClassLibrary\ClFile::dirGetFiles(__DIR__.DIRECTORY_SEPARATOR.'scripts');
 //往上3个目录
