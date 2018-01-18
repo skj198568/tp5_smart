@@ -1,10 +1,6 @@
 # tp5_smart
 基于tp5，实现智能化、简化开发。
 ### composer使用
-修改配置
-```
-"minimum-stability":"dev"
-```
 添加执行脚本
 ```
 "scripts":{
