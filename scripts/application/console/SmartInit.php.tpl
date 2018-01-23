@@ -128,23 +128,22 @@ class SmartInit extends Command
     {
         $table_name = $this->getTableNameWithPrefix($table_name);
         $table_comment = ClMysql::query(sprintf("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_NAME = '%s'", $table_name));
-        if(empty($table_comment[0]['TABLE_COMMENT'])){
-            $table_comment = [
-                'name' => '',
-                'is_cache' => 0
-            ];
-        }else{
-            $table_comment = json_decode($table_comment[0]['TABLE_COMMENT'], true);
-            if(empty($table_comment)){
-                $table_comment = [
-                    'name' => $table_comment
-                ];
-            }
-            if(!isset($table_comment['is_cache'])){
-                $table_comment['is_cache'] = 0;
+        $return = [
+            'name' => '',
+            'is_cache' => 0
+        ];
+        foreach($table_comment as $each_comment){
+            $comment = json_decode($each_comment['TABLE_COMMENT'], true);
+            if(empty($comment)){
+                $return['name'] = $each_comment['TABLE_COMMENT'];
+            }else{
+                if(!isset($table_comment['is_cache'])){
+                    $table_comment['is_cache'] = 0;
+                }
+                $return = array_merge($return, $comment);
             }
         }
-        return $table_comment;
+        return $return;
     }
 
     /**
@@ -316,14 +315,15 @@ class SmartInit extends Command
      */
     private function getAllTables()
     {
-        $tables = ClMysql::query("SHOW TABLES LIKE '" . config('database.prefix') . "%'");
+        $database_prefix = config('database.prefix');
+        $tables = ClMysql::query("SHOW TABLES LIKE '" . $database_prefix . "%'");
         $table_names = [];
         foreach ($tables as $k => $table_name) {
             $table_name = array_pop($table_name);
-            if(!empty(config('database.prefix')) && strpos($table_name, config('database.prefix')) !== 0){
+            if(!empty($database_prefix) && strpos($table_name, $database_prefix) !== 0){
                 continue;
             }
-            $table_name = ClString::replaceOnce(config('database.prefix'), '', $table_name);
+            $table_name = ClString::replaceOnce($database_prefix, '', $table_name);
             if ($table_name != 'migrations') {
                 $table_names[] = $table_name;
             }
