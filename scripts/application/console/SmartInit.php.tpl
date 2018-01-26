@@ -195,6 +195,17 @@ class SmartInit extends Command
 ", $field_comment['name'], $each['Type'], $each['Default'] === '' ? "''" : $each['Default'], strtoupper($each['Field']), $each['Field']);
             //处理静态参数
             if (isset($field_comment['const_values']) && !empty($field_comment['const_values'])) {
+                //处理格式化参数
+                if(!isset($field_comment['show_format']) || empty($field_comment['show_format'])){
+                    $field_comment['show_format'] = [];
+                }
+                $format = [];
+                foreach($field_comment['const_values'] as $const_value_array){
+                    $format[] = [$const_value_array[1], $const_value_array[2]];
+                }
+                //新增格式化字段
+                $field_comment['show_format'][] = [$format, '_show'];
+                //处理静态变量
                 foreach ($field_comment['const_values'] as $const_value_array) {
                     $const_fields .= sprintf("
     /**
