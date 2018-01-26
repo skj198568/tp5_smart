@@ -37,6 +37,8 @@ class {$table_name}Model extends {$table_name}Map
             return count(self::$instances_array);
         }else if($id == -2){
             return self::instance(count(self::$instances_array));
+        }else{
+            return null;
         }
     }
 
