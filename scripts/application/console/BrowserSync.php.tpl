@@ -90,7 +90,7 @@ class BrowserSync extends Command
     protected function configure()
     {
         $this->setName('browser_sync')
-            ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，分号分割，例如：html;js;css;php', 'html;js;css;php')
+            ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，分号分割，英文双引号包围，例如："html;js;css;php"', '"html;js;css;php"')
             ->addOption('--dirs', '-d', Option::VALUE_REQUIRED, '监听web根目录下变化的文件夹，分号分割，例如：application;public', 'application;public')
             ->addOption('--port', '-p', Option::VALUE_REQUIRED, 'socket监听的端口，注意防火墙的设置', '8000')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
@@ -112,6 +112,18 @@ class BrowserSync extends Command
         $this->output_object = $output;
         $this->input_object = $input;
         $this->socket_port = $input->getOption('port');
+        //校验文件类型
+        $files_types = $this->input_object->getOption('file_types');
+        $files_types = trim(trim($files_types, '"'), "'");
+        if (empty($files_types)) {
+            $this->output_object->error('请输入监听文件files的类型');
+            return false;
+        }
+        $command = $this->input_object->getOption('command');
+        $command = trim($command);
+        if(in_array($command, ['start', 'start-d'])){
+            $this->output_object->highlight(sprintf('监听文件:%s', $files_types));
+        }
         return $this->syncClient();
     }
 
@@ -244,11 +256,7 @@ class BrowserSync extends Command
         clearstatcache();
         $last_scan_files = $this->scan_files;
         $files_types = $this->input_object->getOption('file_types');
-        $files_types = trim($files_types, '"');
-        if (empty($files_types)) {
-            $this->output('<error>请输入监听文件files的类型</error>');
-            return false;
-        }
+        //去除两端引号
         $files_types = explode(';', trim(trim(str_replace('；', ';', $files_types)), ';'));
         $dirs = $this->input_object->getOption('dirs');
         $root_path = dirname(dirname(__DIR__));
