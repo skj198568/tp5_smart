@@ -278,8 +278,11 @@ class SmartInit extends Command
                 'fields_read_only' => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
                 'all_fields_str' => implode(', ', $all_fields),
                 'fields_show_map_fields' => $fields_show_map_fields,
+                'fields_show_map_fields_keys' => array_keys($fields_show_map_fields),
                 'fields_show_format' => $fields_show_format,
+                'fields_show_format_keys' => array_keys($fields_show_format),
                 'fields_store_format' => $fields_store_format,
+                'fields_store_format_keys' => array_keys($fields_store_format),
                 'fields_invisible' => empty($fields_invisible) ? '' : implode(', ', $fields_invisible)
             ]);
         $map_file = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';

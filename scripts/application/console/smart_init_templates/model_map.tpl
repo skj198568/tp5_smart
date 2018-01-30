@@ -47,20 +47,20 @@ class {$table_name}Map extends BaseModel
      * @var array
      */
     protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v">
-        <php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$v neq end($fields_show_map_fields)">,</if>
+        <php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if>
     </foreach><php>echo "\n\t";</php>]</empty>;
 
     /**
      * 字段格式化
      * @var array
      */
-    protected static $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$v neq end($fields_show_format)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
+    protected static $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$key neq end($fields_show_format_keys)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
 
     /**
      * 字段存储格式
      * @var array
      */
-    protected static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$v neq end($fields_store_format)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
+    protected static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$key neq end($fields_store_format_keys)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
 
     /**
      * 获取所有的字段
