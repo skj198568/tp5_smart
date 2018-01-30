@@ -515,7 +515,14 @@ class BaseModel extends Query
                             if(is_string($each_field_store_format)){
                                 switch ($each_field_store_format){
                                     case 'json':
-                                        $data[$k][$k_field] = json_decode($each[$k_field], true);
+                                        if(empty($each[$k_field])){
+                                            $data[$k][$k_field] = [];
+                                        }else{
+                                            $data[$k][$k_field] = json_decode($each[$k_field], true);
+                                            if(is_null($data[$k][$k_field])){
+                                                $data[$k][$k_field] = [];
+                                            }
+                                        }
                                         break;
                                 }
                             }
