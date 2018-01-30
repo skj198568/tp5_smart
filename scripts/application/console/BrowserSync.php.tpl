@@ -228,7 +228,13 @@ class BrowserSync extends Command
     public function getJsContent()
     {
         $port = $this->port();
+        //服务如果没有开启
         if (empty($port)) {
+            return '';
+        }
+        //如果以端口方式访问
+        $host = request()->host();
+        if(strpos($host, ':') !== false){
             return '';
         }
         if(input('browser_sync', 1) == 0 || cookie('?browser_sync')){
@@ -243,7 +249,7 @@ class BrowserSync extends Command
     ws.onclose = function(){
         window.location.reload();
     };
-</script>', request()->host(), $port);
+</script>', $host, $port);
     }
 
     /**
