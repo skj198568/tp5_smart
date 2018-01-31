@@ -506,6 +506,9 @@ class BaseModel extends Query
     public function select($data = null)
     {
         $data = parent::select($data);
+        if(empty($data)){
+            return [];
+        }
         if(is_array($data)){
             //存储格式处理
             if(!empty(static::$fields_store_format)){
@@ -545,6 +548,9 @@ class BaseModel extends Query
     public function find($data = null)
     {
         $data = parent::find($data);
+        if(empty($data)){
+            return [];
+        }
         //存储格式处理
         if(!empty(static::$fields_store_format)){
             foreach(static::$fields_store_format as $k_field => $each_field_store_format){
@@ -552,7 +558,14 @@ class BaseModel extends Query
                     if(is_string($each_field_store_format)){
                         switch ($each_field_store_format){
                             case 'json':
-                                $data[$k_field] = json_decode($data[$k_field], true);
+                                if(empty($each[$k_field])){
+                                    $data[$k_field] = [];
+                                }else{
+                                    $data[$k_field] = json_decode($each[$k_field], true);
+                                    if(is_null($data[$k_field])){
+                                        $data[$k_field] = [];
+                                    }
+                                }
                                 break;
                         }
                     }
@@ -576,7 +589,14 @@ class BaseModel extends Query
             if(is_string(static::$fields_store_format[$field])){
                 switch (static::$fields_store_format[$field]){
                     case 'json':
-                        $value = json_decode($value, true);
+                        if(empty($value)){
+                            $value = [];
+                        }else{
+                            $value = json_decode($value, true);
+                            if(is_null($value)){
+                                $value = [];
+                            }
+                        }
                         break;
                 }
             }
@@ -598,7 +618,14 @@ class BaseModel extends Query
                 if(is_string(static::$fields_store_format[$field])){
                     switch (static::$fields_store_format[$field]){
                         case 'json':
-                            $data[$key] = json_decode($value, true);
+                            if(empty($value)){
+                                $data[$key] = [];
+                            }else{
+                                $data[$key] = json_decode($value, true);
+                                if(is_null($data[$key])){
+                                    $data[$key] = [];
+                                }
+                            }
                             break;
                     }
                 }
