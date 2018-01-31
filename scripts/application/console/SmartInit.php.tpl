@@ -176,6 +176,8 @@ class SmartInit extends Command
         $fields_invisible = [];
         //校验器
         $fields_verifies = [];
+        //字段注释关系
+        $fields_names = [];
         foreach ($table_info as $k => $each) {
             $all_fields[] = 'self::F_' . strtoupper($each['Field']);
             if ($each['Field'] == 'id') {
@@ -185,6 +187,7 @@ class SmartInit extends Command
             if(empty($field_comment)){
                 $field_comment = ['name' => $each['Comment']];
             }
+            $fields_names['self::F_' . strtoupper($each['Field'])] = $field_comment['name'];
             $const_fields .= sprintf("
     /**
      * %s
@@ -283,7 +286,9 @@ class SmartInit extends Command
                 'fields_show_format_keys' => array_keys($fields_show_format),
                 'fields_store_format' => $fields_store_format,
                 'fields_store_format_keys' => array_keys($fields_store_format),
-                'fields_invisible' => empty($fields_invisible) ? '' : implode(', ', $fields_invisible)
+                'fields_invisible' => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
+                'fields_names' => $fields_names,
+                'fields_names_keys' => array_keys($fields_names),
             ]);
         $map_file = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         //创建文件夹

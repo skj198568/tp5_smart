@@ -63,6 +63,11 @@ class {$table_name}Map extends BaseModel
     protected static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n\t\t";</php>{$key} => {$v}<if condition="$key neq end($fields_store_format_keys)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
 
     /**
+     * 所有字段的注释
+     */
+    public static $fields_names = <empty name="fields_names">[]<else/>[<foreach name="fields_names" item="v"><php>echo "\n\t\t";</php>{$key} => '{$v}'<if condition="$key neq end($fields_names_keys)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
+
+    /**
      * 获取所有的字段
      * @param array $exclude_fields 不包含的字段
      * @return array

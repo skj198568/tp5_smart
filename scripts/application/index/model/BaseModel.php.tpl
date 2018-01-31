@@ -84,6 +84,11 @@ class BaseModel extends Query
     protected static $fields_store_format = [];
 
     /**
+     * 所有字段的注释
+     */
+    public static $fields_names = [];
+
+    /**
      * 获取所有的字段
      * @param array $exclude_fields 不包含的字段
      * @return array
