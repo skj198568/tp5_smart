@@ -127,7 +127,7 @@ class SmartInit extends Command
     public function getTableComment($table_name)
     {
         $table_name = $this->getTableNameWithPrefix($table_name);
-        $table_comment = ClMysql::query(sprintf("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_NAME = '%s'", $table_name));
+        $table_comment = ClMysql::query(sprintf("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name));
         $return = [
             'name' => '',
             'is_cache' => 0
