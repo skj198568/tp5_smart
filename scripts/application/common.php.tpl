@@ -87,15 +87,6 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
 const PAGES_NUM = 15;
 
 /**
- * 是否是debug模式
- * @return mixed
- */
-function app_debug()
-{
-    return \think\App::$debug;
-}
-
-/**
  * json结果返回
  * @param $data
  * @param bool $is_log
@@ -104,9 +95,9 @@ function app_debug()
 function json_return($data, $is_log = false)
 {
     //调试模式下，记录信息
-    if (app_debug() && $is_log) {
+    if (\think\App::$debug || $is_log) {
         //将请求地址加入返回数组中，用于区别请求内容
-        log_info('jsonReturn:', $data);
+        log_info('jsonReturn:', json_encode($data, JSON_UNESCAPED_UNICODE), $data);
     }
     $type = isset($_GET['callback']) ? 'JSONP' : 'JSON';
     if ($type == 'JSON') {

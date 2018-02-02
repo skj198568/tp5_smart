@@ -10,6 +10,8 @@
 namespace app\api\base;
 use app\index\model\BaseModel;
 use ClassLibrary\ClFieldVerify;
+use ClassLibrary\ClVerify;
+use think\App;
 use think\Controller;
 
 /**
@@ -26,7 +28,7 @@ class BaseApiController extends Controller
     public function _initialize()
     {
         parent::_initialize();
-        if (app_debug()) {
+        if (App::$debug) {
             log_info('$_REQUEST:', request()->request());
         }
     }
@@ -59,6 +61,10 @@ class BaseApiController extends Controller
             }else{
                 $data['example_'.rand(1, 99)] = $example;
             }
+        }
+        //本地请求，自动记录
+        if(ClVerify::isLocalIp()){
+            $is_log = true;
         }
         return json_return(array_merge([
             'status' => $status,
