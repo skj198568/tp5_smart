@@ -242,7 +242,7 @@ class BaseModel extends Query
                 }
             }
         }
-        $result = parent::insertAll($dataSet, $replace);
+        $result = parent::insertAll($dataSet);
         //执行
         if (count($dataSet) !== count($dataSet, 1)) {
             //多维数组
