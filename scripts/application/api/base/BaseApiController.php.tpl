@@ -47,9 +47,9 @@ class BaseApiController extends Controller
         //转小写
         $status = strtolower($status);
         $data = is_array($data) ? $data : [$data];
-        //是否包含
-        $api_include_example = get_param('api_include_example', ClFieldVerify::instance()->verifyNumber()->verifyInArray([0, 1])->fetchVerifies(), '返回值是否包含例子', 0);
-        if($api_include_example != 0){
+        //本地请求，
+        if(ClVerify::isLocalIp()){
+            //是否包含例子
             if(!empty($example)){
                 $example = trim($example);
                 $example = str_replace(["\t", "\n"], ['', ''], $example);
@@ -61,9 +61,7 @@ class BaseApiController extends Controller
             }else{
                 $data['example_'.rand(1, 99)] = $example;
             }
-        }
-        //本地请求，自动记录
-        if(ClVerify::isLocalIp()){
+            //是否记录日志
             $is_log = true;
         }
         return json_return(array_merge([
