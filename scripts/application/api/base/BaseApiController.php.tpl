@@ -28,7 +28,7 @@ class BaseApiController extends Controller
     public function _initialize()
     {
         parent::_initialize();
-        if (App::$debug) {
+        if (App::$debug || ClVerify::isLocalIp()) {
             log_info('$_REQUEST:', request()->request());
         }
     }
