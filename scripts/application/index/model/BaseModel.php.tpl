@@ -331,14 +331,15 @@ class BaseModel extends Query
                         $table_and_field = $each_map_field[0];
                         $alias = $each_map_field[1];
                         $fetch_field = ClString::getBetween($table_and_field, '.', '', false);
-                        if(strpos($table_and_field, '_') !== false){
-                            $table_and_field = explode('_', $table_and_field);
-                            foreach($table_and_field as $k => $each_table_and_field){
-                                $table_and_field[$k] = ucfirst($each_table_and_field);
+                        $table_name = ClString::getBetween($table_and_field, '', '.', false);
+                        if(strpos($table_name, '_') !== false){
+                            $table_name = explode('_', $table_name);
+                            foreach($table_name as $k_table_name => $each_table_and_field){
+                                $table_name[$k_table_name] = ucfirst($each_table_and_field);
                             }
-                            $model = implode('', $table_and_field);
+                            $model = implode('', $table_name);
                         }else{
-                            $model = ucfirst(ClString::getBetween($table_and_field, '', '.', false));
+                            $model = ucfirst(ClString::getBetween($table_name, '', '.', false));
                         }
                         //拼接Model
                         $model .= 'Model';
