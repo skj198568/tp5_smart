@@ -424,13 +424,25 @@ class SmartInit extends Command
                 }
             }
         }
+        $ar_get_list_json = [
+            'status' => strtolower(sprintf('api/%s/getList/1', $table_name)),
+            'items' => [$info]
+        ];
         $ar_get_json = [
-            'status' => strtolower(sprintf('api-%s-get-1', $table_name_format)),
+            'status' => strtolower(sprintf('api/%s/get/1', $table_name)),
             'info' => $info
         ];
-        $ar_get_list_json = [
-            'status' => strtolower(sprintf('api-%s-getList-1', $table_name_format)),
-            'items' => [$info]
+        $ar_create_json = [
+            'status' => strtolower(sprintf('api/%s/create/1', $table_name)),
+            'info' => $info
+        ];
+        $ar_update_json = [
+            'status' => strtolower(sprintf('api/%s/update/1', $table_name)),
+            'info' => $info
+        ];
+        $ar_delete_json = [
+            'status' => strtolower(sprintf('api/%s/delete/1', $table_name)),
+            'id' => '主键id'
         ];
         $map_template_file = __DIR__ . '/smart_init_templates/controller_base.tpl';
         $content = "<?php\n" . $this->view->fetch($map_template_file, [
@@ -438,8 +450,11 @@ class SmartInit extends Command
                 'time' => date('H:i:s') . "\n",
                 'table_name' => $table_name_format,
                 'table_comment' => $this->getTableComment($table_name),
-                'ar_get_json' => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
                 'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_json' => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
+                'ar_create_json' => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_json' => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
+                'ar_delete_json' => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
                 'create_api' => $table_comment['create_api']
             ]);
         if(!empty($content)){

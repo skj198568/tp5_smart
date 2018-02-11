@@ -10,6 +10,7 @@
 namespace app\api\base;
 use app\index\model\BaseModel;
 use ClassLibrary\ClFieldVerify;
+use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
 use think\App;
 use think\Controller;
@@ -28,7 +29,7 @@ class BaseApiController extends Controller
     public function _initialize()
     {
         parent::_initialize();
-        if (App::$debug || ClVerify::isLocalIp()) {
+        if (App::$debug) {
             log_info('$_REQUEST:', request()->request());
         }
     }
@@ -43,13 +44,21 @@ class BaseApiController extends Controller
      */
     protected function ar($code, $data = [], $example = '', $is_log = false)
     {
-        $status = sprintf('%s-%s-%s-%s', request()->module(), request()->controller(), request()->action(), $code);
-        //转小写
-        $status = strtolower($status);
+        $status = sprintf('%s/%s/%s/%s', request()->module(), request()->controller(), request()->action(), $code);
+        //格式化
+        $status = ClString::toArray($status);
+        foreach($status as $k_status => $v_status){
+            if(ClVerify::isAlphaCapital($v_status)){
+                $status[$k_status] = '_'.strtolower($v_status);
+            }
+        }
+        //转换为字符串
+        $status = implode('', $status);
+        $status = str_replace('/_', '/', $status);
         $data = is_array($data) ? $data : [$data];
-        //本地请求，
-        if(ClVerify::isLocalIp()){
-            //是否包含例子
+        //是否包含
+        $api_include_example = get_param('api_include_example', ClFieldVerify::instance()->verifyNumber()->verifyInArray([0, 1])->fetchVerifies(), '返回值是否包含例子', 0);
+        if($api_include_example != 0){
             if(!empty($example)){
                 $example = trim($example);
                 $example = str_replace(["\t", "\n"], ['', ''], $example);
@@ -61,8 +70,6 @@ class BaseApiController extends Controller
             }else{
                 $data['example_'.rand(1, 99)] = $example;
             }
-            //是否记录日志
-            $is_log = true;
         }
         return json_return(array_merge([
             'status' => $status,
