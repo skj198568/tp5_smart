@@ -422,20 +422,30 @@ class BaseModel extends Query
                 foreach ($each_format as $each_format_item){
                     if(is_string($each_format_item[0]) && strpos($each_format_item[0], '%s') !== false){
                         //函数型格式化
-                        $format_string = sprintf('%s;', sprintf($each_format_item[0], $item[$k_format_key]));
-                        $function = ClString::getBetween($format_string, '', '(', false);
-                        $params = ClString::getBetween($format_string, '(', ')',false);
-                        if(strpos($params, ',') !== false){
-                            $params = explode(',', $params);
+                        if(empty($item[$k_format_key])){
+                            //如果为空，则取消格式化
+                            $item[$k_format_key.$each_format_item[1]] = '';
                         }else{
-                            $params = [$params];
+                            $format_string = sprintf('%s;', sprintf($each_format_item[0], $item[$k_format_key]));
+                            $function = ClString::getBetween($format_string, '', '(', false);
+                            $params = ClString::getBetween($format_string, '(', ')',false);
+                            if(strpos($params, ',') !== false){
+                                $params = explode(',', $params);
+                            }else{
+                                $params = [$params];
+                            }
+                            $item[$k_format_key.$each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
                         }
-                        $item[$k_format_key.$each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
                     }else{
                         //数组式格式化
-                        foreach((array)$each_format_item[0] as $each_format_item_each){
-                            if($each_format_item_each[0] == $item[$k_format_key]){
-                                $item[$k_format_key.$each_format_item[1]] = $each_format_item_each[1];
+                        if(empty($item[$k_format_key])){
+                            //如果为空，则取消格式化
+                            $item[$k_format_key.$each_format_item[1]] = '';
+                        }else {
+                            foreach((array)$each_format_item[0] as $each_format_item_each){
+                                if($each_format_item_each[0] == $item[$k_format_key]){
+                                    $item[$k_format_key.$each_format_item[1]] = $each_format_item_each[1];
+                                }
                             }
                         }
                     }
