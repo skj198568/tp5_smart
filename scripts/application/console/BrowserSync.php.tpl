@@ -9,6 +9,8 @@
 
 namespace app\console;
 
+use ClassLibrary\ClFile;
+use ClassLibrary\ClString;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
@@ -90,7 +92,7 @@ class BrowserSync extends Command
     protected function configure()
     {
         $this->setName('browser_sync')
-            ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，分号分割，英文双引号包围，例如："html;js;css;php"', '"html;js;css;php"')
+            ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，分号分割，英文双引号包围，例如：".html;.js;.css;.php"', '".html;.js;.css;.php"')
             ->addOption('--dirs', '-d', Option::VALUE_REQUIRED, '监听web根目录下变化的文件夹，分号分割，例如：application;public', 'application;public')
             ->addOption('--port', '-p', Option::VALUE_REQUIRED, 'socket监听的端口，注意防火墙的设置', '8000')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
@@ -107,7 +109,7 @@ class BrowserSync extends Command
     {
         set_time_limit(0);
         if (!is_dir(LOG_PATH)) {
-            $this->dirCreate(LOG_PATH);
+            ClFile::dirCreate(LOG_PATH);
         }
         $this->output_object = $output;
         $this->input_object = $input;
@@ -143,7 +145,7 @@ class BrowserSync extends Command
     {
         $command = $this->input_object->getOption('command');
         $command = trim($command);
-        $command = $this->spaceManyToOne($command);
+        $command = ClString::spaceManyToOne($command);
         if (!in_array($command, ['start', 'start-d', 'stop', 'restart', 'reload', 'status'])) {
             $this->output('command input:' . $command . ' error，请输入如下命令：start/启动，start -d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止');
             exit;
@@ -272,7 +274,7 @@ class BrowserSync extends Command
             if (empty($dir) || !is_dir($root_path . '/' . $dir)) {
                 continue;
             }
-            $files = array_merge($files, $this->dirGetFiles($root_path . '/' . $dir, $files_types));
+            $files = array_merge($files, ClFile::dirGetFiles($root_path . '/' . $dir, $files_types));
         }
         $scan_files = [];
         //文件内容改变，md5_file计算时间较长，以文件最后修改的时间为判断依据
@@ -298,123 +300,6 @@ class BrowserSync extends Command
         //设置新文件记录
         $this->scan_files = $scan_files;
         return $has_modify;
-    }
-
-    /**
-     * 多个空格转换为一个空格
-     * @param $string
-     * @param string $separator
-     * @return string
-     */
-    private function spaceManyToOne($string, $separator = ' ')
-    {
-        return trim(preg_replace('/[\s]+/', $separator, $string));
-    }
-
-    /**
-     * 获取文件夹下面的所有文件
-     * @param string $dir 文件夹目录绝对地址
-     * @param array $file_types :文件类型array('pdf', 'doc')
-     * @param array $ignore_dir_or_file : 忽略的文件或文件夹
-     * @return array
-     */
-    private function dirGetFiles($dir, $file_types = array(), $ignore_dir_or_file = [])
-    {
-        foreach (['.', '..'] as $each) {
-            if (!in_array($each, $ignore_dir_or_file)) {
-                $ignore_dir_or_file[] = $each;
-            }
-        }
-        $data = array();
-        if (is_dir($dir)) {
-            $files = scandir($dir);
-            foreach ($files as $file) {
-                if (in_array($file, $ignore_dir_or_file)) {
-                    continue;
-                }
-                if (is_dir($dir . '/' . $file)) {
-                    $data = array_merge($data, $this->dirGetFiles($dir . '/' . $file, $file_types, $ignore_dir_or_file));
-                } else {
-                    if (empty($file_types)) {
-                        $data[] = $dir . '/' . $file;
-                    } else {
-                        //判断类型
-                        if (in_array($this->getSuffix($file), $file_types)) {
-                            $data[] = $dir . '/' . $file;
-                        }
-                    }
-                }
-            }
-        } else if (is_file($dir)) {
-            if (empty($file_types)) {
-                if (!in_array($dir, $ignore_dir_or_file)) {
-                    $data[] = $dir;
-                }
-            } else {
-                //判断类型
-                if (in_array($this->getSuffix($dir), $file_types) && !in_array($dir, $ignore_dir_or_file)) {
-                    $data[] = $dir;
-                }
-            }
-        }
-        return $data;
-    }
-
-    /**
-     * 获取文件后缀名
-     * @param $file
-     * @return mixed
-     */
-    private function getSuffix($file)
-    {
-        return isset(pathinfo($file)['extension']) ? strtolower(pathinfo($file)['extension']) : '';
-    }
-
-    /**
-     * 是否是win环境
-     * @return bool
-     */
-    private function isWin()
-    {
-        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-    }
-
-    /**
-     * 无限新建文件夹，支持linux和windows目录
-     * @param string $absolute_file_name 待创建的文件，例如：C:\workspace\PhpStorm\CC\WebSite\Application\Runtime\Logs/Home//DDD/14_08_07.log
-     * @param bool $is_file 传入的是否是文件，如果是文件则不进行文件、文件夹的自动判断
-     * @return string
-     */
-    private function dirCreate($absolute_file_name, $is_file = false)
-    {
-        $file_name = trim(str_replace('\\', '/', $absolute_file_name), '/');
-        $dir_array = explode('/', $file_name);
-        if ($this->isWin()) {
-            $dir_str = '';
-        } else {
-            $dir_str = '/';
-        }
-        if (empty($dir_array[0])) {
-            //去除为空的数据
-            array_shift($dir_array);
-        }
-        //第一个目录不判断
-        $dir_str .= $dir_array[0];
-        array_shift($dir_array);
-        //判断最后一个是文件还是文件夹
-        if ($is_file) {
-            $min_limit = 1;
-        } else {
-            $min_limit = empty($this->getSuffix($file_name)) ? 0 : 1;
-        }
-        while (is_array($dir_array) && count($dir_array) > $min_limit) {
-            $dir_str .= '/' . $dir_array[0];
-            if (!is_dir($dir_str)) {
-                mkdir($dir_str, 0777, true);
-            }
-            array_shift($dir_array);
-        }
-        return $dir_str;
     }
 
     /**
