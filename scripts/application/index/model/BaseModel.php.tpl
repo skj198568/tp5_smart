@@ -8,6 +8,7 @@
 
 namespace app\index\model;
 
+use ClassLibrary\ClArray;
 use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
@@ -128,7 +129,7 @@ class BaseModel extends Query
                 $result = parent::execute($sql, $bind);
             }
             if (!empty($items)) {
-                if (count($items) !== count($items, 1)) {
+                if (!ClArray::isLinearArray($items)) {
                     //多维数组
                     foreach ($items as $each) {
                         $this->cacheRemoveTrigger($each);
@@ -186,7 +187,7 @@ class BaseModel extends Query
         }
         $result = parent::insert($data, $replace, $getLastInsID, $sequence);
         //执行
-        if (count($data) !== count($data, 1)) {
+        if (!ClArray::isLinearArray($data)) {
             //多维数组
             foreach ($data as $each) {
                 $this->cacheRemoveTrigger($each);
@@ -244,7 +245,7 @@ class BaseModel extends Query
         }
         $result = parent::insertAll($dataSet);
         //执行
-        if (count($dataSet) !== count($dataSet, 1)) {
+        if (!ClArray::isLinearArray($dataSet)) {
             //多维数组
             foreach ($dataSet as $each) {
                 $this->cacheRemoveTrigger($each);
@@ -317,7 +318,7 @@ class BaseModel extends Query
         }
         $is_linear_array = false;
         //一维数组，处理成多维数组
-        if (count($items) === count($items, 1)) {
+        if (ClArray::isLinearArray($items)) {
             $items = [$items];
             $is_linear_array = true;
         }
@@ -378,7 +379,7 @@ class BaseModel extends Query
         }
         $is_linear_array = false;
         //一维数组，处理成多维数组
-        if (count($items) === count($items, 1)) {
+        if (ClArray::isLinearArray($items)) {
             $items = [$items];
             $is_linear_array = true;
         }
@@ -410,7 +411,7 @@ class BaseModel extends Query
         }
         $is_linear_array = false;
         //一维数组，处理成多维数组
-        if (count($items) === count($items, 1)) {
+        if (ClArray::isLinearArray($items)) {
             $items = [$items];
             $is_linear_array = true;
         }
