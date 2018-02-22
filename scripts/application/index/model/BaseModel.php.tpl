@@ -422,7 +422,7 @@ class BaseModel extends Query
                 foreach ($each_format as $each_format_item){
                     if(is_string($each_format_item[0]) && strpos($each_format_item[0], '%s') !== false){
                         //函数型格式化
-                        if(empty($item[$k_format_key])){
+                        if(!is_numeric($item[$k_format_key]) && empty($item[$k_format_key])){
                             //如果为空，则取消格式化
                             $item[$k_format_key.$each_format_item[1]] = '';
                         }else{
@@ -438,7 +438,7 @@ class BaseModel extends Query
                         }
                     }else{
                         //数组式格式化
-                        if(empty($item[$k_format_key])){
+                        if(!is_numeric($item[$k_format_key]) && empty($item[$k_format_key])){
                             //如果为空，则取消格式化
                             $item[$k_format_key.$each_format_item[1]] = '';
                         }else {
