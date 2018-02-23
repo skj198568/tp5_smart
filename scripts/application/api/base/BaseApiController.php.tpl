@@ -56,21 +56,6 @@ class BaseApiController extends Controller
         $status = implode('', $status);
         $status = str_replace('/_', '/', $status);
         $data = is_array($data) ? $data : [$data];
-        //是否包含
-        $api_include_example = get_param('api_include_example', ClFieldVerify::instance()->verifyNumber()->verifyInArray([0, 1])->fetchVerifies(), '返回值是否包含例子', 0);
-        if($api_include_example != 0){
-            if(!empty($example)){
-                $example = trim($example);
-                $example = str_replace(["\t", "\n"], ['', ''], $example);
-            }
-            //解码为数组
-            $example = json_decode($example, true);
-            if(!isset($data['example'])){
-                $data['example'] = $example;
-            }else{
-                $data['example_'.rand(1, 99)] = $example;
-            }
-        }
         return json_return(array_merge([
             'status' => $status,
         ], $data), $is_log);
@@ -91,7 +76,7 @@ class BaseApiController extends Controller
      */
     protected function paging(BaseModel $model_instance, $where, $call_back = '', $exclude_fields = [], $limit = PAGES_NUM, $duration = null)
     {
-        $limit = get_param('limit', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
+        $limit = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
         $total = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
         $page = get_param('page', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '当前页码数', 1);
         $order = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为"asc"', 'asc');
