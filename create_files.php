@@ -147,6 +147,17 @@ if(is_file($file)){
     }
     $replace = trim(trim($replace), ',');
     $file_content = str_replace($search, "level' => [$replace]", $file_content);
+    //加载函数库
+    if(strpos($file_content, 'common_for_smart.php') === false){
+        //解析
+        $search = \ClassLibrary\ClString::getBetween($file_content, 'extra_file_list', ']', true);
+        $search = \ClassLibrary\ClString::getBetween($search, '[', '', true);
+        $replace = \ClassLibrary\ClString::getBetween($search, '[', ']', false);
+        $replace = trim($replace, ',');
+        $replace .= ", APP_PATH. 'common_for_smart' . EXT";
+        $replace = sprintf('[%s]', $replace);
+        $file_content = str_replace($search, $replace, $file_content);
+    }
     //回写
     file_put_contents($file, $file_content);
 }
