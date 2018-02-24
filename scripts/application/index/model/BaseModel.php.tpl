@@ -111,23 +111,13 @@ class BaseModel extends Query
     public function execute($sql, $bind = [])
     {
         if (strpos($sql, 'UPDATE') === 0 || strpos($sql, 'DELETE') === 0) {
-            if (strpos($sql, 'UPDATE') === 0) {
-                //先更新，后查询
-                $result = parent::execute($sql, $bind);
-                $last_sql = $this->getLastSql();
-                $table_name = substr($last_sql, strpos($last_sql, '`') + 1);
-                $table_name = substr($table_name, 0, strpos($table_name, '`'));
-                $trigger_sql = sprintf('SELECT * FROM `%s` %s', $table_name, substr($last_sql, strpos($last_sql, 'WHERE')));
-                $items = $this->query($trigger_sql);
-            } else {
-                //先查询，后删除
-                $last_sql = $this->connection->getRealSql($sql, $bind);
-                $table_name = substr($last_sql, strpos($last_sql, '`') + 1);
-                $table_name = substr($table_name, 0, strpos($table_name, '`'));
-                $trigger_sql = sprintf('SELECT * FROM `%s` %s', $table_name, substr($last_sql, strpos($last_sql, 'WHERE')));
-                $items = $this->query($trigger_sql);
-                $result = parent::execute($sql, $bind);
-            }
+            //先查询，后执行
+            $last_sql = $this->connection->getRealSql($sql, $bind);
+            $table_name = substr($last_sql, strpos($last_sql, '`') + 1);
+            $table_name = substr($table_name, 0, strpos($table_name, '`'));
+            $trigger_sql = sprintf('SELECT * FROM `%s` %s', $table_name, substr($last_sql, strpos($last_sql, 'WHERE')));
+            $items = $this->query($trigger_sql);
+            $result = parent::execute($sql, $bind);
             if (!empty($items)) {
                 if (!ClArray::isLinearArray($items)) {
                     //多维数组
