@@ -168,6 +168,11 @@ class BaseModel extends Query
                     }else{
                         switch ($each_field_store_format){
                             case 'json':
+                                if(empty($data[$k_field])){
+                                    $data[$k_field] = [];
+                                }else if(!is_array($data[$k_field])){
+                                    $data[$k_field] = [$data[$k_field]];
+                                }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                 break;
                         }
@@ -225,6 +230,11 @@ class BaseModel extends Query
                         }else{
                             switch ($each_field_store_format){
                                 case 'json':
+                                    if(empty($data[$k_field])){
+                                        $data[$k_field] = [];
+                                    }else if(!is_array($data[$k_field])){
+                                        $data[$k_field] = [$data[$k_field]];
+                                    }
                                     $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                     break;
                             }
@@ -278,6 +288,11 @@ class BaseModel extends Query
                     }else{
                         switch ($each_field_store_format){
                             case 'json':
+                                if(empty($data[$k_field])){
+                                    $data[$k_field] = [];
+                                }else if(!is_array($data[$k_field])){
+                                    $data[$k_field] = [$data[$k_field]];
+                                }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                 break;
                         }
@@ -565,6 +580,7 @@ class BaseModel extends Query
                     if(is_string($each_field_store_format)){
                         switch ($each_field_store_format){
                             case 'json':
+                                echo_info($data[$k_field]);
                                 if(empty($data[$k_field])){
                                     $data[$k_field] = [];
                                 }else{
