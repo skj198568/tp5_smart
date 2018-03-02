@@ -11,6 +11,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
+    "php": ">=7.0.0",
     "skj198568/class_library": "*",
     "workerman/workerman": "*",
     "php-ai/php-ml": "*",
