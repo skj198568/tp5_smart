@@ -48,6 +48,7 @@ class ApiDoc extends Command
         $base_dir = APP_PATH.'api/controller';
         $files = ClFile::dirGetFiles($base_dir, [], ['ApiController.php']);
         $api = [];
+//        echo_info('$files:', $files);
         foreach($files as $each_file){
             $output->info($each_file);
 //            if(strpos($each_file, 'Area') === false){
@@ -55,6 +56,7 @@ class ApiDoc extends Command
 //            }
             //获取所有函数，包括所有继承的父类
             $functions = $this->getAllFunctions($each_file);
+//            echo_info('$functions:', $functions);
             foreach ($functions as $key => $each_function){
                 $functions[$key] = [$each_file, $each_function];
             }
@@ -74,6 +76,7 @@ class ApiDoc extends Command
                 }
             }
             $class_desc = $this->getClassDesc($each_file);
+//            echo_info('$class_desc:', $class_desc);
             foreach($functions as $k => $each_function){
                 list($each_file_temp, $each_function) = $each_function;
 //                if(strpos($each_file_temp, 'MajorController') === false){
@@ -96,7 +99,7 @@ class ApiDoc extends Command
         $api_items = '';
         $api_item_template = __DIR__ . '/api_doc_templates/api_item.html';
         $id = 0;
-//        le_info($api);
+//        echo_info($api);
         $item_index = 0;
         $menu = [];
         foreach($api as $request_url => $each_content){
@@ -198,10 +201,11 @@ class ApiDoc extends Command
             return [];
         }
         $content = file_get_contents($file_absolute_url);
+//        echo_info('$content:', $content);
         $return = [];
         $all_functions = [];
         foreach($function_types as $function_type){
-            $all_functions = array_merge($all_functions, ClString::parseToArray($content, sprintf('%s ', $function_type), '\)'));
+            $all_functions = array_merge($all_functions, ClString::parseToArray($content, sprintf('%s ', $function_type), ')'));
         }
         $lines = explode("\n", $content);
         $temp = '';
@@ -432,7 +436,7 @@ class ApiDoc extends Command
         $function_content_array = explode("\n", $function_content);
         foreach($function_content_array as $each_line){
             if(strpos($each_line, '::getAllFields') !== false){
-                $each_line_array = ClString::parseToArray(str_replace('=', ',', $each_line), ',', '\)');
+                $each_line_array = ClString::parseToArray(str_replace('=', ',', $each_line), ',', ')');
 //                echo_info($each_line_array);
                 $params_functions = '';
                 foreach ($each_line_array as $each_line_item){
@@ -454,7 +458,7 @@ class ApiDoc extends Command
                     continue;
                 }
                 $class_const_content = file_get_contents($class_const_file_absolute_url);
-                $class_const_content = ClString::parseToArray($class_const_content, '\/\*\*', ';');
+                $class_const_content = ClString::parseToArray($class_const_content, '/**', ';');
                 foreach($class_const_content as $k => $v){
                     if(strpos($v, 'const F_') === false){
                         unset($class_const_content[$k]);
@@ -490,7 +494,7 @@ class ApiDoc extends Command
             }
         }
         //获取内部调用的函数
-        $inner_functions = ClString::parseToArray($function_content, '\$this\-\>', '\(');
+        $inner_functions = ClString::parseToArray($function_content, '$this->', '(');
         foreach($inner_functions as $k => $v){
             if(strpos($v, ',') !== false || strpos($v, ';') !== false){
                 continue;
