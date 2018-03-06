@@ -78,30 +78,29 @@ class BaseApiController extends Controller
     {
         $limit = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
         $total = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
-        $page = get_param('page', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '当前页码数', 1);
+        $offset = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量', 0);
         $order = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为"asc"', 'asc');
         $sort = get_param('sort', ClFieldVerify::instance()->verifyAlphaNumDash()->fetchVerifies(), '排序值，默认为表的主键', $model_instance->getPk());
         $return = [
             'limit' => $limit,
-            'page' => $page,
+            'offset' => $offset,
             'total' => $total
         ];
         $return['items'] = $model_instance
-            ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $page, $limit, 'items'], $duration)
+            ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
             ->where($where)
             ->field($model_instance::getAllFields($exclude_fields))
             ->order([
                 $sort => $order
             ])
-            ->page($page)
-            ->limit($limit)
+            ->limit($offset, $limit)
             ->select();
         if (!empty($call_back) && gettype($call_back) == 'object') {
             $return['items'] = $call_back($return['items']);
         }
         if (empty($total)) {
             $return['total'] = $model_instance
-                ->cache([$model_instance->getTable(), $where, $order, $page, $limit, 'total'], $duration)
+                ->cache([$model_instance->getTable(), $where, $order, $offset, $limit, 'total'], $duration)
                 ->where($where)
                 ->count();
         }
