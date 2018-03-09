@@ -344,10 +344,14 @@ class SmartInit extends Command
             }
             $table_name = ClString::replaceOnce($database_prefix, '', $table_name);
             if ($table_name != 'migrations') {
-                $table_names[] = $table_name;
+                //处理分表问题
+                $table_comment = json_encode($this->getTableComment($table_name), JSON_UNESCAPED_UNICODE);
+                if(!array_key_exists($table_comment, $table_names)){
+                    $table_names[$table_comment] = $table_name;
+                }
             }
         }
-        return $table_names;
+        return array_values($table_names);
     }
 
     /**处理ApiController
