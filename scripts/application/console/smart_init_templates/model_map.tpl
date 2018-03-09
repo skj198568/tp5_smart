@@ -121,7 +121,7 @@ class {$table_name}Map extends BaseModel
      * @param $id
      * @return bool
      */
-    public static function getByIdRc($id){
+    protected static function getByIdRc($id){
         return ClCache::remove($id);
     }
 
