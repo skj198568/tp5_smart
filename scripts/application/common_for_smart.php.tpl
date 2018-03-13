@@ -21,7 +21,7 @@ function log_info()
     if (!empty($args)) {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
-        $str = '[' . $function . ']' .call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
+        $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
         Log::record($str, Log::LOG);
     }
 }
@@ -29,16 +29,17 @@ function log_info()
 /**
  * 输出信息
  */
-function echo_info(){
+function echo_info()
+{
     $args = func_get_args();
     if (!empty($args)) {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
-        $str = '[' . $function . ']' .call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
-        if(request()->isCli() || request()->isAjax()){
-            echo $str."\n";
-        }else{
-            echo $str.'<br/>';
+        $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
+        if (request()->isCli() || request()->isAjax()) {
+            echo $str . "\n";
+        } else {
+            echo $str . '<br/>';
         }
     }
 }
@@ -46,18 +47,19 @@ function echo_info(){
 /**
  * 记录日志and输出
  */
-function le_info(){
+function le_info()
+{
     $args = func_get_args();
-    if(!empty($args)){
+    if (!empty($args)) {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
-        $str = '[' . $function . ']' .call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
+        $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
         Log::record($str, Log::LOG);
         //输出
-        if(request()->isCli() || request()->isAjax()){
-            echo $str."\n";
-        }else{
-            echo $str.'<br/>';
+        if (request()->isCli() || request()->isAjax()) {
+            echo $str . "\n";
+        } else {
+            echo $str . '<br/>';
         }
     }
 }
@@ -71,11 +73,21 @@ function le_info(){
  * @param string $filter 过滤器，参考input方法
  * @return mixed
  */
-function get_param($key = '', $verifies = [], $desc = '', $default = null, $filter = ''){
-    if(strpos($desc, ',') !== false){
+function get_param($key = '', $verifies = [], $desc = '', $default = null, $filter = '')
+{
+    if (strpos($desc, ',') !== false) {
         exit(sprintf('%s含有非法字符","，请改成中文"，"', $desc));
     }
-    $value = input($key, $default, $filter);
+    try {
+        $value = input($key, $default, $filter);
+    } catch (\InvalidArgumentException $exception) {
+        if (strpos($key, '/') == false) {
+            //尝试数组方式获取
+            $value = input($key . '/a', $default, $filter);
+        } else {
+            throw $exception;
+        }
+    }
     //校验参数
     \ClassLibrary\ClFieldVerify::verifyFields([$key => $value], [$key => $verifies]);
     return $value;
