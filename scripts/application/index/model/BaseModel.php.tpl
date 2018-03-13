@@ -328,7 +328,7 @@ class BaseModel extends Query
             $is_linear_array = true;
         }
         //查询结果值
-        $values = [];
+        $search_values = [];
         //额外字段拼接
         foreach(static::$fields_show_map_fields as $field => $map_fields){
             foreach ($items as $k => $each) {
@@ -349,15 +349,26 @@ class BaseModel extends Query
                         }
                         //拼接Model
                         $model .= 'Model';
-                        //考虑性能，对查询结果进行缓存
-                        $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each[$field], $fetch_field);
-                        if(!isset($values[$key])){
-                            $each[$alias] = call_user_func_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each[$field], $fetch_field]);
-                            //赋值
-                            $values[$key] = $each[$alias];
+                        if(is_array($each[$field])){
+                            $each[$alias] = [];
+                            foreach($each[$field] as $each_field){
+                                //考虑性能，对查询结果进行缓存
+                                $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each_field, $fetch_field);
+                                if(!isset($search_values[$key])){
+                                    $search_values[$key] = call_user_func_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each_field, $fetch_field]);
+                                }
+                                //获取信息
+                                $each[$alias][] = $search_values[$key];
+                            }
+                        }else{
+                            //考虑性能，对查询结果进行缓存
+                            $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each[$field], $fetch_field);
+                            if(!isset($search_values[$key])){
+                                $search_values[$key] = call_user_func_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each[$field], $fetch_field]);
+                            }
+                            //获取信息
+                            $each[$alias] = $search_values[$key];
                         }
-                        //获取信息
-                        $each[$alias] = $values[$key];
                     }
                 }
                 $items[$k] = $each;
