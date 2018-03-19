@@ -330,7 +330,7 @@ class ApiDoc extends Command
 //        echo_info($function_content);
         $return_array = [];
         //获取get_param方式参数
-        $params = ClString::parseToArray($function_content, 'get_param', ';', false);
+        $params = ClString::parseToArray($function_content, 'get_param', ');', false);
         foreach($params as $param){
 //            if(strpos($param, 'subject_include_ids') === false){
 //                continue;
