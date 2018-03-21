@@ -76,6 +76,19 @@ class ApiDoc extends Command {
 //            echo_info('$class_desc:', $class_desc);
             foreach ($functions as $k => $each_function) {
                 list($each_file_temp, $each_function) = $each_function;
+//                echo_info($each_file_temp, $each_function);
+                //忽略的函数
+                $ignore = false;
+                foreach (['public function _empty'] as $each_ignore_function) {
+                    if (strpos($each_function, $each_ignore_function) !== false) {
+                        $ignore = true;
+                        break;
+                    }
+                }
+                if ($ignore) {
+                    continue;
+                }
+
 //                if(strpos($each_file_temp, 'MajorController') === false){
 //                    continue;
 //                }
