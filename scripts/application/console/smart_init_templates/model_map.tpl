@@ -14,8 +14,7 @@ use ClassLibrary\ClCache;
  * Class {$table_name}Map
  * @package app\index\map
  */
-class {$table_name}Map extends BaseModel
-{
+class {$table_name}Map extends BaseModel {
 
     /**
      * 当前数据表名称（含前缀）
@@ -72,8 +71,7 @@ class {$table_name}Map extends BaseModel
      * @param array $exclude_fields 不包含的字段
      * @return array
      */
-    public static function getAllFields($exclude_fields = [self::F_ID])
-    {
+    public static function getAllFields($exclude_fields = [self::F_ID]) {
         $fields = [{$all_fields_str}];
         return array_diff($fields, $exclude_fields);
     }
@@ -88,18 +86,17 @@ class {$table_name}Map extends BaseModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']})
-    {
-        if($duration == 0){
+    public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+        if($duration == 0) {
             return static::instance()->where([
                 self::F_ID => is_array($id) ? ['in', $id] : $id
             ])->field(self::getAllFields($exclude_fields))->find();
         }else{
-            if(is_array($id)){
+            if(is_array($id)) {
                 $items = [];
-                foreach($id as $each_id){
+                foreach($id as $each_id) {
                     $info = self::getById($each_id, $exclude_fields, $duration);
-                    if(!empty($info)){
+                    if(!empty($info)) {
                         $items[] = $info;
                     }
                 }
@@ -108,7 +105,7 @@ class {$table_name}Map extends BaseModel
             $info = static::instance()->cache([$id], $duration)->where([
                 self::F_ID => $id
             ])->find();
-            if(empty($info)){
+            if(empty($info)) {
                 return [];
             }else{
                 return ClArray::getByKeys($info, self::getAllFields($exclude_fields));
@@ -121,7 +118,7 @@ class {$table_name}Map extends BaseModel
      * @param $id
      * @return bool
      */
-    protected static function getByIdRc($id){
+    protected static function getByIdRc($id) {
         return ClCache::remove($id);
     }
 
@@ -136,14 +133,13 @@ class {$table_name}Map extends BaseModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getValueById($id, $field, $default = '', $is_convert_to_int = false)
-    {
-        if({$table_comment['is_cache']} > 0){
+    public static function getValueById($id, $field, $default = '', $is_convert_to_int = false) {
+        if({$table_comment['is_cache']} > 0) {
             $info = self::getById($id);
-            if(empty($info)){
+            if(empty($info)) {
                 return $default;
             }else{
-                if($is_convert_to_int){
+                if($is_convert_to_int) {
                     return intval($info[$field]);
                 }else{
                     return $info[$field];

@@ -18,11 +18,9 @@ use think\console\Output;
 use Workerman\Lib\Timer;
 use Workerman\Worker;
 
-class TaskRun extends Command
-{
+class TaskRun extends Command {
 
-    protected function configure()
-    {
+    protected function configure() {
         $this->setName('task_run')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
             ->setDescription(sprintf('执行定时任务，请配置:%s', __DIR__ . '/task_run.ini'));
@@ -34,8 +32,7 @@ class TaskRun extends Command
      * @param Output $output
      * @return bool
      */
-    protected function execute(Input $input, Output $output)
-    {
+    protected function execute(Input $input, Output $output) {
         $task_ini_file = __DIR__ . '/task_run.ini';
         if (!is_file($task_ini_file)) {
             file_put_contents($task_ini_file, ';执行命令=类似crontab的执行时间定义，支持到秒一级任务定义 */秒 */分 */时 */日 */月 */周
@@ -59,7 +56,7 @@ class TaskRun extends Command
         //设置进程id文件地址
         $task::$pidFile = LOG_PATH . 'task_run.pid';
         //设置日志文件
-        $task::$logFile = LOG_PATH . 'task_run.log';
+        $task::$logFile      = LOG_PATH . 'task_run.log';
         $task->onWorkerStart = function ($task) use ($task_ini_file) {
             $settings = parse_ini_file($task_ini_file);
             foreach ($settings as $command => $cron_date) {
@@ -80,8 +77,7 @@ class TaskRun extends Command
     /**
      * 配置文件
      */
-    private function help()
-    {
+    private function help() {
         echo <<<EOT
 -h 使用帮助\n-c start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止，default: start\n
 EOT;

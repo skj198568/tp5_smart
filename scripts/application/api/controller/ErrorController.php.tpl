@@ -14,7 +14,6 @@ namespace app\api\controller;
  * Class EmptyController
  * @package app\api\controller
  */
-class ErrorController extends ApiController
-{
+class ErrorController extends ApiController {
 
 }

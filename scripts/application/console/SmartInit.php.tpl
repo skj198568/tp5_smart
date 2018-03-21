@@ -25,16 +25,14 @@ use think\View;
  * Class ModelInit
  * @package app\console
  */
-class SmartInit extends Command
-{
+class SmartInit extends Command {
 
     /**
      * @var \think\View 视图类实例
      */
     protected $view;
 
-    protected function configure()
-    {
+    protected function configure() {
         $this->setName('smart_init')
             ->addOption('--table_name', '-t', Option::VALUE_REQUIRED, '不带前缀的数据库表名，例如：user_goods，如果参数为空则创建所有表')
             ->setDescription('依据数据库表自动创建Model模型、ApiController接口');
@@ -47,8 +45,7 @@ class SmartInit extends Command
      * @return int|null|void
      * @throws \think\Exception
      */
-    protected function execute(Input $input, Output $output)
-    {
+    protected function execute(Input $input, Output $output) {
         //设置view
         $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
         //设置Mysql
@@ -72,8 +69,7 @@ class SmartInit extends Command
      * @return bool
      * @throws \think\Exception
      */
-    protected function initModel(Input $input, Output $output)
-    {
+    protected function initModel(Input $input, Output $output) {
         $table_name = $input->getOption('table_name');
         if (empty($table_name)) {
             //创建所有的
@@ -95,8 +91,7 @@ class SmartInit extends Command
      * @param $table_name
      * @return string
      */
-    private function getTableNameWithPrefix($table_name)
-    {
+    private function getTableNameWithPrefix($table_name) {
         return config('database.prefix') . $table_name;
     }
 
@@ -105,11 +100,10 @@ class SmartInit extends Command
      * @param $table_name
      * @return string
      */
-    private function tableNameFormat($table_name)
-    {
+    private function tableNameFormat($table_name) {
         if (strpos($table_name, '_')) {
             $table_name_array = explode('_', $table_name);
-            $table_name = '';
+            $table_name       = '';
             foreach ($table_name_array as $v) {
                 $table_name .= ucfirst($v);
             }
@@ -124,20 +118,19 @@ class SmartInit extends Command
      * @param $table_name
      * @return mixed
      */
-    public function getTableComment($table_name)
-    {
-        $table_name = $this->getTableNameWithPrefix($table_name);
+    public function getTableComment($table_name) {
+        $table_name    = $this->getTableNameWithPrefix($table_name);
         $table_comment = ClMysql::query(sprintf("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name));
-        $return = [
-            'name' => '',
+        $return        = [
+            'name'     => '',
             'is_cache' => 0
         ];
-        foreach($table_comment as $each_comment){
+        foreach ($table_comment as $each_comment) {
             $comment = json_decode($each_comment['TABLE_COMMENT'], true);
-            if(empty($comment)){
+            if (empty($comment)) {
                 $return['name'] = $each_comment['TABLE_COMMENT'];
-            }else{
-                if(!isset($table_comment['is_cache'])){
+            } else {
+                if (!isset($table_comment['is_cache'])) {
                     $table_comment['is_cache'] = 0;
                 }
                 $return = array_merge($return, $comment);
@@ -153,8 +146,7 @@ class SmartInit extends Command
      * @return bool
      * @throws \think\Exception
      */
-    protected function dealModelMap($table_name, Output $output)
-    {
+    protected function dealModelMap($table_name, Output $output) {
         $table_info = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
         if (empty($table_info)) {
             $output->highlight(sprintf('table name:%s is not exist.', $table_name));
@@ -162,7 +154,7 @@ class SmartInit extends Command
         }
         $map_template_file = __DIR__ . '/smart_init_templates/model_map.tpl';
         //所有字段
-        $all_fields = [];
+        $all_fields   = [];
         $const_fields = '';
         //额外展示字段
         $fields_show_map_fields = [];
@@ -184,11 +176,11 @@ class SmartInit extends Command
                 continue;
             }
             $field_comment = json_decode($each['Comment'], true);
-            if(empty($field_comment)){
+            if (empty($field_comment)) {
                 $field_comment = ['name' => $each['Comment']];
             }
             $fields_names['self::F_' . strtoupper($each['Field'])] = $field_comment['name'];
-            $const_fields .= sprintf("
+            $const_fields                                          .= sprintf("
     /**
      * %s
      * Type: %s
@@ -199,11 +191,11 @@ class SmartInit extends Command
             //处理静态参数
             if (isset($field_comment['const_values']) && !empty($field_comment['const_values'])) {
                 //处理格式化参数
-                if(!isset($field_comment['show_format']) || empty($field_comment['show_format'])){
+                if (!isset($field_comment['show_format']) || empty($field_comment['show_format'])) {
                     $field_comment['show_format'] = [];
                 }
                 $format = [];
-                foreach($field_comment['const_values'] as $const_value_array){
+                foreach ($field_comment['const_values'] as $const_value_array) {
                     $format[] = [$const_value_array[1], $const_value_array[2]];
                 }
                 //新增格式化字段
@@ -221,25 +213,25 @@ class SmartInit extends Command
             //设置校验器，默认有长度限制
             if (isset($field_comment['verifies'])) {
                 $has_verify_length_max = false;
-                foreach($field_comment['verifies'] as $each_verify){
-                    if($each_verify[0] == 'length_max'){
+                foreach ($field_comment['verifies'] as $each_verify) {
+                    if ($each_verify[0] == 'length_max') {
                         $has_verify_length_max = true;
                         break;
                     }
                 }
-                if(!$has_verify_length_max){
+                if (!$has_verify_length_max) {
                     $max_length = ClString::getBetween($each['Type'], '(', ')', false);
-                    if(is_numeric($max_length) && $max_length > 0){
+                    if (is_numeric($max_length) && $max_length > 0) {
                         $field_comment['verifies'] = array_merge($field_comment['verifies'], ClFieldVerify::instance()->verifyStringLengthMax($max_length)->fetchVerifies());
                     }
                 }
-            }else{
+            } else {
                 $max_length = ClString::getBetween($each['Type'], '(', ')', false);
-                if(is_numeric($max_length) && $max_length > 0){
+                if (is_numeric($max_length) && $max_length > 0) {
                     $field_comment['verifies'] = ClFieldVerify::instance()->verifyStringLengthMax($max_length)->fetchVerifies();
                 }
             }
-            if(isset($field_comment['verifies'])){
+            if (isset($field_comment['verifies'])) {
                 $fields_verifies['self::F_' . strtoupper($each['Field'])] = $field_comment['verifies'];
             }
             //设置只读字段
@@ -247,19 +239,19 @@ class SmartInit extends Command
                 $fields_read_only[] = 'self::F_' . strtoupper($each['Field']);
             }
             //设置不可见字段
-            if(isset($field_comment['visible']) && $field_comment['visible'] == 0){
+            if (isset($field_comment['visible']) && $field_comment['visible'] == 0) {
                 $fields_invisible[] = 'self::F_' . strtoupper($each['Field']);
             }
             //设置额外显示字段
-            if(isset($field_comment['show_map_fields'])){
+            if (isset($field_comment['show_map_fields'])) {
                 $fields_show_map_fields['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['show_map_fields'], JSON_UNESCAPED_UNICODE);
             }
             //设置字段格式化
-            if(isset($field_comment['show_format'])){
+            if (isset($field_comment['show_format'])) {
                 $fields_show_format['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['show_format'], JSON_UNESCAPED_UNICODE);
             }
             //设置字段存储格式
-            if(isset($field_comment['store_format'])){
+            if (isset($field_comment['store_format'])) {
                 $fields_store_format['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['store_format'], JSON_UNESCAPED_UNICODE);
             }
         }
@@ -270,25 +262,25 @@ class SmartInit extends Command
             $fields_verifies_string .= sprintf('
         %s => %s, ', $field, json_encode($verify_array, JSON_UNESCAPED_UNICODE));
         }
-        $content = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date' => date('Y/m/d') . "\n",
-                'time' => date('H:i:s') . "\n",
-                'table_comment' => $this->getTableComment($table_name),
-                'table_name' => $this->tableNameFormat($table_name),
-                'table_name_with_prefix' => $this->getTableNameWithPrefix($table_name),
-                'const_fields' => $const_fields,
-                'fields_verifies' => empty($fields_verifies_string) ? '' : trim($fields_verifies_string, ',') . "\n    ",
-                'fields_read_only' => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
-                'all_fields_str' => implode(', ', $all_fields),
-                'fields_show_map_fields' => $fields_show_map_fields,
+        $content  = "<?php\n" . $this->view->fetch($map_template_file, [
+                'date'                        => date('Y/m/d') . "\n",
+                'time'                        => date('H:i:s') . "\n",
+                'table_comment'               => $this->getTableComment($table_name),
+                'table_name'                  => $this->tableNameFormat($table_name),
+                'table_name_with_prefix'      => $this->getTableNameWithPrefix($table_name),
+                'const_fields'                => $const_fields,
+                'fields_verifies'             => empty($fields_verifies_string) ? '' : trim($fields_verifies_string, ',') . "\n    ",
+                'fields_read_only'            => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
+                'all_fields_str'              => implode(', ', $all_fields),
+                'fields_show_map_fields'      => $fields_show_map_fields,
                 'fields_show_map_fields_keys' => array_keys($fields_show_map_fields),
-                'fields_show_format' => $fields_show_format,
-                'fields_show_format_keys' => array_keys($fields_show_format),
-                'fields_store_format' => $fields_store_format,
-                'fields_store_format_keys' => array_keys($fields_store_format),
-                'fields_invisible' => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
-                'fields_names' => $fields_names,
-                'fields_names_keys' => array_keys($fields_names),
+                'fields_show_format'          => $fields_show_format,
+                'fields_show_format_keys'     => array_keys($fields_show_format),
+                'fields_store_format'         => $fields_store_format,
+                'fields_store_format_keys'    => array_keys($fields_store_format),
+                'fields_invisible'            => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
+                'fields_names'                => $fields_names,
+                'fields_names_keys'           => array_keys($fields_names),
             ]);
         $map_file = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         //创建文件夹
@@ -306,18 +298,17 @@ class SmartInit extends Command
      * @return bool
      * @throws \think\Exception
      */
-    protected function dealModel($table_name, Output $output)
-    {
+    protected function dealModel($table_name, Output $output) {
         $model_name_file = APP_PATH . 'index/model/' . $this->tableNameFormat($table_name) . 'Model.php';
         if (is_file($model_name_file)) {
             $output->highlight('[Model]:' . $model_name_file . " is exist");
             return false;
         }
         $template_file = __DIR__ . '/smart_init_templates/model.tpl';
-        $content =  "<?php\n" . $this->view->fetch($template_file, [
-                'date' => date('Y/m/d') . "\n",
-                'time' => date('H:i:s') . "\n",
-                'table_name' => $this->tableNameFormat($table_name),
+        $content       = "<?php\n" . $this->view->fetch($template_file, [
+                'date'          => date('Y/m/d') . "\n",
+                'time'          => date('H:i:s') . "\n",
+                'table_name'    => $this->tableNameFormat($table_name),
                 'table_comment' => $this->getTableComment($table_name)
             ]);
         if (!empty($content)) {
@@ -332,21 +323,20 @@ class SmartInit extends Command
      * 获取所有的表格
      * @return array
      */
-    private function getAllTables()
-    {
+    private function getAllTables() {
         $database_prefix = config('database.prefix');
-        $tables = ClMysql::query("SHOW TABLES LIKE '" . $database_prefix . "%'");
-        $table_names = [];
+        $tables          = ClMysql::query("SHOW TABLES LIKE '" . $database_prefix . "%'");
+        $table_names     = [];
         foreach ($tables as $k => $table_name) {
             $table_name = array_pop($table_name);
-            if(!empty($database_prefix) && strpos($table_name, $database_prefix) !== 0){
+            if (!empty($database_prefix) && strpos($table_name, $database_prefix) !== 0) {
                 continue;
             }
             $table_name = ClString::replaceOnce($database_prefix, '', $table_name);
             if ($table_name != 'migrations') {
                 //处理分表问题
                 $table_comment = json_encode($this->getTableComment($table_name), JSON_UNESCAPED_UNICODE);
-                if(!array_key_exists($table_comment, $table_names)){
+                if (!array_key_exists($table_comment, $table_names)) {
                     $table_names[$table_comment] = $table_name;
                 }
             }
@@ -361,8 +351,7 @@ class SmartInit extends Command
      * @return bool
      * @throws \think\Exception
      */
-    protected function initController(Input $input, Output $output)
-    {
+    protected function initController(Input $input, Output $output) {
         ClMysql::init(config('database.hostname'), config('database.hostport'), config('database.username'), config('database.password'), config('database.database'));
         $table_name = $input->getOption('table_name');
         if (empty($table_name)) {
@@ -387,84 +376,84 @@ class SmartInit extends Command
      * @return bool
      * @throws \think\Exception
      */
-    private function dealControllerApiBase($table_name, Output $output){
+    private function dealControllerApiBase($table_name, Output $output) {
         //如果不创建api，则忽略
         $table_comment = $this->getTableComment($table_name);
-        $table_info = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
+        $table_info    = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
         if (empty($table_info)) {
             $output->highlight(sprintf('table name:%s is not exist.', $table_name));
             return false;
         }
         $table_name_format = $this->tableNameFormat($table_name);
-        $info = [];
-        foreach($table_info as $k => $each){
-            if(empty($each['Comment'])){
+        $info              = [];
+        foreach ($table_info as $k => $each) {
+            if (empty($each['Comment'])) {
                 $comment = [];
-            }else{
+            } else {
                 $comment = json_decode($each['Comment'], true);
-                if(empty($comment)){
+                if (empty($comment)) {
                     $comment = ['name' => $comment];
                 }
             }
             //如果是不可见字段，则忽略
-            if(isset($comment['visible']) && $comment['visible'] == 0){
+            if (isset($comment['visible']) && $comment['visible'] == 0) {
                 continue;
             }
             $info[$each['Field']] = empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'];
             //静态变量
             $const_str = '';
-            if(isset($comment['const_values'])){
-                foreach($comment['const_values'] as $each_const_value){
+            if (isset($comment['const_values'])) {
+                foreach ($comment['const_values'] as $each_const_value) {
                     $const_str .= sprintf(' %s/%s;', $each_const_value[1], $each_const_value[2]);
                 }
-                if(!empty($const_str)){
+                if (!empty($const_str)) {
                     $info[$each['Field']] .= sprintf(':%s', $const_str);
                 }
             }
             //额外字段
-            if(isset($comment['show_map_fields'])){
-                foreach($comment['show_map_fields'] as $each_field){
+            if (isset($comment['show_map_fields'])) {
+                foreach ($comment['show_map_fields'] as $each_field) {
                     $info[$each_field[1]] = $each_field[2];
                 }
             }
         }
-        $ar_get_list_json = [
+        $ar_get_list_json  = [
             'status' => strtolower(sprintf('api/%s/getList/1', $table_name)),
-            'limit' => 15,
-            'page' => 1,
-            'total' => 10,
-            'items' => [$info]
+            'limit'  => 15,
+            'page'   => 1,
+            'total'  => 10,
+            'items'  => [$info]
         ];
-        $ar_get_json = [
+        $ar_get_json       = [
             'status' => strtolower(sprintf('api/%s/get/1', $table_name)),
-            'info' => $info
+            'info'   => $info
         ];
-        $ar_create_json = [
+        $ar_create_json    = [
             'status' => strtolower(sprintf('api/%s/create/1', $table_name)),
-            'info' => $info
+            'info'   => $info
         ];
-        $ar_update_json = [
+        $ar_update_json    = [
             'status' => strtolower(sprintf('api/%s/update/1', $table_name)),
-            'info' => $info
+            'info'   => $info
         ];
-        $ar_delete_json = [
+        $ar_delete_json    = [
             'status' => strtolower(sprintf('api/%s/delete/1', $table_name)),
-            'id' => '主键id'
+            'id'     => '主键id'
         ];
         $map_template_file = __DIR__ . '/smart_init_templates/controller_base.tpl';
-        $content = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date' => date('Y/m/d') . "\n",
-                'time' => date('H:i:s') . "\n",
-                'table_name' => $table_name_format,
-                'table_comment' => $this->getTableComment($table_name),
+        $content           = "<?php\n" . $this->view->fetch($map_template_file, [
+                'date'             => date('Y/m/d') . "\n",
+                'time'             => date('H:i:s') . "\n",
+                'table_name'       => $table_name_format,
+                'table_comment'    => $this->getTableComment($table_name),
                 'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_json' => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
-                'ar_create_json' => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
-                'ar_update_json' => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
-                'ar_delete_json' => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
-                'create_api' => $table_comment['create_api']
+                'ar_get_json'      => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
+                'ar_create_json'   => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_json'   => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
+                'ar_delete_json'   => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
+                'create_api'       => $table_comment['create_api']
             ]);
-        if(!empty($content)){
+        if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
             //创建文件夹
             ClFile::dirCreate($base_name_file);
@@ -482,19 +471,19 @@ class SmartInit extends Command
      * @return bool
      * @throws \think\Exception
      */
-    private function dealController($table_name, Output $output){
-        $api_controller_file = APP_PATH . 'api/controller/' . $this->tableNameFormat($table_name).'Controller.php';
+    private function dealController($table_name, Output $output) {
+        $api_controller_file = APP_PATH . 'api/controller/' . $this->tableNameFormat($table_name) . 'Controller.php';
         if (is_file($api_controller_file)) {
             $output->highlight('[ApiController]:' . $api_controller_file . " is exist.");
             return false;
         }
-        $map_template_file = __DIR__ . '/smart_init_templates/controller.tpl';
-        $table_comment = $this->getTableComment($table_name);
+        $map_template_file     = __DIR__ . '/smart_init_templates/controller.tpl';
+        $table_comment         = $this->getTableComment($table_name);
         $table_comment['name'] .= "\n";
-        $content = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date' => date('Y/m/d') . "\n",
-                'time' => date('H:i:s') . "\n",
-                'table_name' => $this->tableNameFormat($table_name),
+        $content               = "<?php\n" . $this->view->fetch($map_template_file, [
+                'date'          => date('Y/m/d') . "\n",
+                'time'          => date('H:i:s') . "\n",
+                'table_name'    => $this->tableNameFormat($table_name),
                 'table_comment' => $table_comment
             ]);
         if (!empty($content)) {

@@ -23,8 +23,7 @@ use Workerman\Worker;
  * Class BrowserSync
  * @package app\console
  */
-class BrowserSync extends Command
-{
+class BrowserSync extends Command {
 
     /**
      * socket端口
@@ -78,8 +77,7 @@ class BrowserSync extends Command
      * 实例对象
      * @return BrowserSync|null
      */
-    public static function instance()
-    {
+    public static function instance() {
         if (self::$instance_instance == null) {
             self::$instance_instance = new self();
         }
@@ -89,8 +87,7 @@ class BrowserSync extends Command
     /**
      * 配置文件
      */
-    protected function configure()
-    {
+    protected function configure() {
         $this->setName('browser_sync')
             ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，分号分割，英文双引号包围，例如：".html;.js;.css;.php"', '".html;.js;.css;.php"')
             ->addOption('--dirs', '-d', Option::VALUE_REQUIRED, '监听web根目录下变化的文件夹，分号分割，例如：application;public', 'application;public')
@@ -105,15 +102,14 @@ class BrowserSync extends Command
      * @param Output $output
      * @return bool
      */
-    protected function execute(Input $input, Output $output)
-    {
+    protected function execute(Input $input, Output $output) {
         set_time_limit(0);
         if (!is_dir(LOG_PATH)) {
             ClFile::dirCreate(LOG_PATH);
         }
         $this->output_object = $output;
-        $this->input_object = $input;
-        $this->socket_port = $input->getOption('port');
+        $this->input_object  = $input;
+        $this->socket_port   = $input->getOption('port');
         //校验文件类型
         $files_types = $this->input_object->getOption('file_types');
         $files_types = trim(trim($files_types, '"'), "'");
@@ -123,7 +119,7 @@ class BrowserSync extends Command
         }
         $command = $this->input_object->getOption('command');
         $command = trim($command);
-        if(in_array($command, ['start', 'start-d'])){
+        if (in_array($command, ['start', 'start-d'])) {
             $this->output_object->highlight(sprintf('监听文件:%s', $files_types));
         }
         return $this->syncClient();
@@ -133,16 +129,14 @@ class BrowserSync extends Command
      * 输出信息
      * @param $msg
      */
-    private function output($msg)
-    {
+    private function output($msg) {
         $this->output_object->highlight($msg);
     }
 
     /**
      * 同步客户端
      */
-    private function syncClient()
-    {
+    private function syncClient() {
         $command = $this->input_object->getOption('command');
         $command = trim($command);
         $command = ClString::spaceManyToOne($command);
@@ -162,7 +156,7 @@ class BrowserSync extends Command
         //设置进程id文件地址
         $worker::$pidFile = $this->worker_man_pid_file;
         //设置日志文件
-        $worker::$logFile = $this->worker_man_log_file;
+        $worker::$logFile      = $this->worker_man_log_file;
         $worker->onWorkerStart = function ($worker) {
             //定时器定时监听
             Timer::add(1, function () use ($worker) {
@@ -176,7 +170,7 @@ class BrowserSync extends Command
                 }
             });
         };
-        $worker->onWorkerStop = function ($worker) {
+        $worker->onWorkerStop  = function ($worker) {
             //删除端口号
             $this->port(-1);
             //刷新页面
@@ -195,8 +189,7 @@ class BrowserSync extends Command
      * @param int $port 0/获取， < 0 / 删除，> 0 / 设置
      * @return bool|mixed
      */
-    public function port($port = 0)
-    {
+    public function port($port = 0) {
         //清除缓存
         clearstatcache();
         if (empty($port)) {
@@ -227,8 +220,7 @@ class BrowserSync extends Command
      * 获取js拼接内容
      * @return string
      */
-    public function getJsContent()
-    {
+    public function getJsContent() {
         $port = $this->port();
         //服务如果没有开启
         if (empty($port)) {
@@ -236,13 +228,13 @@ class BrowserSync extends Command
         }
         //如果以端口方式访问
         $host = request()->host();
-        if(strpos($host, ':') !== false){
+        if (strpos($host, ':') !== false) {
             return '';
         }
-        if(input('browser_sync', 1) == 0 || cookie('?browser_sync')){
-            cookie('browser_sync', 0, 3600*10);
+        if (input('browser_sync', 1) == 0 || cookie('?browser_sync')) {
+            cookie('browser_sync', 0, 3600 * 10);
             return '';
-        }else{
+        } else {
             //删除cookie
             cookie('browser_sync', null);
         }
@@ -258,18 +250,17 @@ class BrowserSync extends Command
      * 获取监听的文件是否被修改
      * @return bool
      */
-    private function fileIsModify()
-    {
+    private function fileIsModify() {
         //清除缓存
         clearstatcache();
         $last_scan_files = $this->scan_files;
-        $files_types = $this->input_object->getOption('file_types');
+        $files_types     = $this->input_object->getOption('file_types');
         //去除两端引号
         $files_types = explode(';', trim(trim(str_replace('；', ';', $files_types)), ';'));
-        $dirs = $this->input_object->getOption('dirs');
-        $root_path = dirname(dirname(__DIR__));
-        $dirs = explode(';', trim(trim(str_replace('；', ';', $dirs)), ';'));
-        $files = [];
+        $dirs        = $this->input_object->getOption('dirs');
+        $root_path   = dirname(dirname(__DIR__));
+        $dirs        = explode(';', trim(trim(str_replace('；', ';', $dirs)), ';'));
+        $files       = [];
         foreach ($dirs as $dir) {
             if (empty($dir) || !is_dir($root_path . '/' . $dir)) {
                 continue;
@@ -305,8 +296,7 @@ class BrowserSync extends Command
     /**
      * 析构函数
      */
-    public function __destruct()
-    {
+    public function __destruct() {
 
     }
 

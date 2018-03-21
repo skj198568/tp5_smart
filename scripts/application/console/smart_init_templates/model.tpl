@@ -12,8 +12,7 @@ use app\index\map\{$table_name}Map;
 /**
  * {$table_comment['name']} Model
  */
-class {$table_name}Model extends {$table_name}Map
-{
+class {$table_name}Model extends {$table_name}Map {
 
     /**
      * 实例对象存放数组
@@ -26,16 +25,15 @@ class {$table_name}Model extends {$table_name}Map
      * @param int $id -1/获取实例数量，-2/自动新增一个实例
      * @return int|mixed|null|static
      */
-    public static function instance($id = 0)
-    {
-        if($id >= 0){
+    public static function instance($id = 0) {
+        if($id >= 0) {
             if (!isset(self::$instances_array[$id])) {
                 self::$instances_array[$id] = new self();
             }
             return self::$instances_array[$id];
-        }else if($id == -1){
+        }else if($id == -1) {
             return count(self::$instances_array);
-        }else if($id == -2){
+        }else if($id == -2) {
             return self::instance(count(self::$instances_array));
         }else{
             return null;
@@ -46,9 +44,8 @@ class {$table_name}Model extends {$table_name}Map
      * 缓存清除触发器
      * @param $item
      */
-    protected function cacheRemoveTrigger($item)
-    {
-        if(isset($item[self::F_ID])){
+    protected function cacheRemoveTrigger($item) {
+        if(isset($item[self::F_ID])) {
             self::getByIdRc($item[self::F_ID]);
         }
     }

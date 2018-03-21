@@ -15,7 +15,6 @@ use app\api\base\{$table_name}BaseApiController;
  * Class {$table_name}Controller
  * @package app\api\controller
  */
-class {$table_name}Controller extends {$table_name}BaseApiController
-{
+class {$table_name}Controller extends {$table_name}BaseApiController {
 
 }

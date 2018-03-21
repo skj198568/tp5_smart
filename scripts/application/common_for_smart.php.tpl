@@ -15,8 +15,7 @@ use think\Log;
 /**
  * 写日志函数
  */
-function log_info()
-{
+function log_info() {
     $args = func_get_args();
     if (!empty($args)) {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
@@ -29,8 +28,7 @@ function log_info()
 /**
  * 输出信息
  */
-function echo_info()
-{
+function echo_info() {
     $args = func_get_args();
     if (!empty($args)) {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
@@ -47,8 +45,7 @@ function echo_info()
 /**
  * 记录日志and输出
  */
-function le_info()
-{
+function le_info() {
     $args = func_get_args();
     if (!empty($args)) {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
@@ -73,8 +70,7 @@ function le_info()
  * @param string $filter 过滤器，参考input方法
  * @return mixed
  */
-function get_param($key = '', $verifies = [], $desc = '', $default = null, $filter = '')
-{
+function get_param($key = '', $verifies = [], $desc = '', $default = null, $filter = '') {
     if (strpos($desc, ',') !== false) {
         exit(sprintf('%s含有非法字符","，请改成中文"，"', $desc));
     }
@@ -89,7 +85,7 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
         }
     }
     //校验参数
-    if($value != $default){
+    if ($value != $default) {
         \ClassLibrary\ClFieldVerify::verifyFields([$key => $value], [$key => $verifies]);
     }
     return $value;
@@ -106,8 +102,7 @@ const PAGES_NUM = 15;
  * @param bool $is_log
  * @return \think\response\Json|\think\response\Jsonp
  */
-function json_return($data, $is_log = false)
-{
+function json_return($data, $is_log = false) {
     //调试模式下，记录信息
     if (\think\App::$debug || $is_log) {
         //将请求地址加入返回数组中，用于区别请求内容

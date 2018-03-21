@@ -8,6 +8,7 @@
  */
 
 namespace think\log\driver;
+
 use ClassLibrary\ClHttp;
 
 /**
@@ -15,8 +16,7 @@ use ClassLibrary\ClHttp;
  * Class Udp
  * @package think\log\driver
  */
-class Udp
-{
+class Udp {
 
     /**
      * 日志写入接口
@@ -26,11 +26,11 @@ class Udp
      */
     public function save($log) {
         $report_address = config('REMOTE_UDP_LOG_ADDRESS');
-        if(empty($report_address)){
+        if (empty($report_address)) {
             exit('please config `REMOTE_UDP_LOG_ADDRESS`');
         }
         //添加域名、ip
-        $log = ClHttp::getServerDomain().' '.request()->ip() . "\n" . $log;
+        $log    = ClHttp::getServerDomain() . ' ' . request()->ip() . "\n" . $log;
         $socket = stream_socket_client($report_address);
         if (!$socket) {
             return false;

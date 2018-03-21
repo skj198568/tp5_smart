@@ -18,8 +18,7 @@ use think\db\Query;
  * 基础Model
  * Class BaseModel
  */
-class BaseModel extends Query
-{
+class BaseModel extends Query {
 
     /**
      * @var int 有效数字标识 1
@@ -94,8 +93,7 @@ class BaseModel extends Query
      * @param array $exclude_fields 不包含的字段
      * @return array
      */
-    public static function getAllFields($exclude_fields = [self::F_ID])
-    {
+    public static function getAllFields($exclude_fields = [self::F_ID]) {
         return [];
     }
 
@@ -108,16 +106,15 @@ class BaseModel extends Query
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function execute($sql, $bind = [])
-    {
+    public function execute($sql, $bind = []) {
         if (strpos($sql, 'UPDATE') === 0 || strpos($sql, 'DELETE') === 0) {
             //先查询，后执行
-            $last_sql = $this->connection->getRealSql($sql, $bind);
-            $table_name = substr($last_sql, strpos($last_sql, '`') + 1);
-            $table_name = substr($table_name, 0, strpos($table_name, '`'));
+            $last_sql    = $this->connection->getRealSql($sql, $bind);
+            $table_name  = substr($last_sql, strpos($last_sql, '`') + 1);
+            $table_name  = substr($table_name, 0, strpos($table_name, '`'));
             $trigger_sql = sprintf('SELECT * FROM `%s` %s', $table_name, substr($last_sql, strpos($last_sql, 'WHERE')));
-            $items = $this->query($trigger_sql);
-            $result = parent::execute($sql, $bind);
+            $items       = $this->query($trigger_sql);
+            $result      = parent::execute($sql, $bind);
             if (!empty($items)) {
                 if (!ClArray::isLinearArray($items)) {
                     //多维数组
@@ -145,8 +142,7 @@ class BaseModel extends Query
      * @param null $sequence
      * @return int|string
      */
-    public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null)
-    {
+    public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
         //自动完成字段
@@ -156,21 +152,21 @@ class BaseModel extends Query
             }
         }
         //存储格式处理
-        if(!empty(static::$fields_store_format)){
-            foreach(static::$fields_store_format as $k_field => $each_field_store_format){
-                if(isset($data[$k_field])){
-                    if(is_array($each_field_store_format)){
-                        switch ($each_field_store_format[0]){
+        if (!empty(static::$fields_store_format)) {
+            foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
+                if (isset($data[$k_field])) {
+                    if (is_array($each_field_store_format)) {
+                        switch ($each_field_store_format[0]) {
                             case 'password':
-                                $data[$k_field] = md5($data[$k_field].$each_field_store_format[1]);
+                                $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
                                 break;
                         }
-                    }else{
-                        switch ($each_field_store_format){
+                    } else {
+                        switch ($each_field_store_format) {
                             case 'json':
-                                if(empty($data[$k_field])){
+                                if (empty($data[$k_field])) {
                                     $data[$k_field] = [];
-                                }else if(!is_array($data[$k_field])){
+                                } else if (!is_array($data[$k_field])) {
                                     $data[$k_field] = [$data[$k_field]];
                                 }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
@@ -198,13 +194,12 @@ class BaseModel extends Query
     /**
      * 批量插入记录
      * @access public
-     * @param mixed     $dataSet 数据集
-     * @param boolean   $replace  是否replace
-     * @param integer   $limit   每次写入数据限制
+     * @param mixed $dataSet 数据集
+     * @param boolean $replace 是否replace
+     * @param integer $limit 每次写入数据限制
      * @return integer|string
      */
-    public function insertAll(array $dataSet, $replace = false, $limit = null)
-    {
+    public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
         foreach ($dataSet as $data) {
             ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
@@ -218,21 +213,21 @@ class BaseModel extends Query
                 }
             }
             //存储格式处理
-            if(!empty(static::$fields_store_format)){
-                foreach(static::$fields_store_format as $k_field => $each_field_store_format){
-                    if(isset($data[$k_field])){
-                        if(is_array($each_field_store_format)){
-                            switch ($each_field_store_format[0]){
+            if (!empty(static::$fields_store_format)) {
+                foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
+                    if (isset($data[$k_field])) {
+                        if (is_array($each_field_store_format)) {
+                            switch ($each_field_store_format[0]) {
                                 case 'password':
-                                    $data[$k_field] = md5($data[$k_field].$each_field_store_format[1]);
+                                    $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
                                     break;
                             }
-                        }else{
-                            switch ($each_field_store_format){
+                        } else {
+                            switch ($each_field_store_format) {
                                 case 'json':
-                                    if(empty($data[$k_field])){
+                                    if (empty($data[$k_field])) {
                                         $data[$k_field] = [];
-                                    }else if(!is_array($data[$k_field])){
+                                    } else if (!is_array($data[$k_field])) {
                                         $data[$k_field] = [$data[$k_field]];
                                     }
                                     $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
@@ -265,8 +260,7 @@ class BaseModel extends Query
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public function update(array $data = [])
-    {
+    public function update(array $data = []) {
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance());
         //自动完成字段
@@ -276,21 +270,21 @@ class BaseModel extends Query
             }
         }
         //存储格式处理
-        if(!empty(static::$fields_store_format)){
-            foreach(static::$fields_store_format as $k_field => $each_field_store_format){
-                if(isset($data[$k_field])){
-                    if(is_array($each_field_store_format)){
-                        switch ($each_field_store_format[0]){
+        if (!empty(static::$fields_store_format)) {
+            foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
+                if (isset($data[$k_field])) {
+                    if (is_array($each_field_store_format)) {
+                        switch ($each_field_store_format[0]) {
                             case 'password':
-                                $data[$k_field] = md5($data[$k_field].$each_field_store_format[1]);
+                                $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
                                 break;
                         }
-                    }else{
-                        switch ($each_field_store_format){
+                    } else {
+                        switch ($each_field_store_format) {
                             case 'json':
-                                if(empty($data[$k_field])){
+                                if (empty($data[$k_field])) {
                                     $data[$k_field] = [];
-                                }else if(!is_array($data[$k_field])){
+                                } else if (!is_array($data[$k_field])) {
                                     $data[$k_field] = [$data[$k_field]];
                                 }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
@@ -314,56 +308,56 @@ class BaseModel extends Query
      * @param array $items
      * @return array|mixed
      */
-    private static function showMapFields($items){
-        if(empty($items)){
+    private static function showMapFields($items) {
+        if (empty($items)) {
             return $items;
         }
-        if(empty(static::$fields_show_map_fields)) {
+        if (empty(static::$fields_show_map_fields)) {
             return $items;
         }
         $is_linear_array = false;
         //一维数组，处理成多维数组
         if (ClArray::isLinearArray($items)) {
-            $items = [$items];
+            $items           = [$items];
             $is_linear_array = true;
         }
         //查询结果值
         $search_values = [];
         //额外字段拼接
-        foreach(static::$fields_show_map_fields as $field => $map_fields){
+        foreach (static::$fields_show_map_fields as $field => $map_fields) {
             foreach ($items as $k => $each) {
-                if(isset($each[$field])){
-                    foreach($map_fields as $each_map_field){
+                if (isset($each[$field])) {
+                    foreach ($map_fields as $each_map_field) {
                         $table_and_field = $each_map_field[0];
-                        $alias = $each_map_field[1];
-                        $fetch_field = ClString::getBetween($table_and_field, '.', '', false);
-                        $table_name = ClString::getBetween($table_and_field, '', '.', false);
-                        if(strpos($table_name, '_') !== false){
+                        $alias           = $each_map_field[1];
+                        $fetch_field     = ClString::getBetween($table_and_field, '.', '', false);
+                        $table_name      = ClString::getBetween($table_and_field, '', '.', false);
+                        if (strpos($table_name, '_') !== false) {
                             $table_name = explode('_', $table_name);
-                            foreach($table_name as $k_table_name => $each_table_and_field){
+                            foreach ($table_name as $k_table_name => $each_table_and_field) {
                                 $table_name[$k_table_name] = ucfirst($each_table_and_field);
                             }
                             $model = implode('', $table_name);
-                        }else{
+                        } else {
                             $model = ucfirst(ClString::getBetween($table_name, '', '.', false));
                         }
                         //拼接Model
                         $model .= 'Model';
-                        if(is_array($each[$field])){
+                        if (is_array($each[$field])) {
                             $each[$alias] = [];
-                            foreach($each[$field] as $each_field){
+                            foreach ($each[$field] as $each_field) {
                                 //考虑性能，对查询结果进行缓存
                                 $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each_field, $fetch_field);
-                                if(!isset($search_values[$key])){
+                                if (!isset($search_values[$key])) {
                                     $search_values[$key] = call_user_func_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each_field, $fetch_field]);
                                 }
                                 //获取信息
                                 $each[$alias][] = $search_values[$key];
                             }
-                        }else{
+                        } else {
                             //考虑性能，对查询结果进行缓存
                             $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each[$field], $fetch_field);
-                            if(!isset($search_values[$key])){
+                            if (!isset($search_values[$key])) {
                                 $search_values[$key] = call_user_func_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each[$field], $fetch_field]);
                             }
                             //获取信息
@@ -374,9 +368,9 @@ class BaseModel extends Query
                 $items[$k] = $each;
             }
         }
-        if($is_linear_array){
+        if ($is_linear_array) {
             return $items[0];
-        }else{
+        } else {
             return $items;
         }
     }
@@ -386,29 +380,29 @@ class BaseModel extends Query
      * @param array $items
      * @return array|mixed
      */
-    private static function showInvisible($items){
-        if(empty($items)){
+    private static function showInvisible($items) {
+        if (empty($items)) {
             return $items;
         }
-        if(empty(static::$fields_invisible)){
+        if (empty(static::$fields_invisible)) {
             return $items;
         }
         $is_linear_array = false;
         //一维数组，处理成多维数组
         if (ClArray::isLinearArray($items)) {
-            $items = [$items];
+            $items           = [$items];
             $is_linear_array = true;
         }
-        foreach($items as $k => $v){
-            foreach (static::$fields_invisible as $each_key){
-                if(array_key_exists($each_key, $v)){
+        foreach ($items as $k => $v) {
+            foreach (static::$fields_invisible as $each_key) {
+                if (array_key_exists($each_key, $v)) {
                     unset($items[$k][$each_key]);
                 }
             }
         }
-        if($is_linear_array){
+        if ($is_linear_array) {
             return $items[0];
-        }else{
+        } else {
             return $items;
         }
     }
@@ -418,50 +412,50 @@ class BaseModel extends Query
      * @param array $items
      * @return array|mixed
      */
-    private static function showFormat($items){
-        if(empty($items)){
+    private static function showFormat($items) {
+        if (empty($items)) {
             return $items;
         }
-        if(empty(static::$fields_show_format)){
+        if (empty(static::$fields_show_format)) {
             return $items;
         }
         $is_linear_array = false;
         //一维数组，处理成多维数组
         if (ClArray::isLinearArray($items)) {
-            $items = [$items];
+            $items           = [$items];
             $is_linear_array = true;
         }
-        foreach($items as $k => $item){
-            foreach(static::$fields_show_format as $k_format_key => $each_format){
-                if(!isset($item[$k_format_key])){
+        foreach ($items as $k => $item) {
+            foreach (static::$fields_show_format as $k_format_key => $each_format) {
+                if (!isset($item[$k_format_key])) {
                     continue;
                 }
-                foreach ($each_format as $each_format_item){
-                    if(is_string($each_format_item[0]) && strpos($each_format_item[0], '%s') !== false){
+                foreach ($each_format as $each_format_item) {
+                    if (is_string($each_format_item[0]) && strpos($each_format_item[0], '%s') !== false) {
                         //函数型格式化
-                        if(!is_numeric($item[$k_format_key]) && empty($item[$k_format_key])){
+                        if (!is_numeric($item[$k_format_key]) && empty($item[$k_format_key])) {
                             //如果为空，则取消格式化
-                            $item[$k_format_key.$each_format_item[1]] = '';
-                        }else{
+                            $item[$k_format_key . $each_format_item[1]] = '';
+                        } else {
                             $format_string = sprintf('%s;', sprintf($each_format_item[0], $item[$k_format_key]));
-                            $function = ClString::getBetween($format_string, '', '(', false);
-                            $params = ClString::getBetween($format_string, '(', ')',false);
-                            if(strpos($params, ',') !== false){
+                            $function      = ClString::getBetween($format_string, '', '(', false);
+                            $params        = ClString::getBetween($format_string, '(', ')', false);
+                            if (strpos($params, ',') !== false) {
                                 $params = explode(',', $params);
-                            }else{
+                            } else {
                                 $params = [$params];
                             }
-                            $item[$k_format_key.$each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
+                            $item[$k_format_key . $each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
                         }
-                    }else{
+                    } else {
                         //数组式格式化
-                        if(!is_numeric($item[$k_format_key]) && empty($item[$k_format_key])){
+                        if (!is_numeric($item[$k_format_key]) && empty($item[$k_format_key])) {
                             //如果为空，则取消格式化
-                            $item[$k_format_key.$each_format_item[1]] = '';
-                        }else {
-                            foreach((array)$each_format_item[0] as $each_format_item_each){
-                                if($each_format_item_each[0] == $item[$k_format_key]){
-                                    $item[$k_format_key.$each_format_item[1]] = $each_format_item_each[1];
+                            $item[$k_format_key . $each_format_item[1]] = '';
+                        } else {
+                            foreach ((array)$each_format_item[0] as $each_format_item_each) {
+                                if ($each_format_item_each[0] == $item[$k_format_key]) {
+                                    $item[$k_format_key . $each_format_item[1]] = $each_format_item_each[1];
                                 }
                             }
                         }
@@ -470,9 +464,9 @@ class BaseModel extends Query
             }
             $items[$k] = $item;
         }
-        if($is_linear_array){
+        if ($is_linear_array) {
             return $items[0];
-        }else{
+        } else {
             return $items;
         }
     }
@@ -482,8 +476,7 @@ class BaseModel extends Query
      * @param int $id
      * @return mixed|null|static
      */
-    public static function instance($id = 0)
-    {
+    public static function instance($id = 0) {
         return null;
     }
 
@@ -491,8 +484,7 @@ class BaseModel extends Query
      * 缓存清除触发器
      * @param $item
      */
-    protected function cacheRemoveTrigger($item)
-    {
+    protected function cacheRemoveTrigger($item) {
 
     }
 
@@ -503,16 +495,15 @@ class BaseModel extends Query
      * @param null $tag
      * @return $this
      */
-    public function cache($key = true, $expire = null, $tag = null)
-    {
-        if(is_null($expire)){
-            if(is_numeric($key)){
-                $key = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], []);
+    public function cache($key = true, $expire = null, $tag = null) {
+        if (is_null($expire)) {
+            if (is_numeric($key)) {
+                $key    = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], []);
                 $expire = $key;
-            }else{
+            } else {
                 $key = false;
             }
-        }else{
+        } else {
             $key = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], !is_array($key) ? [$key] : $key);
         }
         parent::cache($key, $expire, $tag);
@@ -524,7 +515,7 @@ class BaseModel extends Query
      * @param $items
      * @return array|mixed
      */
-    public static function forShow($items){
+    public static function forShow($items) {
         return self::showFormat(self::showInvisible(self::showMapFields($items)));
     }
 
@@ -536,26 +527,25 @@ class BaseModel extends Query
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function select($data = null)
-    {
+    public function select($data = null) {
         $data = parent::select($data);
-        if(empty($data)){
+        if (empty($data)) {
             return [];
         }
-        if(is_array($data)){
+        if (is_array($data)) {
             //存储格式处理
-            if(!empty(static::$fields_store_format)){
-                foreach($data as $k => $each){
-                    foreach(static::$fields_store_format as $k_field => $each_field_store_format){
-                        if(isset($each[$k_field])){
-                            if(is_string($each_field_store_format)){
-                                switch ($each_field_store_format){
+            if (!empty(static::$fields_store_format)) {
+                foreach ($data as $k => $each) {
+                    foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
+                        if (isset($each[$k_field])) {
+                            if (is_string($each_field_store_format)) {
+                                switch ($each_field_store_format) {
                                     case 'json':
-                                        if(empty($each[$k_field])){
+                                        if (empty($each[$k_field])) {
                                             $data[$k][$k_field] = [];
-                                        }else{
+                                        } else {
                                             $data[$k][$k_field] = json_decode($each[$k_field], true);
-                                            if(is_null($data[$k][$k_field])){
+                                            if (is_null($data[$k][$k_field])) {
                                                 $data[$k][$k_field] = [];
                                             }
                                         }
@@ -578,24 +568,23 @@ class BaseModel extends Query
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function find($data = null)
-    {
+    public function find($data = null) {
         $data = parent::find($data);
-        if(empty($data)){
+        if (empty($data)) {
             return [];
         }
         //存储格式处理
-        if(!empty(static::$fields_store_format)){
-            foreach(static::$fields_store_format as $k_field => $each_field_store_format){
-                if(isset($data[$k_field])){
-                    if(is_string($each_field_store_format)){
-                        switch ($each_field_store_format){
+        if (!empty(static::$fields_store_format)) {
+            foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
+                if (isset($data[$k_field])) {
+                    if (is_string($each_field_store_format)) {
+                        switch ($each_field_store_format) {
                             case 'json':
-                                if(empty($data[$k_field])){
+                                if (empty($data[$k_field])) {
                                     $data[$k_field] = [];
-                                }else{
+                                } else {
                                     $data[$k_field] = json_decode($data[$k_field], true);
-                                    if(is_null($data[$k_field])){
+                                    if (is_null($data[$k_field])) {
                                         $data[$k_field] = [];
                                     }
                                 }
@@ -615,18 +604,17 @@ class BaseModel extends Query
      * @param bool $force
      * @return mixed
      */
-    public function value($field, $default = null, $force = false)
-    {
+    public function value($field, $default = null, $force = false) {
         $value = parent::value($field, $default, $force);
-        if(!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)){
-            if(is_string(static::$fields_store_format[$field])){
-                switch (static::$fields_store_format[$field]){
+        if (!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)) {
+            if (is_string(static::$fields_store_format[$field])) {
+                switch (static::$fields_store_format[$field]) {
                     case 'json':
-                        if(empty($value)){
+                        if (empty($value)) {
                             $value = [];
-                        }else{
+                        } else {
                             $value = json_decode($value, true);
-                            if(is_null($value)){
+                            if (is_null($value)) {
                                 $value = [];
                             }
                         }
@@ -643,19 +631,18 @@ class BaseModel extends Query
      * @param string $key
      * @return array
      */
-    public function column($field, $key = '')
-    {
+    public function column($field, $key = '') {
         $data = parent::column($field, $key);
-        if(!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)){
-            foreach($data as $key => $value){
-                if(is_string(static::$fields_store_format[$field])){
-                    switch (static::$fields_store_format[$field]){
+        if (!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)) {
+            foreach ($data as $key => $value) {
+                if (is_string(static::$fields_store_format[$field])) {
+                    switch (static::$fields_store_format[$field]) {
                         case 'json':
-                            if(empty($value)){
+                            if (empty($value)) {
                                 $data[$key] = [];
-                            }else{
+                            } else {
                                 $data[$key] = json_decode($value, true);
-                                if(is_null($data[$key])){
+                                if (is_null($data[$key])) {
                                     $data[$key] = [];
                                 }
                             }
@@ -673,10 +660,10 @@ class BaseModel extends Query
      * @param string $user_input_password 用户输入的待校验的密码
      * @return bool
      */
-    public static function verifyPassword($db_store_password, $user_input_password){
-        foreach(static::$fields_store_format as $each_field => $each_field_store_format){
-            if(is_array($each_field_store_format) && $each_field_store_format[0] == 'password'){
-                if($db_store_password == md5($user_input_password.$each_field_store_format[1])){
+    public static function verifyPassword($db_store_password, $user_input_password) {
+        foreach (static::$fields_store_format as $each_field => $each_field_store_format) {
+            if (is_array($each_field_store_format) && $each_field_store_format[0] == 'password') {
+                if ($db_store_password == md5($user_input_password . $each_field_store_format[1])) {
                     return true;
                 }
             }

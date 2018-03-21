@@ -8,6 +8,7 @@
  */
 
 namespace app\api\base;
+
 use app\index\model\BaseModel;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
@@ -20,14 +21,12 @@ use think\Controller;
  * Class BaseApiController
  * @package app\api\base
  */
-class BaseApiController extends Controller
-{
+class BaseApiController extends Controller {
 
     /**
      * 初始化函数
      */
-    public function _initialize()
-    {
+    public function _initialize() {
         parent::_initialize();
         if (App::$debug) {
             log_info('$_REQUEST:', request()->request());
@@ -42,20 +41,19 @@ class BaseApiController extends Controller
      * @param bool $is_log
      * @return \think\response\Json|\think\response\Jsonp
      */
-    protected function ar($code, $data = [], $example = '', $is_log = false)
-    {
+    protected function ar($code, $data = [], $example = '', $is_log = false) {
         $status = sprintf('%s/%s/%s/%s', request()->module(), request()->controller(), request()->action(), $code);
         //格式化
         $status = ClString::toArray($status);
-        foreach($status as $k_status => $v_status){
-            if(ClVerify::isAlphaCapital($v_status)){
-                $status[$k_status] = '_'.strtolower($v_status);
+        foreach ($status as $k_status => $v_status) {
+            if (ClVerify::isAlphaCapital($v_status)) {
+                $status[$k_status] = '_' . strtolower($v_status);
             }
         }
         //转换为字符串
         $status = implode('', $status);
         $status = str_replace('/_', '/', $status);
-        $data = is_array($data) ? $data : [$data];
+        $data   = is_array($data) ? $data : [$data];
         return json_return(array_merge([
             'status' => $status,
         ], $data), $is_log);
@@ -74,17 +72,16 @@ class BaseApiController extends Controller
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function paging(BaseModel $model_instance, $where, $call_back = '', $exclude_fields = [], $limit = PAGES_NUM, $duration = null)
-    {
-        $limit = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
-        $total = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
-        $offset = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量', 0);
-        $order = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为"asc"', 'asc');
-        $sort = get_param('sort', ClFieldVerify::instance()->verifyAlphaNumDash()->fetchVerifies(), '排序值，默认为表的主键', $model_instance->getPk());
-        $return = [
-            'limit' => $limit,
+    protected function paging(BaseModel $model_instance, $where, $call_back = '', $exclude_fields = [], $limit = PAGES_NUM, $duration = null) {
+        $limit           = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
+        $total           = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
+        $offset          = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量', 0);
+        $order           = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为"asc"', 'asc');
+        $sort            = get_param('sort', ClFieldVerify::instance()->verifyAlphaNumDash()->fetchVerifies(), '排序值，默认为表的主键', $model_instance->getPk());
+        $return          = [
+            'limit'  => $limit,
             'offset' => $offset,
-            'total' => $total
+            'total'  => $total
         ];
         $return['items'] = $model_instance
             ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)

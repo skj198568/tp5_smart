@@ -11,7 +11,8 @@
 </head>
 <body class="container" style="padding-bottom: 2em;">
 <h1 style="text-align: center;margin: 1em;">
-    Api（共 <span class="text-danger">{$api_count}</span> 个）<small style="margin-left: 2em;">{$create_time}</small>
+    Api（共 <span class="text-danger">{$api_count}</span> 个）
+    <small style="margin-left: 2em;">{$create_time}</small>
 </h1>
 <hr>
 <div class="row">
@@ -23,7 +24,9 @@
         <div class="btn-group-vertical bs-docs-sidebar hidden-print hidden-xs hidden-sm affix">
             <foreach name="menu" item="v" key="k">
                 <div class="btn-group">
-                    <button id="id_{$v['controller']}" type="button" class="btn {$k%2 == 0 ? 'btn-success' : 'btn-default'} dropdown-toggle" data-toggle="dropdown" style="text-align: left;">
+                    <button id="id_{$v['controller']}" type="button"
+                            class="btn {$k%2 == 0 ? 'btn-success' : 'btn-default'} dropdown-toggle"
+                            data-toggle="dropdown" style="text-align: left;">
                         {$k+1}. {$v['name']}
                         <span class="caret"></span>
                     </button>

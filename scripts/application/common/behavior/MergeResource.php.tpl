@@ -15,14 +15,13 @@ use ClassLibrary\ClMergeResource;
  * Class MergeResource
  * @package app\common\behavior
  */
-class MergeResource
-{
+class MergeResource {
 
     /**
      * 执行
      * @param $content
      */
-    public function run(&$content){
+    public function run(&$content) {
         $content = ClMergeResource::merge($content);
     }
 

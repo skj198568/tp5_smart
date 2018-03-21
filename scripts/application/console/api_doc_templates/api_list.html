@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <title>接口列表</title>
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
-    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body class="container">
-    <h1>接口列表</h1>
-    <hr>
-    <div class="list-group">
-        <foreach name="api_files" item="v" key="k">
-            <a href="/api/index/index/api_file_name/{$v}" class="list-group-item" target="_blank">{$k+1}. {$v}</a>
-        </foreach>
-    </div>
+<h1>接口列表</h1>
+<hr>
+<div class="list-group">
+    <foreach name="api_files" item="v" key="k">
+        <a href="/api/index/index/api_file_name/{$v}" class="list-group-item" target="_blank">{$k+1}. {$v}</a>
+    </foreach>
+</div>
 </body>
 </html>
