@@ -89,7 +89,9 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
         }
     }
     //校验参数
-    \ClassLibrary\ClFieldVerify::verifyFields([$key => $value], [$key => $verifies]);
+    if($value != $default){
+        \ClassLibrary\ClFieldVerify::verifyFields([$key => $value], [$key => $verifies]);
+    }
     return $value;
 }
 
