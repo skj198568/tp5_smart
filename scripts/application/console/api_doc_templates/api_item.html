@@ -12,7 +12,7 @@
     <notempty name="params">
         <h3 style="padding-top: 0.5em;">参数:</h3>
         <!--表格begin-->
-        <table class="table table-striped table-hover table-bordered table-condensed"
+        <table class="table table-hover table-bordered table-condensed"
                style="margin-top: 1em;table-layout: fixed;">
             <thead>
             <tr>
@@ -24,7 +24,7 @@
             <tbody>
             <foreach name="params" item="vo">
                 <tr>
-                    <td style="width: 20%;"><span class="text-primary">{$vo['name']}</span></td>
+                    <td style="width: 20%;">{$vo['name']}</td>
                     <td style="width: 30%;word-wrap:break-word;word-break:break-all;"><span class="text-danger">{$vo['filters']}</span>
                     </td>
                     <td style="width: 50%;word-wrap:break-word;word-break:break-all;"><span class="text-info">{$vo['remark']}</span>
