@@ -18,14 +18,15 @@ use think\App;
  * Class BrowserSyncJsMerge
  * @package app\common\behavior
  */
-class BrowserSyncJsMerge {
+class BrowserSyncJsMerge
+{
 
     /**
      * 执行
      * @param $content
      */
-    public function run(&$content) {
-        if (App::$debug && !request()->isAjax() && !request()->isCli()) {
+    public function run(&$content){
+        if(App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(request()->module(), ['Api', 'api'])){
             //拼接socket监听js
             $content .= BrowserSync::instance()->getJsContent();
         }
