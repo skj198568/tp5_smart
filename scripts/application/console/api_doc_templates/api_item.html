@@ -1,16 +1,16 @@
 <div>
     <a name="{$a_name}"></a>
     <if condition="$item_index eq 0">
-        <h2 style="padding-top:1em;">{$id}. {$api_desc}</h2>
+        <h3 style="padding-top:1em;">{$id}. {$api_desc}</h3>
         <else/>
-        <h2 style="border-top: 1px #CCCCCC solid;padding-top:1em;margin-top: 1em;">{$id}. {$api_desc}</h2>
+        <h3 style="border-top: 1px #CCCCCC solid;padding-top:1em;margin-top: 1em;">{$id}. {$api_desc}</h3>
     </if>
-    <h3 style="padding-top: 0.5em;">请求地址:</h3>
+    <h4 style="padding-top: 0.5em;">请求地址:</h4>
     <p class="text-danger" style="border: 1px #CCCCCC dashed;padding: 0.5em;">
         {$url}
     </p>
     <notempty name="params">
-        <h3 style="padding-top: 0.5em;">参数:</h3>
+        <h4 style="padding-top: 0.5em;">参数:</h4>
         <!--表格begin-->
         <table class="table table-hover table-bordered table-condensed"
                style="margin-top: 1em;table-layout: fixed;">
@@ -35,7 +35,7 @@
         </table>
         <!--表格end-->
     </notempty>
-    <h3 style="padding-top: 0.5em;">返回值:</h3>
+    <h4 style="padding-top: 0.5em;">返回值:</h4>
     <empty name="ar_returns">
         <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
             无
