@@ -14,7 +14,6 @@ use app\api\base\BaseApiController;
 use ClassLibrary\ClCrypt;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
-use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
 
 /**
@@ -28,7 +27,7 @@ class ApiController extends BaseApiController {
      * 用户uid
      * @var int
      */
-    protected $uid = 0;
+    protected $id = 0;
 
     /**
      * 不校验的请求
@@ -52,11 +51,11 @@ class ApiController extends BaseApiController {
             $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token', '');
         }
         if (!empty($token)) {
-            $this->uid = ClCrypt::decrypt($token, CRYPT_KEY);
-            if (empty($this->uid)) {
+            $this->id = ClCrypt::decrypt($token, CRYPT_KEY);
+            if (empty($this->id)) {
                 if (ClVerify::isLocalIp(request()->ip())) {
                     //本机请求
-                    $this->uid = $token;
+                    $this->id = $token;
                 } else {
                     $msg = json_encode([
                         'status'  => -1,
