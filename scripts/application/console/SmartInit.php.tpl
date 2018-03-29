@@ -262,7 +262,7 @@ class SmartInit extends Command {
             $fields_verifies_string .= sprintf('
         %s => %s, ', $field, json_encode($verify_array, JSON_UNESCAPED_UNICODE));
         }
-        $content  = "<?php\n" . $this->view->fetch($map_template_file, [
+        $content     = "<?php\n" . $this->view->fetch($map_template_file, [
                 'date'                        => date('Y/m/d') . "\n",
                 'time'                        => date('H:i:s') . "\n",
                 'table_comment'               => $this->getTableComment($table_name),
@@ -282,12 +282,19 @@ class SmartInit extends Command {
                 'fields_names'                => $fields_names,
                 'fields_names_keys'           => array_keys($fields_names),
             ]);
-        $map_file = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
-        //创建文件夹
-        ClFile::dirCreate($map_file);
+        $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
+        $old_content = '';
+        if (is_file($map_file)) {
+            $old_content = file_get_contents($map_file);
+        } else {
+            //创建文件夹
+            ClFile::dirCreate($map_file);
+        }
         //写入
         file_put_contents($map_file, $content);
-        $output->info('[Map]:create ' . $map_file . " ok");
+        if ($content != $old_content) {
+            $output->info('[Map]:create ' . $map_file . " ok");
+        }
         return true;
     }
 
@@ -301,7 +308,6 @@ class SmartInit extends Command {
     protected function dealModel($table_name, Output $output) {
         $model_name_file = APP_PATH . 'index/model/' . $this->tableNameFormat($table_name) . 'Model.php';
         if (is_file($model_name_file)) {
-            $output->highlight('[Model]:' . $model_name_file . " is exist");
             return false;
         }
         $template_file = __DIR__ . '/smart_init_templates/model.tpl';
@@ -455,11 +461,18 @@ class SmartInit extends Command {
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
-            //创建文件夹
-            ClFile::dirCreate($base_name_file);
+            $old_content    = '';
+            if (is_file($base_name_file)) {
+                $old_content = file_get_contents($base_name_file);
+            } else {
+                //创建文件夹
+                ClFile::dirCreate($base_name_file);
+            }
             //存储
             file_put_contents($base_name_file, $content);
-            $output->info('[ApiBaseController]:create ' . $base_name_file . " ok");
+            if ($old_content != $content) {
+                $output->info('[ApiBaseController]:create ' . $base_name_file . " ok");
+            }
         }
         return true;
     }
@@ -474,7 +487,6 @@ class SmartInit extends Command {
     private function dealController($table_name, Output $output) {
         $api_controller_file = APP_PATH . 'api/controller/' . $this->tableNameFormat($table_name) . 'Controller.php';
         if (is_file($api_controller_file)) {
-            $output->highlight('[ApiController]:' . $api_controller_file . " is exist.");
             return false;
         }
         $map_template_file     = __DIR__ . '/smart_init_templates/controller.tpl';
