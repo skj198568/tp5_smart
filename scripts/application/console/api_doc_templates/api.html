@@ -27,7 +27,7 @@
         <!--垂直排列按钮组begin-->
         <div class="btn-group-vertical bs-docs-sidebar hidden-print hidden-xs hidden-sm affix">
             <foreach name="menu" item="v" key="k">
-                <div class="btn-group {:$k > count($menu)/2 ? 'dropup' : ''}">
+                <div class="btn-group {:$k > 20 ? 'dropup' : ''}">
                     <button id="id_{$v['controller']}" type="button" class="btn {:$k%2 == 0 ? 'btn-success' : 'btn-default'} dropdown-toggle btn-xs" data-toggle="dropdown" style="text-align: left;">
                         {$k+1}. {$v['name']}
                         <span class="caret"></span>
