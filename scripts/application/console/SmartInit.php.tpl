@@ -425,8 +425,8 @@ class SmartInit extends Command {
         }
         $ar_get_list_json  = [
             'status' => strtolower(sprintf('api/%s/getList/1', $table_name)),
-            'limit'  => 15,
-            'page'   => 1,
+            'limit'  => 10,
+            'offset'   => 0,
             'total'  => 10,
             'items'  => [$info]
         ];
