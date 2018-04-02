@@ -293,7 +293,11 @@ class SmartInit extends Command {
         //写入
         file_put_contents($map_file, $content);
         if ($content != $old_content) {
-            $output->info('[Map]:create ' . $map_file . " ok");
+            if(empty($old_content)){
+                $output->info('[Map]:create ' . $map_file . " ok");
+            }else{
+                $output->info('[Map]:modify ' . $map_file . " ok");
+            }
         }
         return true;
     }
@@ -471,7 +475,11 @@ class SmartInit extends Command {
             //存储
             file_put_contents($base_name_file, $content);
             if ($old_content != $content) {
-                $output->info('[ApiBaseController]:create ' . $base_name_file . " ok");
+                if(empty($old_content)){
+                    $output->info('[ApiBaseController]:create ' . $base_name_file . " ok");
+                }else{
+                    $output->info('[ApiBaseController]:modify ' . $base_name_file . " ok");
+                }
             }
         }
         return true;
