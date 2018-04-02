@@ -104,4 +104,17 @@ class BaseApiController extends Controller {
         return $return;
     }
 
+    /**
+     * 空内容的返回
+     * @return array
+     */
+    protected function pagingGetEmptyReturn() {
+        return [
+            'limit'  => PAGES_NUM,
+            'offset' => 0,
+            'total'  => 0,
+            'items'  => []
+        ];
+    }
+
 }
