@@ -476,9 +476,9 @@ class SmartInit extends Command {
             file_put_contents($base_name_file, $content);
             if ($old_content != $content) {
                 if(empty($old_content)){
-                    $output->info('[ApiBaseController]:create ' . $base_name_file . " ok");
+                    $output->info('[Base]:create ' . $base_name_file . " ok");
                 }else{
-                    $output->info('[ApiBaseController]:modify ' . $base_name_file . " ok");
+                    $output->info('[Base]:modify ' . $base_name_file . " ok");
                 }
             }
         }
@@ -509,7 +509,7 @@ class SmartInit extends Command {
         if (!empty($content)) {
             //写入
             file_put_contents($api_controller_file, $content);
-            $output->info('[ApiController]:create ' . $api_controller_file . " ok");
+            $output->info('[Api]:create ' . $api_controller_file . " ok");
         }
         return true;
     }
