@@ -17,6 +17,7 @@ use think\Config;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
+use think\exception\ThrowableError;
 use think\View;
 
 class ApiDoc extends Command {
@@ -89,15 +90,16 @@ class ApiDoc extends Command {
                     continue;
                 }
 
-//                if(strpos($each_file_temp, 'MajorController') === false){
+//                if(strpos($each_file_temp, 'UserFocusController') === false){
 //                    continue;
 //                }
-//                le_info($k);
-//                if($k !== 'verifyMobile'){
+//                echo_info($k);
+//                if($k !== 'isFocus'){
 //                    continue;
 //                }
                 $desc              = $this->getDescByFunctionContent($each_function);
                 $params            = $this->getParamsByFunctionContent($each_file_temp, $each_function);
+//                echo_info($params);
                 $ar_items          = $this->getAjaxReturnByFunctionContent($each_function);
                 $ajax_return_items = [];
                 foreach ($ar_items as $status => $content) {
@@ -142,6 +144,7 @@ class ApiDoc extends Command {
                 'href' => $a_name
             ];
         }
+//        echo_info($menu);
         $api_item_template = __DIR__ . '/api_doc_templates/api.html';
         $api_content       = $this->view->fetch($api_item_template, [
             'api_items'   => $api_items,
@@ -342,17 +345,23 @@ class ApiDoc extends Command {
         //获取get_param方式参数
         $params = ClString::parseToArray($function_content, 'get_param', ');', false);
         foreach ($params as $param) {
-//            if(strpos($param, 'subject_include_ids') === false){
+//            if(strpos($param, 'focus_type') === false){
 //                continue;
 //            }
             $param   = ClString::spaceTrim($param);
             $param   = trim($param);
             $param   = ClString::spaceTrim($param);
-            $filters = ClString::getBetween($param, 'ClFieldVerify', 'fetchVerifies()');
-            if (strpos($filters, 'ClFieldVerify') === false) {
-                continue;
+            if(strpos($param, 'ClFieldVerify') === false || strpos($param, 'fetchVerifies') === false){
+                $filters = [];
+            }else{
+                $filters = ClString::getBetween($param, 'ClFieldVerify', 'fetchVerifies()');
             }
             $param       = str_replace($filters, '', $param);
+            if(strpos($param, ',,') === false){
+                $desc_index = 2;
+            }else{
+                $desc_index = 1;
+            }
             $param       = str_replace([',,', '\''], [',', '"'], $param);
             $param       = trim($param, ')');
             $param       = trim($param, '(');
@@ -368,6 +377,7 @@ class ApiDoc extends Command {
                     $param_temp[] = $each;
                 }
             }
+//            echo_info($param_temp);
             //参数名
             $name = ClString::getBetween($param_temp[0], '', '"', false);
             if (strpos($name, "'") === 0) {
@@ -382,6 +392,7 @@ class ApiDoc extends Command {
             if (strpos($name, '/') !== false) {
                 $name = ClString::getBetween($name, '', '/', false);
             }
+//            echo_info($name, $filters);
             //过滤器
             if (!empty($filters)) {
                 $sub_filters = ClString::getBetween($filters, 'instance', 'fetchVerifies', false);
@@ -428,8 +439,8 @@ class ApiDoc extends Command {
             }
             //注释
             $remark = '';
-            if (isset($param_temp[1])) {
-                $remark = trim($param_temp[1], '"');
+            if (isset($param_temp[$desc_index])) {
+                $remark = trim($param_temp[$desc_index], '"');
                 if (strpos($remark, '->getPk')) {
                     $remark = '主键';
                 } elseif (strpos($remark, 'sprintf') !== false) {
