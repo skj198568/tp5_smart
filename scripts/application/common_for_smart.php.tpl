@@ -70,7 +70,7 @@ function le_info() {
  * @param string $filter 过滤器，参考input方法
  * @return mixed
  */
-function get_param($key = '', $verifies = [], $desc = '', $default = null, $filter = '') {
+function get_param($key = '', $verifies = [], $desc = '', $default = null, $filter = 'trim') {
     if (strpos($desc, ',') !== false) {
         exit(sprintf('%s含有非法字符","，请改成中文"，"', $desc));
     }
