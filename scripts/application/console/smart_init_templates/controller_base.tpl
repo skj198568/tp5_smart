@@ -27,9 +27,11 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function getList() {
         $where = [];
-        return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($items) {
+        return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($return) {
             //拼接额外字段 & 格式化相关字段
-            return {$table_name}Model::forShow($items);
+            $return['items'] = {$table_name}Model::forShow($return['items']);
+            //返回
+            return $return;
         }), '{$ar_get_list_json}');
     }
 </if>

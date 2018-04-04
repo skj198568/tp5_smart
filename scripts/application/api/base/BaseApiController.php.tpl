@@ -78,11 +78,13 @@ class BaseApiController extends Controller {
         $offset          = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量', 0);
         $order           = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为"asc"', 'asc');
         $sort            = get_param('sort', ClFieldVerify::instance()->verifyAlphaNumDash()->fetchVerifies(), '排序值，默认为表的主键', $model_instance->getPk());
+        //默认返回值
         $return          = [
             'limit'  => $limit,
             'offset' => $offset,
             'total'  => $total
         ];
+        //列表
         $return['items'] = $model_instance
             ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
             ->where($where)
@@ -92,14 +94,16 @@ class BaseApiController extends Controller {
             ])
             ->limit($offset, $limit)
             ->select();
-        if (!empty($call_back) && gettype($call_back) == 'object') {
-            $return['items'] = $call_back($return['items']);
-        }
+        //总数
         if (empty($total)) {
             $return['total'] = $model_instance
-                ->cache([$model_instance->getTable(), $where, $order, $offset, $limit, 'total'], $duration)
+                ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'total'], $duration)
                 ->where($where)
                 ->count();
+        }
+        //回调函数处理
+        if (!empty($call_back) && gettype($call_back) == 'object') {
+            $return = $call_back($return);
         }
         return $return;
     }
