@@ -77,8 +77,18 @@ class {$table_name}Map extends BaseModel {
     }
 
     /**
+     * 缓存清除触发器
+     * @param $item
+     */
+    protected function cacheRemoveTrigger($item) {
+        if ({$table_comment['is_cache']} > 0 && isset($item[static::F_ID])) {
+            static::getByIdOrIdsRc($item[static::F_ID]);
+        }
+    }
+
+    /**
      * 按id或id数组获取
-     * @param $id
+     * @param int|array $id_or_ids id或ids
      * @param array $exclude_fields 不包含的字段
      * @param int $duration 缓存时间
      * @return array|false|\PDOStatement|string|\think\Model
@@ -86,29 +96,36 @@ class {$table_name}Map extends BaseModel {
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
-        if($duration == 0) {
-            return static::instance()->where([
-                self::F_ID => is_array($id) ? ['in', $id] : $id
-            ])->field(self::getAllFields($exclude_fields))->find();
-        }else{
-            if(is_array($id)) {
+    public static function getByIdOrIds($id_or_ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+        if (is_numeric($duration)) {
+            if (is_array($id_or_ids)) {
                 $items = [];
-                foreach($id as $each_id) {
-                    $info = self::getById($each_id, $exclude_fields, $duration);
-                    if(!empty($info)) {
+                foreach ($id_or_ids as $each_id) {
+                    $info = static::getByIdOrIds($each_id, $exclude_fields, $duration);
+                    if (!empty($info)) {
                         $items[] = $info;
                     }
                 }
                 return $items;
+            } else {
+                $info = static::instance()->cache([$id_or_ids], $duration)->where([
+                    static::F_ID => $id_or_ids
+                ])->find();
+                if (empty($info)) {
+                    return [];
+                } else {
+                    return ClArray::getByKeys($info, static::getAllFields($exclude_fields));
+                }
             }
-            $info = static::instance()->cache([$id], $duration)->where([
-                self::F_ID => $id
-            ])->find();
-            if(empty($info)) {
-                return [];
-            }else{
-                return ClArray::getByKeys($info, self::getAllFields($exclude_fields));
+        } else {
+            if (is_array($id_or_ids)) {
+                return static::instance()->where([
+                    static::F_ID => ['in', $id_or_ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance()->where([
+                    static::F_ID => $id_or_ids
+                ])->field(static::getAllFields($exclude_fields))->find();
             }
         }
     }
@@ -118,7 +135,7 @@ class {$table_name}Map extends BaseModel {
      * @param $id
      * @return bool
      */
-    protected static function getByIdRc($id) {
+    protected static function getByIdOrIdsRc($id) {
         return ClCache::remove($id);
     }
 
@@ -128,28 +145,59 @@ class {$table_name}Map extends BaseModel {
      * @param string $field 字段
      * @param string $default 默认值
      * @param bool $is_convert_to_int 是否转换为int
+     * @param int $duration 缓存时间
      * @return int|mixed|string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getValueById($id, $field, $default = '', $is_convert_to_int = false) {
-        if({$table_comment['is_cache']} > 0) {
-            $info = self::getById($id);
-            if(empty($info)) {
+    public static function getValueById($id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
+        if (is_numeric($duration)) {
+            $info = static::getByIdOrIds($id, [], $duration);
+            if (empty($info)) {
                 return $default;
-            }else{
-                if($is_convert_to_int) {
+            } else {
+                if ($is_convert_to_int) {
                     return intval($info[$field]);
-                }else{
+                } else {
                     return $info[$field];
                 }
             }
-        }else{
+        } else {
             return static::instance()->where([
-                self::F_ID => $id
+                static::F_ID => $id
             ])->value($field, $default, $is_convert_to_int);
         }
+    }
+
+    /**
+     * 按id数组获取某一列的值
+     * @param $id_or_ids
+     * @param $field
+     * @param bool $is_convert_to_int
+     * @param int $duration
+     * @return array|false|\PDOStatement|string|\think\Model
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function getColumnByIds($id_or_ids, $field, $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
+        if (is_numeric($duration)) {
+            $items = static::getByIdOrIds($id_or_ids, [], $duration);
+            if (!empty($items)) {
+                $items = array_column($items, $field);
+            }
+        } else {
+            $items = static::instance()->where([
+                static::F_ID => ['in', $id_or_ids]
+            ])->column($field);
+        }
+        if (!empty($items) && $is_convert_to_int) {
+            array_walk($items, function (&$value) {
+                $value = intval($value);
+            });
+        }
+        return $items;
     }
 
 }

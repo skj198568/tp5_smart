@@ -123,7 +123,7 @@ class SmartInit extends Command {
         $table_comment = ClMysql::query(sprintf("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name));
         $return        = [
             'name'     => '',
-            'is_cache' => 0
+            'is_cache' => 'null'
         ];
         foreach ($table_comment as $each_comment) {
             $comment = json_decode($each_comment['TABLE_COMMENT'], true);
@@ -131,7 +131,7 @@ class SmartInit extends Command {
                 $return['name'] = $each_comment['TABLE_COMMENT'];
             } else {
                 if (!isset($table_comment['is_cache'])) {
-                    $table_comment['is_cache'] = 0;
+                    $table_comment['is_cache'] = 'null';
                 }
                 $return = array_merge($return, $comment);
             }

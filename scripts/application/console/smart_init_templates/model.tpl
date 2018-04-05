@@ -45,9 +45,8 @@ class {$table_name}Model extends {$table_name}Map {
      * @param $item
      */
     protected function cacheRemoveTrigger($item) {
-        if(isset($item[self::F_ID])) {
-            self::getByIdRc($item[self::F_ID]);
-        }
+        //先执行父类
+        parent::cacheRemoveTrigger($item);
     }
 
 }
