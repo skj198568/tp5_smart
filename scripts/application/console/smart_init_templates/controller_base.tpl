@@ -47,7 +47,7 @@ class {$table_name}BaseApiController extends ApiController {
     public function get() {
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
         //获取
-        $info = {$table_name}Model::getByIdOrIds($id);
+        $info = {$table_name}Model::getById($id);
         //拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], '{$ar_get_json}');
@@ -67,7 +67,7 @@ class {$table_name}BaseApiController extends ApiController {
         //创建
         {$table_name}Model::instance()->insert($fields);
         //获取
-        $info = {$table_name}Model::getByIdOrIds({$table_name}Model::instance()->getLastInsID());
+        $info = {$table_name}Model::getById({$table_name}Model::instance()->getLastInsID());
         //拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], '{$ar_create_json}');
@@ -90,7 +90,7 @@ class {$table_name}BaseApiController extends ApiController {
             {$table_name}Model::F_ID => $id
         ])->setField($fields);
         //获取
-        $info = {$table_name}Model::getByIdOrIds($id);
+        $info = {$table_name}Model::getById($id);
         //拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], '{$ar_update_json}');
