@@ -45,12 +45,28 @@ class {$table_name}BaseApiController extends ApiController {
      * @throws \think\exception\DbException
      */
     public function get() {
-        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
+        $id = get_param('id', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
         //获取
         $info = {$table_name}Model::getById($id);
         //拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], '{$ar_get_json}');
+    }
+
+    /**
+     * 多个信息
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getByIds() {
+        $ids = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->verifyArray()->fetchVerifies(), '主键id数组');
+        //获取
+        $items = {$table_name}Model::getItemsByIds($ids);
+        //拼接额外字段 & 格式化相关字段
+        $items = {$table_name}Model::forShow($items);
+        return $this->ar(1, ['items' => $items], '{$ar_get_by_ids_json}');
     }
 </if>
 <if condition="in_array('create', $create_api)">

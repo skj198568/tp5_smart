@@ -293,9 +293,9 @@ class SmartInit extends Command {
         //写入
         file_put_contents($map_file, $content);
         if ($content != $old_content) {
-            if(empty($old_content)){
+            if (empty($old_content)) {
                 $output->info('[Map]:create ' . $map_file . " ok");
-            }else{
+            } else {
                 $output->info('[Map]:modify ' . $map_file . " ok");
             }
         }
@@ -427,37 +427,42 @@ class SmartInit extends Command {
                 }
             }
         }
-        $ar_get_list_json  = [
+        $ar_get_list_json   = [
             'status' => strtolower(sprintf('api/%s/getList/1', $table_name)),
             'limit'  => 10,
-            'offset'   => 0,
+            'offset' => 0,
             'total'  => 10,
             'items'  => [$info]
         ];
-        $ar_get_json       = [
+        $ar_get_json        = [
             'status' => strtolower(sprintf('api/%s/get/1', $table_name)),
             'info'   => $info
         ];
-        $ar_create_json    = [
+        $ar_get_by_ids_json = [
+            'status' => strtolower(sprintf('api/%s/getByIds/1', $table_name)),
+            'items'   => [$info]
+        ];
+        $ar_create_json     = [
             'status' => strtolower(sprintf('api/%s/create/1', $table_name)),
             'info'   => $info
         ];
-        $ar_update_json    = [
+        $ar_update_json     = [
             'status' => strtolower(sprintf('api/%s/update/1', $table_name)),
             'info'   => $info
         ];
-        $ar_delete_json    = [
+        $ar_delete_json     = [
             'status' => strtolower(sprintf('api/%s/delete/1', $table_name)),
             'id'     => '主键id'
         ];
-        $map_template_file = __DIR__ . '/smart_init_templates/controller_base.tpl';
-        $content           = "<?php\n" . $this->view->fetch($map_template_file, [
+        $map_template_file  = __DIR__ . '/smart_init_templates/controller_base.tpl';
+        $content            = "<?php\n" . $this->view->fetch($map_template_file, [
                 'date'             => date('Y/m/d') . "\n",
                 'time'             => date('H:i:s') . "\n",
                 'table_name'       => $table_name_format,
                 'table_comment'    => $this->getTableComment($table_name),
                 'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
                 'ar_get_json'      => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_by_ids_json'      => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
                 'ar_create_json'   => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
                 'ar_update_json'   => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'   => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
@@ -475,9 +480,9 @@ class SmartInit extends Command {
             //存储
             file_put_contents($base_name_file, $content);
             if ($old_content != $content) {
-                if(empty($old_content)){
+                if (empty($old_content)) {
                     $output->info('[Base]:create ' . $base_name_file . " ok");
-                }else{
+                } else {
                     $output->info('[Base]:modify ' . $base_name_file . " ok");
                 }
             }
