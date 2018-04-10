@@ -257,9 +257,9 @@ var jCommon = {
      * @param date
      * @returns {number}
      */
-    getDateTimestamp: function(date){
+    getDateTimestamp: function (date) {
         var d = new Date(date);
-        return d.getTime()/1000;
+        return d.getTime() / 1000;
     },
 
     /**
@@ -798,7 +798,9 @@ var jCommon = {
      * @param name
      */
     cookieDel: function (name) {
-        document.cookie = name + "=; expires=" + (new Date(0)).toGMTString();
+        var d = new Date();
+        d.setTime(d.getTime()-1);
+        document.cookie = name + '=; expires=' + d.toGMTString() + ';path=/';
     },
 
     /**
@@ -808,14 +810,14 @@ var jCommon = {
      * @param seconds 为0时不设定过期时间，浏览器关闭时cookie自动消失
      */
     cookieAdd: function (name, value, seconds) {
-        var str = name + "=" + encodeURI(value);
+        var str = name + '=' + encodeURI(value);
         if (seconds > 0) {
             var date = new Date();
             seconds = seconds * 1000;
             date.setTime(date.getTime() + seconds);
-            str += "; expires=" + date.toGMTString();
+            str += '; expires=' + date.toGMTString();
         }
-        document.cookie = str + ";path=/";
+        document.cookie = str + ';path=/';
     },
 
     /**
