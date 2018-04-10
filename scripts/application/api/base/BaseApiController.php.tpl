@@ -73,9 +73,9 @@ class BaseApiController extends Controller {
      * @throws \think\exception\DbException
      */
     protected function paging(BaseModel $model_instance, $where, $call_back = '', $exclude_fields = [], $limit = PAGES_NUM, $duration = null) {
-        $limit           = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
+        $limit           = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量，默认15条', $limit);
         $total           = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
-        $offset          = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量', 0);
+        $offset          = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量，默认0', 0);
         $order           = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为asc', 'asc');
         $sort            = get_param('sort', ClFieldVerify::instance()->verifyAlphaNumDash()->fetchVerifies(), '排序值，默认为表的主键id', $model_instance->getPk());
         //默认返回值
