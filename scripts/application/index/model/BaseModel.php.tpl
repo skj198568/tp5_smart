@@ -345,8 +345,6 @@ class BaseModel extends Query {
                         $model .= 'Model';
                         if (is_array($each[$field])) {
                             $each[$alias] = [];
-                            //数组方式
-                            $each[$field . '_' . $alias] = [];
                             foreach ($each[$field] as $each_field) {
                                 //考虑性能，对查询结果进行缓存
                                 $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each_field, $fetch_field);
@@ -355,11 +353,6 @@ class BaseModel extends Query {
                                 }
                                 //获取信息
                                 $each[$alias][] = $search_values[$key];
-                                //数组拼接
-                                $each[$field . '_' . $alias][] = [
-                                    $field => $each_field,
-                                    $alias => $search_values[$key]
-                                ];
                             }
                         } else {
                             //考虑性能，对查询结果进行缓存
