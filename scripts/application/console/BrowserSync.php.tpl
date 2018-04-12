@@ -89,7 +89,7 @@ class BrowserSync extends Command {
      */
     protected function configure() {
         $this->setName('browser_sync')
-            ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，分号分割，英文双引号包围，例如：".html;.js;.css;.php"', '".html;.js;.css;.php"')
+            ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，例如：".html;.js;.css"', '".html;.js;.css"')
             ->addOption('--dirs', '-d', Option::VALUE_REQUIRED, '监听web根目录下变化的文件夹，分号分割，例如：application;public', 'application;public')
             ->addOption('--port', '-p', Option::VALUE_REQUIRED, 'socket监听的端口，注意防火墙的设置', '8000')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
