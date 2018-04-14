@@ -18,8 +18,16 @@ use think\console\Output;
 use Workerman\Lib\Timer;
 use Workerman\Worker;
 
+/**
+ * 任务列表
+ * Class TaskRun
+ * @package app\console
+ */
 class TaskRun extends Command {
 
+    /**
+     * 配置
+     */
     protected function configure() {
         $this->setName('task_run')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
