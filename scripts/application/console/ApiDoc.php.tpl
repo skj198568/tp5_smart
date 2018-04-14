@@ -20,6 +20,11 @@ use think\console\Output;
 use think\exception\ThrowableError;
 use think\View;
 
+/**
+ * Api文档
+ * Class ApiDoc
+ * @package app\console
+ */
 class ApiDoc extends Command {
 
     /**
