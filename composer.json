@@ -9,20 +9,11 @@
       "email": "597481334@qq.com"
     }
   ],
-  "minimum-stability": "dev",
   "require": {
     "php": ">=7.0.0",
-    "skj198568/class_library": "*",
+    "skj198568/class_library": "dev-master",
     "workerman/workerman": "*",
     "php-ai/php-ml": "*",
     "facebook/webdriver": "*"
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "php create_files.php"
-    ],
-    "post-update-cmd": [
-      "php create_files.php"
-    ]
   }
 }
