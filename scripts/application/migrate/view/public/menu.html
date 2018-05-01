@@ -1,0 +1,40 @@
+<li>
+    <a href="javascript: void(0);" onclick="menuSelect()">
+        <i class="fa fa-bars"></i>
+        <span class="nav-label">导航</span>
+    </a>
+</li>
+<foreach name="menu" item="v" key="k">
+    <li>
+        <if condition="!empty($v['url'])">
+            <a class="J_menuItem" href="{$v['url']}">
+                {$v['icon']}
+                <span class="nav-label">{$v['name']}</span>
+            </a>
+            <else/>
+            <a href="#">
+                {$v['icon']}
+                <span class="nav-label">{$v['name']}</span>
+                <span class="fa arrow"></span>
+            </a>
+        </if>
+        <if condition="!empty($v['items'])">
+            <ul class="nav nav-second-level">
+                <foreach name="v.items" item="item" key="k_item">
+                    <li>
+                        <a class="J_menuItem"
+                           href="{$item['url']}">{$item['name']}</a>
+                    </li>
+                </foreach>
+            </ul>
+        </if>
+    </li>
+</foreach>
+<script type="text/javascript">
+
+    function menuSelect() {
+        $("body").toggleClass("mini-navbar");
+        SmoothlyMenu();
+        return false;
+    }
+</script>

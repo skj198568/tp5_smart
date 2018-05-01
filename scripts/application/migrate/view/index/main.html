@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--加载文件begin-->
+    <include file="public/include_head"/>
+    <!--加载文件end-->
+</head>
+<body class="gray-bg fixed-sidebar ms-controller full-height-layout pace-done skin-1" ms-controller="avalon_controller">
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="nav-close"><i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                        <span style="font-size: 3em;color: white;"><i class="fa fa-user"></i></span>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                                <span class="clear">
+                                    <span class="text-muted text-xs block">{{user_account}}<b class="caret"></b></span>
+                                </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <li>
+                                <a href="javascript:void(0);" ms-click="$logout">安全退出</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="logo-element">
+                        <i class="fa fa-user"></i>
+                    </div>
+                </li>
+                <!--加载文件begin-->
+                <include file="public/menu"/>
+                <!--加载文件end-->
+            </ul>
+        </div>
+    </nav>
+    <!--左侧导航结束-->
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row content-tabs">
+            <button class="roll-nav roll-left J_tabLeft"><i class="fa fa-backward"></i>
+            </button>
+            <nav class="page-tabs J_menuTabs">
+                <div class="page-tabs-content">
+                    <a href="javascript:void(0);" class="active J_menuTab" data-id="{$default_page}">首页</a>
+                </div>
+            </nav>
+            <button class="roll-nav roll-right J_tabRight"><i class="fa fa-forward"></i>
+            </button>
+            <div class="btn-group roll-nav roll-right">
+                <button class="dropdown J_tabClose" data-toggle="dropdown">
+                    关闭操作<span class="caret"></span>
+                </button>
+                <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                    <li class="J_tabShowActive">
+                        <a>定位当前选项卡</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="J_tabCloseAll">
+                        <a>关闭全部选项卡</a>
+                    </li>
+                    <li class="J_tabCloseOther">
+                        <a>关闭其他选项卡</a>
+                    </li>
+                </ul>
+            </div>
+            <a href="javascript:void(0);" class="roll-nav roll-right J_tabExit" ms-click="$logout"><i
+                    class="fa fa fa-sign-out"></i> 退出</a>
+        </div>
+        <div class="row J_mainContent" id="content-main" style="height: calc(100% - 42px)">
+            <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="{$default_page}"
+                    frameborder="0" data-id="{$default_page}" seamless></iframe>
+        </div>
+    </div>
+    <!--右侧部分结束-->
+</div>
+<script type="text/javascript">
+
+    var avalon_main = avalon.define({
+        $id: 'avalon_controller',
+        $init: function () {
+            if (!jCommon.empty(token)) {
+                avalon_main.$getUserInfo();
+            }
+        },
+        user_account: '',
+        $getUserInfo: function () {
+            $.get('/migrate/user/get', {}, function (r) {
+                avalon_main.user_account = r.info[0];
+            });
+        },
+        $logout: function () {
+            //清除cookie
+            jCommon.cookieDel('token');
+            //跳转至登录页面
+            window.location.href = '{:url("index/index")}';
+        }
+    });
+
+    avalon.ready(function () {
+        avalon_main.$init();
+    });
+
+</script>
+</body>
+</html>

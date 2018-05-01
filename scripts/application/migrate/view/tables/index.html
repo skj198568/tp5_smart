@@ -1,0 +1,183 @@
+<!--布局begin-->
+<layout name="public/layout" replace="{__CONTENT__}"/>
+<!--布局end-->
+<!--jQuery bootstrap table tools内联表单begin-->
+<div id="id_tools_div" class="form-inline">
+    <button type="button" class="btn btn-success" ms-click="$add"><i class="fa fa-plus"></i> 新增</button>
+</div>
+<!--jQuery bootstrap table tools内联表单end-->
+<table id="id_table"></table>
+<!--删除模态框begin-->
+<div class="modal fade" id="id_modal_del" tabindex="-1" role="dialog" aria-labelledby="id_modal_del_title"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="id_modal_del_title">删除</h4>
+            </div>
+            <div class="modal-body">
+                确认删除表“<span class="text-danger">{{del_table_name}}</span>”？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ms-click="$doDel()" ms-visible="!del_loading">确定</button>
+                <img src="/static/images/loading.gif" ms-visible="del_loading">
+            </div>
+        </div>
+    </div>
+</div>
+<!--删除模态框end-->
+<!--重命名模态框begin-->
+<div class="modal fade" id="id_modal_rename" tabindex="-1" role="dialog" aria-labelledby="id_modal_rename_title"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="id_modal_rename_title">重命名</h4>
+            </div>
+            <div class="modal-body">
+                <!--基本表单begin-->
+                <div>
+                    <div class="form-group">
+                        <label>原表名</label>
+                        <p class="form-control-static">{{rename_table_name}}</p>
+                    </div>
+                    <div class="form-group">
+                        <label>新表名</label>
+                        <input type="text" class="form-control" placeholder="table name"
+                               ms-duplex="rename_new_table_name">
+                    </div>
+                </div>
+                <!--基本表单end-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ms-click="$doRename()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--重命名模态框end-->
+<script type="text/javascript">
+
+    var tables = avalon.define({
+        $id: 'avalon_controller',
+        $init: function () {
+            tables.$initTable();
+        },
+        $items: [],
+        $initTable: function () {
+            $('#id_table').bootstrapTable({
+                url: '{:url("/migrate/table/getList")}',
+                cache: false,
+                sortOrder: 'desc',
+                pageSize: 1000,
+                pageList: [],
+                queryParams: function (params) {
+                    if (!jCommon.empty(tables.condition)) {
+                        params.condition = tables.condition;
+                    }
+                    return params;
+                },
+                responseHandler: function (r) {
+                    tables.$items = r.items;
+                    return {
+                        'rows': r.items,
+                        'total': r.total,
+                        'page': r.offset / r.limit + 1
+                    };
+                },
+                idField: 'id',
+                toolbar: '#id_tools_div',
+                pagination: true,
+                sidePagination: "server",
+                showColumns: true,
+                showRefresh: true,
+                columns: [
+                    // {
+                    //     checkbox: true
+                    // },
+                    {
+                        field: 'name',
+                        title: '表名',
+                        formatter: function (value, row, index) {
+                            var btn = [];
+                            btn.push(value);
+                            btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
+                            btn.push('<button class="btn btn-info btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
+                            btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
+                            return btn.join(' ');
+                        }
+                    }
+                ]
+            });
+        },
+        condition: '',
+        $search: function () {
+            $('#id_table').bootstrapTable('refresh', {
+                query: {
+                    offset: 0
+                }
+            });
+        },
+        $refresh: function () {
+            $('#id_table').bootstrapTable('refresh', {});
+        },
+        $add: function () {
+            window.location.href = '/migrate/tables/info.html';
+        },
+        $edit: function (table_name) {
+            window.location.href = '/migrate/tables/info/table_name/' + table_name + '.html';
+        },
+        del_table_name: '',
+        $del: function (table_name) {
+            tables.del_table_name = table_name;
+            $('#id_modal_del').modal('show');
+        },
+        del_loading: false,
+        $doDel: function () {
+            tables.del_loading = true;
+            //先获取字段，用于缓存
+            $.get('/migrate/field/getList', {
+                table_name: tables.del_table_name
+            }, function (r) {
+                $.get('/migrate/table/delete', {
+                    table_name: tables.del_table_name
+                }, function (r) {
+                    tables.del_loading = false;
+                    layer.msg('删除成功', function () {
+                    });
+                    tables.$refresh();
+                });
+            });
+        },
+        rename_table_name: '',
+        rename_new_table_name: '',
+        $rename: function (table_name) {
+            tables.rename_table_name = table_name;
+            tables.rename_new_table_name = '';
+            $('#id_modal_rename').modal('show');
+        },
+        $doRename: function () {
+            $.post('/migrate/table/rename', {
+                table_name: tables.rename_table_name,
+                new_table_name: tables.rename_new_table_name
+            }, function (r) {
+                layer.msg('更新成功', function () {
+
+                });
+                $('#id_modal_rename').modal('hide');
+                tables.$refresh();
+            });
+        }
+    });
+
+    avalon.ready(function () {
+        tables.$init();
+    });
+
+</script>

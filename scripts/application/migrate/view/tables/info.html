@@ -1,0 +1,1388 @@
+<!--布局begin-->
+<layout name="public/layout" replace="{__CONTENT__}"/>
+<!--布局end-->
+<!--面包屑路径导航begin-->
+<ol class="breadcrumb" style="margin-bottom: 1em;">
+    <li><a href="{:url('tables/index')}">首页</a></li>
+    <li class="active">新建表</li>
+</ol>
+<!--面包屑路径导航end-->
+<!--新增-基本表单begin-->
+<h3 style="padding-left: 1em;">表</h3>
+<div style="border: 1px dashed #00b7ee;margin: 1em;padding: 1em;">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>表名</label>
+                <input id="id_table_name" type="text" class="form-control" placeholder="Enter name"
+                       ms-duplex="table_name"
+                       ms-if="is_add == 1">
+                <p class="form-control-static" ms-if="is_add == 0"><span class="text-warning">{{table_name}}</span></p>
+                <p class="form-control-static">不含前缀，例如: <span class="text-danger">user_friends</span></p>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>注释</label>
+                <input type="text" class="form-control" placeholder="Enter name" ms-duplex="table_desc">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>默认创建的接口</label>
+                <div ms-each="api_functions">
+                    <label ms-class="text-success: $apiIsChecked(el)" style="cursor:pointer;margin-right: 1em;"
+                           ms-click="$apiChecked(el)">
+                        <i class="fa fa-check-square-o" ms-visible="$apiIsChecked(el)"></i>
+                        <i class="fa fa-square-o" ms-visible="!$apiIsChecked(el)"></i>
+                        {{el}}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <div class="form-group">
+                <label>引擎</label>
+                <select class="form-control" ms-duplex="engine">
+                    <option value="MyISAM">MyISAM</option>
+                    <option value="InnoDB">InnoDB</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>是否使用缓存</label>
+                        <select class="form-control" ms-duplex="using_cache">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div ms-visible="using_cache == 1">
+                            <label>缓存时间</label>
+                            <input type="text" class="form-control" placeholder="Enter seconds"
+                                   ms-duplex="cache_seconds">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-danger" ms-visible="!is_add" ms-click="$updateTable()">保存</button>
+</div>
+<!--新增-基本表单end-->
+<hr>
+<div ms-visible="table_name.length > 0">
+    <h3 style="padding-left: 1em;">字段</h3>
+    <div style="border:1px dashed #9cb945;margin: 1em;padding-left: 1em;padding-right: 1em;padding-bottom: 1em;">
+        <!--jQuery bootstrap table tools内联表单begin-->
+        <div id="id_tools_div" class="form-inline">
+            <button type="button" class="btn btn-success" ms-click="$add"><i class="fa fa-plus"></i> 新增</button>
+        </div>
+        <!--jQuery bootstrap table tools内联表单end-->
+        <table id="id_table"></table>
+    </div>
+    <!--新增字段模态框begin-->
+    <button type="button" class="btn btn-danger btn-block" ms-click="$create()" ms-if="is_add == 1"
+            ms-visible="!create_loading"><i
+            class="fa fa-plus"></i> 新增
+    </button>
+    <img src="/static/images/loading.gif" ms-visible="create_loading">
+</div>
+<div class="modal fade" id="id_modal_add_field" tabindex="-1" role="dialog" aria-labelledby="id_modal_add_field_title"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="id_modal_add_field_title"><span class="text-primary"
+                                                                            ms-if="edit_field_name.length == 0">新增</span><span
+                        class="text-danger" ms-if="edit_field_name.length > 0">编辑</span>字段</h4>
+            </div>
+            <div class="modal-body">
+                <!--基本表单begin-->
+                <div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="text-warning">字段</label>
+                                <input id="id_field_name" type="text" class="form-control"
+                                       placeholder="Enter field name"
+                                       ms-duplex="field_name" ms-if="edit_field_name.length == 0">
+                                <p class="form-control-static text-danger" ms-if="edit_field_name.length > 0">
+                                    {{field_name}}</p>
+                                <p class="form-control-static">字段名为<span class="text-success">create_time</span>或<span
+                                        class="text-success">update_time</span>程序会自动填充时间戳</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-warning">注释</label>
+                                <input type="text" class="form-control"
+                                       placeholder="Enter field desc"
+                                       ms-duplex="field_desc">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ms-visible="!is_add && edit_field_name.length == 0">
+                        <label class="text-warning">After</label>
+                        <select class="form-control" ms-duplex="after_field" ms-each="after_field_select_options"
+                                style="width: 200px;">
+                            <option ms-attr-value="el">{{el}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-warning">字段类型</label>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <select class="form-control" ms-duplex="field_type" ms-each="field_type_values">
+                                            <option ms-attr-value="el">{{el}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group"
+                                             ms-if="field_type != 'text' && field_type != 'text_long'">
+                                            <div class="input-group-addon">默认值</div>
+                                            <input class="form-control" type="text" style="width: 60px;"
+                                                   placeholder="default value" ms-duplex="field_default_value">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ms-if="field_type == 'decimal'">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">精度</div>
+                                            <input class="form-control" type="text" style="width: 60px;"
+                                                   placeholder="精度" ms-duplex="field_scale">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--内联表单end-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-warning">常规设置</label>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div ms-each="common_settings">
+                                    <label ms-class="text-success: $commonSettingCheckIsChecked(el)"
+                                           style="cursor:pointer;margin-right: 1em;"
+                                           ms-click="$commonSettingCheck(el)">
+                                        <i class="fa fa-check-square-o"
+                                           ms-visible="$commonSettingCheckIsChecked(el)"></i>
+                                        <i class="fa fa-square-o" ms-visible="!$commonSettingCheckIsChecked(el)"></i>
+                                        {{el}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="form-control-static">备注: visible / <span class="text-danger">可见</span>，sortable /
+                            <span class="text-danger">排序</span>，searchable / <span class="text-danger">检索</span>，read_only
+                            / <span class="text-danger">只读，新增之后，不可修改。</span></p>
+                    </div>
+                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                        <label class="text-warning">存储类型</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <select class="form-control" ms-duplex="storage_type">
+                                    <option value="string">string</option>
+                                    <option value="json">json</option>
+                                    <option value="password">password</option>
+                                </select>
+                            </div>
+                            <div class="form-group" ms-visible="storage_type == 'password'">
+                                <div class="input-group">
+                                    <div class="input-group-addon">加盐</div>
+                                    <input class="form-control" type="text" style="width: 100px;"
+                                           placeholder="Enter salt" ms-duplex="password_salt">
+                                </div>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group">
+                        <label class="text-warning">校验器-常规</label>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div ms-each="verifies">
+                                    <label ms-class="text-danger: $verifiesIsChecked(el)"
+                                           style="cursor:pointer;margin-right: 1em;"
+                                           ms-click="$verifiesCheck(el)">
+                                        <i class="fa fa-check-square-o" ms-visible="$verifiesIsChecked(el)"></i>
+                                        <i class="fa fa-square-o" ms-visible="!$verifiesIsChecked(el)"></i>
+                                        {{el}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                        <label class="text-warning">密码</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: is_password == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkPassword">
+                                    <i class="fa fa-check-square-o" ms-visible="is_password"></i>
+                                    <i class="fa fa-square-o" ms-visible="!is_password"></i>
+                                    is_password
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="is_password">
+                                <div class="input-group">
+                                    <div class="input-group-addon">最小长度</div>
+                                    <input class="form-control" type="text" style="width: 60px;"
+                                           placeholder="Enter length" ms-duplex="password_min_length">
+                                </div>
+                            </div>
+                            <div class="form-group" ms-visible="is_password">
+                                <div class="input-group">
+                                    <div class="input-group-addon">最大长度</div>
+                                    <input class="form-control" type="text" style="width: 60px;"
+                                           placeholder="Enter length" ms-duplex="password_max_length">
+                                </div>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group">
+                        <label class="text-warning">在数组内</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: in_array == 1" style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkInArray">
+                                    <i class="fa fa-check-square-o" ms-visible="in_array"></i>
+                                    <i class="fa fa-square-o" ms-visible="!in_array"></i>
+                                    in_array
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="in_array">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" style="width: 835px;"
+                                           placeholder="例如：[1, 2, 'a', 'b']"
+                                           ms-duplex="in_array_value">
+                                </div>
+                                <p class="form-control-static" ms-visible="in_array">数组内容(json格式)，例如：<span
+                                        class="text-danger">[1, 2, 'a', 'b']</span></p>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                        <label class="text-warning">在区间内</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: in_scope == 1" style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkInScope">
+                                    <i class="fa fa-check-square-o" ms-visible="in_scope"></i>
+                                    <i class="fa fa-square-o" ms-visible="!in_scope"></i>
+                                    in_scope
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="in_scope">
+                                <div class="input-group">
+                                    <div class="input-group-addon">区间最小值</div>
+                                    <input class="form-control" type="text" style="width: 60px;"
+                                           placeholder="Enter length" ms-duplex="in_scope_min">
+                                </div>
+                            </div>
+                            <div class="form-group" ms-visible="in_scope">
+                                <div class="input-group">
+                                    <div class="input-group-addon">区间最大值</div>
+                                    <input class="form-control" type="text" style="width: 60px;"
+                                           placeholder="Enter length" ms-duplex="in_scope_max">
+                                </div>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="text-warning">最小值</label>
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label ms-class="text-success: min == 1"
+                                               style="cursor:pointer;margin-right: 1em;"
+                                               ms-click="$checkMin">
+                                            <i class="fa fa-check-square-o" ms-visible="min"></i>
+                                            <i class="fa fa-square-o" ms-visible="!min"></i>
+                                            min
+                                        </label>
+                                    </div>
+                                    <div class="form-group" ms-visible="min">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">最小值</div>
+                                            <input class="form-control" type="text" placeholder="最小值"
+                                                   ms-duplex="min_value">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--内联表单end-->
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-warning">最大值</label>
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label ms-class="text-success: max == 1"
+                                               style="cursor:pointer;margin-right: 1em;"
+                                               ms-click="$checkMax">
+                                            <i class="fa fa-check-square-o" ms-visible="max"></i>
+                                            <i class="fa fa-square-o" ms-visible="!max"></i>
+                                            max
+                                        </label>
+                                    </div>
+                                    <div class="form-group" ms-visible="max">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                最大值
+                                            </div>
+                                            <input class="form-control" type="text" placeholder="最大值"
+                                                   ms-duplex="max_value">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--内联表单end-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                        <label class="text-warning">字符串-固定长度</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: str_length_fixed == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkStrLengthFixed">
+                                    <i class="fa fa-check-square-o" ms-visible="str_length_fixed"></i>
+                                    <i class="fa fa-square-o" ms-visible="!str_length_fixed"></i>
+                                    str_length_fixed
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="str_length_fixed">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        固定长度
+                                    </div>
+                                    <input class="form-control" type="text" placeholder="最大值"
+                                           ms-duplex="str_length_fixed_value">
+                                </div>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                        <label class="text-warning">字符串-最小长度</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: str_length_min == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkStrLengthMin">
+                                    <i class="fa fa-check-square-o" ms-visible="str_length_min"></i>
+                                    <i class="fa fa-square-o" ms-visible="!str_length_min"></i>
+                                    str_length_min
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="str_length_min">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        最小长度
+                                    </div>
+                                    <input class="form-control" type="text" placeholder="最大值"
+                                           ms-duplex="str_length_min_value">
+                                </div>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                        <label class="text-warning">字符串-最大长度</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: str_length_max == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkStrLengthMax">
+                                    <i class="fa fa-check-square-o" ms-visible="str_length_max"></i>
+                                    <i class="fa fa-square-o" ms-visible="!str_length_max"></i>
+                                    str_length_max
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="str_length_max">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        最大长度
+                                    </div>
+                                    <input class="form-control" type="text" placeholder="最大值"
+                                           ms-duplex="str_length_max_value">
+                                </div>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                        <label class="text-warning">const定义值</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: const_values == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkConstValues">
+                                    <i class="fa fa-check-square-o" ms-visible="const_values"></i>
+                                    <i class="fa fa-square-o" ms-visible="!const_values"></i>
+                                    const_values
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="const_values">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" style="width: 835px;" placeholder="json格式定义"
+                                           ms-duplex="const_values_json">
+                                </div>
+                                <p class="form-control-static">例：<span class="text-danger">[['man', 1, '男']]</span>会自动生成
+                                    const V_FIELD_MAN = 1;备注是第三个参数</p>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                        <label class="text-warning">map field 映射字段</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: show_map_fields == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkShowMapFields">
+                                    <i class="fa fa-check-square-o" ms-visible="show_map_fields"></i>
+                                    <i class="fa fa-square-o" ms-visible="!show_map_fields"></i>
+                                    show_map_fields
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="show_map_fields">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" style="width: 835px;" placeholder="json格式定义"
+                                           ms-duplex="show_map_fields_json">
+                                </div>
+                                <p class="form-control-static">例：<span class="text-danger">[['不带前缀的表名.表字段', '显示名称', '字段说明'], ['user.name', 'name_show', '用户名']]</span>
+                                </p>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                        <label class="text-warning">展现格式化</label>
+                        <!--内联表单begin-->
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label ms-class="text-success: show_format == 1"
+                                       style="cursor:pointer;margin-right: 1em;"
+                                       ms-click="$checkShowFormat">
+                                    <i class="fa fa-check-square-o" ms-visible="show_format"></i>
+                                    <i class="fa fa-square-o" ms-visible="!show_format"></i>
+                                    show_format
+                                </label>
+                            </div>
+                            <div class="form-group" ms-visible="show_format">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" style="width: 835px;" placeholder="json格式定义"
+                                           ms-duplex="show_format_str">
+                                </div>
+                                <p class="form-control-static">例：两种方式，<span
+                                        class="text-danger">date('Y-m-d H:i:s', %s)</span>这种会自动sprintf进行格式化，这种<span
+                                        class="text-danger">[["1","是"],["0","否"]]</span>会自动按1和0进行格式化显示</span></p>
+                            </div>
+                        </div>
+                        <!--内联表单end-->
+                    </div>
+                </div>
+                <!--基本表单end-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ms-if="field_name.length > 0 && !do_add_or_update_loading"
+                        ms-click="$doAddOrUpdate()">
+                    确定
+                </button>
+                <button type="button" class="btn btn-danger" ms-if="field_name.length == 0 && !do_add_or_update_loading"
+                        disabled="disabled">确定
+                </button>
+                <img src="/static/images/loading.gif" ms-visible="do_add_or_update_loading">
+            </div>
+        </div>
+    </div>
+</div>
+<!--新增字段模态框end-->
+<!--调整位置模态框begin-->
+<div class="modal fade" id="id_modal_change_position" tabindex="-1" role="dialog"
+     aria-labelledby="id_modal_change_position_title"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="id_modal_change_position_title">调整位置</h4>
+            </div>
+            <div class="modal-body">
+                <!--基本表单begin-->
+                <div>
+                    <div class="form-group">
+                        <label>After</label>
+                        <select class="form-control" ms-duplex="after_field" ms-each="after_field_select_options">
+                            <option ms-attr-value="el">{{el}}</option>
+                        </select>
+                    </div>
+                </div>
+                <!--基本表单end-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ms-click="$doChangePosition()"
+                        ms-visible="!change_position_loading">确定
+                </button>
+                <img src="/static/images/loading.gif" ms-visible="change_position_loading">
+            </div>
+        </div>
+    </div>
+</div>
+<!--调整位置模态框end-->
+<!--删除模态框begin-->
+<div class="modal fade" id="id_modal_del" tabindex="-1" role="dialog" aria-labelledby="id_modal_del_title"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="id_modal_del_title">删除</h4>
+            </div>
+            <div class="modal-body">
+                确认删除“<span class="text-danger">{{del_field_name}}</span>”字段？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ms-click="$doDel()" ms-visible="!del_loading">确定</button>
+                <img src="/static/images/loading.gif" ms-visible="del_loading">
+            </div>
+        </div>
+    </div>
+</div>
+<!--删除模态框end-->
+<script type="text/javascript">
+
+    var table_info = avalon.define({
+        $id: 'avalon_controller',
+        $init: function () {
+            //类型处理
+            table_info.is_add = table_info.is_add == 0 ? false : true;
+            table_info.$getTableInfo();
+            table_info.$initTable();
+        },
+        table_name: '{:input("table_name")}',
+        is_add: '{:empty(input("table_name")) ? 1 : 0}',
+        table_desc: '',
+        using_cache: 0,
+        cache_seconds: 0,
+        api_functions: ['get', 'create', 'delete', 'update'],
+        api_functions_selected: ['get', 'create', 'delete', 'update'],
+        engine: 'InnoDB',
+        $getTableInfo: function () {
+            if (jCommon.empty(table_info.table_name)) {
+                return;
+            }
+            $.get('/migrate/table/get', {
+                table_name: table_info.table_name
+            }, function (r) {
+                table_info.table_desc = r.info.name;
+                table_info.using_cache = r.info.is_cache > 0 ? 1 : 0;
+                table_info.cache_seconds = r.info.is_cache;
+                table_info.api_functions_selected = r.info.create_api;
+                table_info.engine = r.info.engine;
+            });
+        },
+        $apiIsChecked: function (function_name) {
+            if (table_info.api_functions_selected.indexOf(function_name) == -1) {
+                return 0;
+            } else {
+                return 1;
+            }
+        },
+        $apiChecked: function (function_name) {
+            if (table_info.$apiIsChecked(function_name)) {
+                //删除
+                table_info.api_functions_selected.remove(function_name);
+            } else {
+                //新增
+                table_info.api_functions_selected.push(function_name);
+            }
+        },
+        $items: [],
+        $initTable: function () {
+            $('#id_table').bootstrapTable({
+                url: '{:url("/migrate/field/getList")}',
+                cache: false,
+                sortOrder: 'desc',
+                pageSize: 1000,
+                pageList: [],
+                queryParams: function (params) {
+                    if (!jCommon.empty(table_info.condition)) {
+                        params.condition = table_info.condition;
+                    }
+                    if (!jCommon.empty(table_info.table_name)) {
+                        params.table_name = table_info.table_name;
+                    }
+                    return params;
+                },
+                responseHandler: function (r) {
+                    //处理显示
+                    $.each(r.items, function (k, v) {
+                        $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_field, v_field) {
+                            if (!v.hasOwnProperty(v_field)) {
+                                v[v_field] = 0;
+                            }
+                        });
+                        if (!v.hasOwnProperty('verifies')) {
+                            v.verifies = [];
+                        }
+                        if (!v.hasOwnProperty('const_values')) {
+                            v.const_values = '';
+                        }
+                        if (!v.hasOwnProperty('show_map_fields')) {
+                            v.show_map_fields = '';
+                        }
+                        if (!v.hasOwnProperty('show_format')) {
+                            v.show_format = [];
+                        }
+                        r.items[k] = v;
+                    });
+                    table_info.$items = r.items;
+                    return {
+                        'rows': r.items,
+                        'total': r.total,
+                        'page': r.offset / r.limit + 1
+                    };
+                },
+                idField: 'id',
+                toolbar: '#id_tools_div',
+                pagination: true,
+                sidePagination: "server",
+                showColumns: true,
+                showRefresh: true,
+                columns: [
+                    // {
+                    //     checkbox: true
+                    // },
+                    {
+                        field: 'field_name',
+                        title: '字段',
+                        formatter: function (value, row, index) {
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'field_desc',
+                        title: '描述'
+                    },
+                    {
+                        field: 'field_type',
+                        title: '类型'
+                    },
+                    {
+                        field: 'field_default_value',
+                        title: '默认值',
+                        formatter: function (value, row, index) {
+                            if (row.field_type == 'text' || row.field_type == 'text_long') {
+                                value = '<span class="text-danger">-</span>';
+                            } else {
+                                value = '<span class="text-primary">' + value + '</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'field_scale',
+                        title: '精度',
+                        visible: false,
+                        formatter: function (value, row, index) {
+                            if (value == 0) {
+                                value = '<span class="text-danger">-</span>';
+                            } else {
+                                value = '<span class="text-primary">' + value + '</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'verifies',
+                        title: '校验器',
+                        formatter: function (value, row, index) {
+                            // $.each(value, function(k, v){
+                            //     if(jCommon.isArray(v)){
+                            //         value[k] = '['+v.join(',')+']'
+                            //     }
+                            // });
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'const_values',
+                        title: 'const_values'
+                    },
+                    {
+                        field: 'show_map_fields',
+                        title: 'show_map_fields'
+                    },
+                    {
+                        field: 'show_format',
+                        title: 'show_format'
+                    },
+                    {
+                        field: 'visible',
+                        title: '可见',
+                        visible: false,
+                        formatter: function (value, row, index) {
+                            if (value == 0) {
+                                value = '<span class="text-danger">否</span>';
+                            } else {
+                                value = '<span class="text-primary">是</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'is_searchable',
+                        title: '可检索',
+                        visible: false,
+                        formatter: function (value, row, index) {
+                            if (value == 0) {
+                                value = '<span class="text-danger">否</span>';
+                            } else {
+                                value = '<span class="text-primary">是</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'is_sortable',
+                        title: '可排序',
+                        visible: false,
+                        formatter: function (value, row, index) {
+                            if (value == 0) {
+                                value = '<span class="text-danger">否</span>';
+                            } else {
+                                value = '<span class="text-primary">是</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'is_read_only',
+                        title: '只读',
+                        visible: false,
+                        formatter: function (value, row, index) {
+                            if (value == 0) {
+                                value = '<span class="text-danger">否</span>';
+                            } else {
+                                value = '<span class="text-primary">是</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'field_name',
+                        title: '操作',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var btn = [];
+                            btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
+                            btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
+                            btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
+                            if (!table_info.is_add) {
+                                //编辑
+                                btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
+                            } else {
+                                //新增
+                                if (index > 0) {
+                                    btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$move(\'' + value + '\', \'up\')"><i class="fa fa-arrow-up"></i> 上移</button>');
+                                } else {
+                                    btn.push('<button class="btn btn-info btn-xs" disabled="disabled"><i class="fa fa-arrow-up"></i> 上移</button>');
+                                }
+                                if (index == table_info.$items.length - 1) {
+                                    btn.push('<button class="btn btn-warning btn-xs" disabled="disabled"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                } else {
+                                    btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$move(\'' + value + '\', \'down\')"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                }
+                            }
+                            return btn.join('&nbsp;&nbsp;')
+                        }
+                    }
+                ]
+            });
+        },
+        condition: '',
+        $search: function () {
+            $('#id_table').bootstrapTable('refresh', {
+                query: {
+                    offset: 0
+                }
+            });
+        },
+        $refresh: function () {
+            $('#id_table').bootstrapTable('refresh', {});
+        },
+        //字段名
+        field_name: '',
+        field_desc: '',
+        field_type: 'int',
+        field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long'],
+        field_default_value: 0,
+        field_scale: 0,
+        //校验器 ['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password']
+        verifies: ['is_required', 'ip', 'postcode', 'id_card', 'number', 'tel', 'is_date', 'unique'],
+        verifies_selected: [],
+        common_settings: ['visible', 'is_sortable', 'is_searchable', 'is_read_only'],
+        common_settings_selected: ['visible'],
+        is_password: 0,
+        password_min_length: 6,
+        password_max_length: 18,
+        in_array: 0,
+        in_array_value: '',
+        in_scope: 0,
+        in_scope_min: 0,
+        in_scope_max: 0,
+        min: 0,
+        min_value: 0,
+        max: 0,
+        max_value: 0,
+        str_length_fixed: 0,
+        str_length_fixed_value: 0,
+        str_length_min: 0,
+        str_length_min_value: 0,
+        str_length_max: 0,
+        str_length_max_value: 0,
+        const_values: 0,
+        const_values_json: '',
+        show_map_fields: '',
+        show_map_fields_json: '',
+        //显示格式化
+        show_format: '',
+        show_format_str: '',
+        storage_type: 'string',
+        password_salt: '',
+        /**
+         * 设置默认值
+         */
+        $setFieldDefaultValue: function () {
+            table_info.edit_field_name = '';
+            //默认值处理
+            table_info.field_name = '';
+            table_info.field_desc = '';
+            table_info.field_type = 'int';
+            table_info.field_default_value = 0;
+            table_info.field_scale = 0;
+            table_info.verifies_selected = [];
+            table_info.common_settings_selected = ['visible'];
+            table_info.is_password = 0;
+            table_info.password_min_length = 6;
+            table_info.password_max_length = 18;
+            table_info.in_array = 0;
+            table_info.in_array_value = '';
+            table_info.in_scope = 0;
+            table_info.in_scope_min = 0;
+            table_info.in_scope_max = 0;
+            table_info.min = 0;
+            table_info.min_value = 0;
+            table_info.max = 0;
+            table_info.max_value = 0;
+            table_info.str_length_fixed = 0;
+            table_info.str_length_fixed_value = 0;
+            table_info.str_length_min = 0;
+            table_info.str_length_min_value = 0;
+            table_info.str_length_max = 0;
+            table_info.str_length_max_value = 0;
+            table_info.const_values = 0;
+            table_info.const_values_json = '';
+            table_info.show_map_fields = 0;
+            table_info.show_map_fields_json = '';
+            //显示格式化
+            table_info.show_format = 0;
+            table_info.show_format_str = '';
+            table_info.storage_type = 'string';
+            table_info.password_salt = '';
+        },
+        $add: function () {
+            table_info.$setFieldDefaultValue();
+            table_info.after_field = '';
+            table_info.after_field_select_options = ['id'];
+            $.each(table_info.$items, function (k, v) {
+                table_info.after_field_select_options.push(v.field_name);
+            });
+            if (table_info.$items.length > 0) {
+                table_info.after_field = table_info.$items[table_info.$items.length - 1].field_name;
+            }
+            $('#id_modal_add_field').modal('show');
+            setTimeout(function () {
+                $('#id_field_name').focus();
+            }, 1000);
+        },
+        $commonSettingCheckIsChecked: function (function_name) {
+            if (table_info.common_settings_selected.indexOf(function_name) == -1) {
+                return 0;
+            } else {
+                return 1;
+            }
+        },
+        $commonSettingCheck: function (function_name) {
+            if (table_info.$commonSettingCheckIsChecked(function_name)) {
+                //删除
+                table_info.common_settings_selected.remove(function_name);
+            } else {
+                //新增
+                table_info.common_settings_selected.push(function_name);
+            }
+        },
+        $verifiesIsChecked: function (function_name) {
+            if (table_info.verifies_selected.indexOf(function_name) == -1) {
+                return 0;
+            } else {
+                return 1;
+            }
+        },
+        $verifiesCheck: function (function_name) {
+            if (table_info.$verifiesIsChecked(function_name)) {
+                //删除
+                table_info.verifies_selected.remove(function_name);
+            } else {
+                //新增
+                table_info.verifies_selected.push(function_name);
+            }
+        },
+        $checkPassword: function () {
+            table_info.is_password = table_info.is_password == 1 ? 0 : 1;
+        },
+        $checkInArray: function () {
+            table_info.in_array = table_info.in_array == 1 ? 0 : 1;
+        },
+        $checkInScope: function () {
+            table_info.in_scope = table_info.in_scope == 1 ? 0 : 1;
+        },
+        $checkMin: function () {
+            table_info.min = table_info.min == 1 ? 0 : 1;
+        },
+        $checkMax: function () {
+            table_info.max = table_info.max == 1 ? 0 : 1;
+        },
+        $checkStrLengthFixed: function () {
+            table_info.str_length_fixed = table_info.str_length_fixed == 1 ? 0 : 1;
+        },
+        $checkStrLengthMin: function () {
+            table_info.str_length_min = table_info.str_length_min == 1 ? 0 : 1;
+        },
+        $checkStrLengthMax: function () {
+            table_info.str_length_max = table_info.str_length_max == 1 ? 0 : 1;
+        },
+        $checkConstValues: function () {
+            table_info.const_values = table_info.const_values == 1 ? 0 : 1;
+        },
+        $checkShowMapFields: function () {
+            table_info.show_map_fields = table_info.show_map_fields == 1 ? 0 : 1;
+        },
+        $checkShowFormat: function () {
+            table_info.show_format = table_info.show_format == 1 ? 0 : 1;
+        },
+        $fieldTypeIsInt: function () {
+            if (['int', 'decimal', 'int_big', 'int_tiny', 'int_small'].indexOf(table_info.field_type) !== -1) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        do_add_or_update_loading: false,
+        $doAddOrUpdate: function () {
+            var param = {
+                field_name: table_info.field_name,
+                field_desc: table_info.field_desc,
+                field_type: table_info.field_type,
+                field_default_value: table_info.field_default_value,
+                field_scale: table_info.field_scale
+            };
+            //常规设置
+            $.each(table_info.common_settings_selected, function (k, v) {
+                param[v] = 1;
+            });
+            if (!jCommon.empty(table_info.const_values_json)) {
+                param.const_values = table_info.const_values_json;
+            }
+            if (!jCommon.empty(table_info.show_map_fields)) {
+                param.show_map_fields = table_info.show_map_fields_json;
+            }
+            if (!jCommon.empty(table_info.show_format)) {
+                param.show_format = table_info.show_format_str;
+            }
+            var verifies = table_info.verifies_selected.$model;
+            if (table_info.storage_type == 'json') {
+                param.store_format = 'json';
+            }
+            if (table_info.storage_type == 'password') {
+                param.store_format = ['password', table_info.password_salt];
+            }
+            if (table_info.in_array) {
+                verifies.push(['in_array', table_info.in_array_value]);
+            }
+            if (table_info.in_scope) {
+                verifies.push(['in_scope', table_info.in_scope_min, table_info.in_scope_max]);
+            }
+            if (table_info.min) {
+                verifies.push(['min', table_info.min_value]);
+            }
+            if (table_info.max) {
+                verifies.push(['max', table_info.max_value]);
+            }
+            if (table_info.is_password) {
+                verifies.push(['is_password', table_info.password_min_length, table_info.password_max_length]);
+            }
+            if (table_info.str_length_fixed) {
+                verifies.push(['length', table_info.str_length_fixed_value]);
+            }
+            if (table_info.str_length_min) {
+                verifies.push(['length_min', table_info.str_length_min_value]);
+            }
+            if (table_info.str_length_max) {
+                verifies.push(['length_max', table_info.str_length_max_value]);
+            }
+            param.verifies = verifies;
+            if (table_info.const_values) {
+                param.const_values = table_info.const_values_json;
+            }
+            if (table_info.show_map_fields) {
+                param.show_map_fields = table_info.show_map_fields_json;
+            }
+            if (table_info.show_format) {
+                param.show_format = [[table_info.show_format_str, '_show']];
+            }
+            param.table_name = table_info.table_name;
+            param.after_field = table_info.after_field;
+            var url = '';
+            if (!table_info.is_add) {
+                if (table_info.edit_field_name.length > 0) {
+                    url = '/migrate/field/update';
+                } else {
+                    url = '/migrate/field/createForExistTable';
+                }
+            } else {
+                url = '/migrate/field/create';
+            }
+            table_info.do_add_or_update_loading = true;
+            $.post(url, param, function (r) {
+                table_info.do_add_or_update_loading = false;
+                layer.msg(table_info.edit_field_name.length > 0 ? '编辑成功' : '新增成功', function () {
+                });
+                $('#id_modal_add_field').modal('hide');
+                table_info.$refresh();
+            });
+        },
+        edit_field_name: '',
+        $edit: function (field_name) {
+            table_info.$setFieldDefaultValue();
+            //用于控制add还是editor
+            table_info.edit_field_name = field_name;
+            $('#id_modal_add_field').modal('show');
+            //设置数据
+            $.each(table_info.$items, function (k, v) {
+                if (v.field_name == field_name) {
+                    table_info.field_name = v.field_name;
+                    table_info.field_desc = v.field_desc;
+                    table_info.field_type = v.field_type;
+                    table_info.field_default_value = jCommon.isNumber(v.field_default_value) ? v.field_default_value : (jCommon.empty(v.field_default_value) ? '空' : v.field_default_value);
+                    table_info.field_scale = v.field_scale;
+                    $.each(['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password'], function (k_verify, v_verify) {
+                        if (v.verifies.indexOf(v_verify) !== -1) {
+                            table_info.verifies_selected.push(v_verify);
+                        }
+                    });
+                    $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_common_settings, v_common_settings) {
+                        if (v.hasOwnProperty(v_common_settings) && v[v_common_settings] == 1) {
+                            table_info.common_settings_selected.push(v_common_settings);
+                        }
+                    });
+                    //复杂校验器
+                    $.each(v.verifies, function (k_verify, v_verify) {
+                        if (jCommon.isArray(v_verify)) {
+                            switch (v_verify[0]) {
+                                case 'is_password':
+                                    table_info.is_password = 1;
+                                    table_info.password_min_length = v_verify[1];
+                                    table_info.password_max_length = v_verify[2];
+                                    break;
+                                case 'in_array':
+                                    table_info.in_array = 1;
+                                    table_info.in_array_value = v_verify[1];
+                                    break;
+                                case 'in_scope':
+                                    table_info.in_scope = 1;
+                                    table_info.in_scope_min = v_verify[1];
+                                    table_info.in_scope_max = v_verify[2];
+                                    break;
+                                case 'min':
+                                    table_info.min = 1;
+                                    table_info.min_value = v_verify[1];
+                                    break;
+                                case 'max':
+                                    table_info.max = 1;
+                                    table_info.max_value = v_verify[1];
+                                    break;
+                                case 'length':
+                                    table_info.str_length_fixed = 1;
+                                    table_info.str_length_fixed_value = v_verify[1];
+                                    break;
+                                case 'length_min':
+                                    table_info.str_length_min = 1;
+                                    table_info.str_length_min_value = v_verify[1];
+                                    break;
+                                case 'length_max':
+                                    table_info.str_length_max = 1;
+                                    table_info.str_length_max_value = v_verify[1];
+                                    break;
+                            }
+                        }
+                    });
+                    if (v.hasOwnProperty('const_values') && !jCommon.empty(v.const_values)) {
+                        table_info.const_values = 1;
+                        table_info.const_values_json = v.const_values;
+                    }
+                    if (v.hasOwnProperty('show_map_fields') && !jCommon.empty(v.show_map_fields)) {
+                        table_info.show_map_fields = 1;
+                        table_info.show_map_fields_json = v.show_map_fields;
+                    }
+                    if (v.hasOwnProperty('show_format') && !jCommon.empty(v.show_format)) {
+                        table_info.show_format = 1;
+                        table_info.show_format_str = v.show_format;
+                    }
+                    if (v.hasOwnProperty('store_format') && !jCommon.empty(v.store_format)) {
+                        if (jCommon.isArray(v.store_format)) {
+                            table_info.storage_type = v.store_format[0];
+                            table_info.password_salt = v.store_format[1];
+                        } else {
+                            table_info.storage_type = v.store_format;
+                        }
+                    } else {
+                        table_info.storage_type = 'string';
+                    }
+                }
+            });
+            setTimeout(function () {
+                $('#id_field_name').focus();
+            }, 1000);
+        },
+        del_loading: false,
+        del_field_name: '',
+        $del: function (field_name) {
+            table_info.del_field_name = field_name;
+            $('#id_modal_del').modal('show');
+        },
+        $doDel: function () {
+            table_info.del_loading = true;
+            $.post('/migrate/field/delete', {
+                table_name: table_info.table_name,
+                field_name: table_info.del_field_name
+            }, function (r) {
+                table_info.del_loading = false;
+                $('#id_modal_del').modal('hide');
+                layer.msg('删除成功，' + r.file_name, function () {
+
+                });
+                //刷新数据
+                table_info.$refresh();
+            });
+        },
+        $move: function (field_name, type) {
+            $.post('/migrate/field/move', {
+                table_name: table_info.table_name,
+                field_name: field_name,
+                type: type
+            }, function (r) {
+                layer.msg('移动成功', function () {
+
+                });
+                //刷新数据
+                table_info.$refresh();
+            });
+        },
+        create_loading: false,
+        $create: function () {
+            table_info.create_loading = true;
+            $.get('/migrate/table/create', {
+                table_name: table_info.table_name,
+                table_desc: table_info.table_desc,
+                cache_seconds: table_info.using_cache ? table_info.cache_seconds : 'null',
+                api_functions: table_info.api_functions_selected.$model,
+                engine: table_info.engine
+            }, function (r) {
+                table_info.create_loading = false;
+                layer.msg('创建成功，文件地址：' + r.file_name, function () {
+                });
+                //跳转
+                window.location.href = "/migrate/table/index.html";
+            });
+        },
+        $fieldRename: function (field_name) {
+            //prompt层
+            layer.prompt({title: '请输入新的字段名'}, function (new_name, index) {
+                if (jCommon.empty(new_name)) {
+                    //不处理
+                    return;
+                }
+                //关闭
+                layer.close(index);
+                //提交
+                $.get('/migrate/field/rename', {
+                    table_name: table_info.table_name,
+                    old_name: field_name,
+                    new_name: new_name
+                }, function (r) {
+                    layer.msg('修改字段名成功:' + r.file_name, function () {
+                    });
+                    //刷新数据
+                    table_info.$refresh();
+                });
+            });
+        },
+        $change_position_field_name: '',
+        after_field: '',
+        after_field_select_options: [],
+        change_position_loading: false,
+        $changePosition: function (field_name) {
+            table_info.$change_position_field_name = field_name;
+            table_info.after_field = '';
+            table_info.after_field_select_options = ['id'];
+            $.each(table_info.$items, function (k, v) {
+                if (v.field_name != field_name) {
+                    table_info.after_field_select_options.push(v.field_name);
+                } else {
+                    if (k > 0) {
+                        table_info.after_field = table_info.$items[k - 1].field_name;
+                    }
+                }
+            });
+            $('#id_modal_change_position').modal('show');
+        },
+        $doChangePosition: function () {
+            //如果位置没改变，则不提交
+            var old_after_field_name = '';
+            $.each(table_info.$items, function (k, v) {
+                if (v.field_name == table_info.$change_position_field_name) {
+                    if (k == 0) {
+                        old_after_field_name = 'id';
+                    } else {
+                        old_after_field_name = table_info.$items[k - 1].field_name;
+                    }
+                    return false;
+                }
+            });
+            if (old_after_field_name == table_info.after_field) {
+                return;
+            }
+            table_info.change_position_loading = true;
+            $.get('/migrate/field/changePosition', {
+                table_name: table_info.table_name,
+                field_name: table_info.$change_position_field_name,
+                after_field_name: table_info.after_field
+            }, function (r) {
+                table_info.change_position_loading = false;
+                layer.msg('修改字段位置成功:' + r.file_name, function () {
+                });
+                $('#id_modal_change_position').modal('hide');
+                //刷新数据
+                table_info.$refresh();
+            });
+        },
+        $updateTable: function(){
+            $.get('/migrate/table/update', {
+                table_name: table_info.table_name,
+                table_desc: table_info.table_desc,
+                engine: table_info.engine,
+                api_functions: table_info.api_functions_selected.$model,
+                cache_seconds: table_info.cache_seconds
+            }, function(r){
+                layer.msg('更新成功', function(){
+
+                });
+                table_info.$getTableInfo();
+            });
+        }
+    });
+
+    avalon.ready(function () {
+        table_info.$init();
+        setTimeout(function () {
+            $('#id_table_name').focus();
+        }, 1000);
+    });
+
+    /**
+     * 监听
+     */
+    table_info.$watch('field_type', function (new_value, old_value) {
+        //设置类型
+        if (table_info.$fieldTypeIsInt()) {
+            table_info.field_default_value = 0;
+            table_info.verifies = ['is_required', 'ip', 'postcode', 'id_card', 'number', 'is_date', 'unique'];
+            table_info.in_scope = 0;
+            table_info.min = 0;
+            table_info.max = 0;
+            table_info.const_values = 0;
+            table_info.show_map_fields = 0;
+            table_info.show_format = 0;
+            table_info.field_scale = 0;
+        } else {
+            table_info.field_default_value = '空';
+            table_info.verifies = ['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash'];
+            table_info.storage_type = 'string';
+            table_info.is_password = 0;
+            table_info.str_length_fixed = 0;
+            table_info.str_length_max = 0;
+            table_info.str_length_min = 0;
+            table_info.field_scale = 0;
+        }
+        table_info.verifies_selected = [];
+        //设置数据
+        switch (new_value) {
+            case 'decimal':
+                table_info.field_scale = 2;
+                break;
+        }
+    });
+
+    /**
+     * 字段类型自动添加过滤
+     */
+    table_info.$watch('field_name', function (new_value, old_value) {
+        if (new_value.length > 6 && new_value.indexOf('_time') == new_value.length - 5) {
+            //时间类型
+            table_info.show_format = 1;
+            table_info.show_format_str = "date('Y-m-d H:i:s', %s)";
+        } else {
+            table_info.show_format = 0;
+            table_info.show_format_str = '';
+        }
+    });
+
+    /**
+     * 检索
+     */
+    table_info.$watch('table_name', function (new_value, old_value) {
+        if (new_value.length > 3) {
+            table_info.$refresh();
+        }
+    });
+
+</script>
