@@ -188,13 +188,13 @@
                         <!--内联表单begin-->
                         <div class="form-inline">
                             <div class="form-group">
-                                <select class="form-control" ms-duplex="storage_type">
+                                <select class="form-control" ms-duplex="store_format">
                                     <option value="string">string</option>
                                     <option value="json">json</option>
                                     <option value="password">password</option>
                                 </select>
                             </div>
-                            <div class="form-group" ms-visible="storage_type == 'password'">
+                            <div class="form-group" ms-visible="store_format == 'password'">
                                 <div class="input-group">
                                     <div class="input-group-addon">加盐</div>
                                     <input class="form-control" type="text" style="width: 100px;"
@@ -655,12 +655,19 @@
                         }
                         if (!v.hasOwnProperty('const_values')) {
                             v.const_values = '';
+                        }else{
+                            v.const_values = JSON.stringify(v.const_values);
                         }
                         if (!v.hasOwnProperty('show_map_fields')) {
                             v.show_map_fields = '';
+                        }else{
+                            v.show_map_fields = JSON.stringify(v.show_map_fields);
                         }
                         if (!v.hasOwnProperty('show_format')) {
                             v.show_format = [];
+                        }
+                        if(!v.hasOwnProperty('store_format')){
+                            v.store_format = 'string';
                         }
                         r.items[k] = v;
                     });
@@ -798,12 +805,19 @@
                         }
                     },
                     {
+                        field: 'store_format',
+                        title: '存储类型',
+                        visible: false
+                    },
+                    {
                         field: 'field_name',
                         title: '操作',
                         align: 'center',
                         formatter: function (value, row, index) {
                             var btn = [];
-                            btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
+                            if(!table_info.is_add){
+                                btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
+                            }
                             btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
                             btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                             if (!table_info.is_add) {
@@ -876,7 +890,7 @@
         //显示格式化
         show_format: '',
         show_format_str: '',
-        storage_type: 'string',
+        store_format: 'string',
         password_salt: '',
         /**
          * 设置默认值
@@ -916,7 +930,7 @@
             //显示格式化
             table_info.show_format = 0;
             table_info.show_format_str = '';
-            table_info.storage_type = 'string';
+            table_info.store_format = 'string';
             table_info.password_salt = '';
         },
         $add: function () {
@@ -1019,9 +1033,6 @@
             $.each(table_info.common_settings_selected, function (k, v) {
                 param[v] = 1;
             });
-            if (!jCommon.empty(table_info.const_values_json)) {
-                param.const_values = table_info.const_values_json;
-            }
             if (!jCommon.empty(table_info.show_map_fields)) {
                 param.show_map_fields = table_info.show_map_fields_json;
             }
@@ -1029,10 +1040,10 @@
                 param.show_format = table_info.show_format_str;
             }
             var verifies = table_info.verifies_selected.$model;
-            if (table_info.storage_type == 'json') {
+            if (table_info.store_format == 'json') {
                 param.store_format = 'json';
             }
-            if (table_info.storage_type == 'password') {
+            if (table_info.store_format == 'password') {
                 param.store_format = ['password', table_info.password_salt];
             }
             if (table_info.in_array) {
@@ -1169,13 +1180,13 @@
                     }
                     if (v.hasOwnProperty('store_format') && !jCommon.empty(v.store_format)) {
                         if (jCommon.isArray(v.store_format)) {
-                            table_info.storage_type = v.store_format[0];
+                            table_info.store_format = v.store_format[0];
                             table_info.password_salt = v.store_format[1];
                         } else {
-                            table_info.storage_type = v.store_format;
+                            table_info.store_format = v.store_format;
                         }
                     } else {
-                        table_info.storage_type = 'string';
+                        table_info.store_format = 'string';
                     }
                 }
             });
@@ -1231,7 +1242,7 @@
                 layer.msg('创建成功，文件地址：' + r.file_name, function () {
                 });
                 //跳转
-                window.location.href = "/migrate/table/index.html";
+                window.location.href = "/migrate/tables/index.html";
             });
         },
         $fieldRename: function (field_name) {
@@ -1346,7 +1357,7 @@
         } else {
             table_info.field_default_value = '空';
             table_info.verifies = ['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash'];
-            table_info.storage_type = 'string';
+            table_info.store_format = 'string';
             table_info.is_password = 0;
             table_info.str_length_fixed = 0;
             table_info.str_length_max = 0;

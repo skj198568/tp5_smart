@@ -22,18 +22,26 @@ ClMigrateField::instance()
 </present>
 <present name="field_info['const_values']">
     <notempty name="field_info['const_values']">
-        ->constValues({:is_array($field_info['const_values']) ? trim(json_encode($field_info['const_values'], JSON_UNESCAPED_UNICODE), '"') : $field_info['const_values']})
+        ->constValues({:is_array($field_info['const_values']) ? trim(json_encode($field_info['const_values'], JSON_UNESCAPED_UNICODE), '"') : $field_info['const_values']}
+        )
     </notempty>
 </present>
 <present name="field_info['show_map_fields']">
     <notempty name="field_info['show_map_fields']">
-        ->showMapFields({:is_array($field_info['show_map_fields']) ? trim(json_encode($field_info['show_map_fields'], JSON_UNESCAPED_UNICODE), '"') : $field_info['show_map_fields']})
+        ->showMapFields({:is_array($field_info['show_map_fields']) ? trim(json_encode($field_info['show_map_fields'], JSON_UNESCAPED_UNICODE), '"') : $field_info['show_map_fields']}
+        )
     </notempty>
 </present>
 <present name="field_info['show_format']">
     <notempty name="field_info['show_format']">
         <foreach name="field_info['show_format']" item="v" key="k">
-            ->showFormat("{$v[0]}")
+            <present name="v[1]">
+                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (!json_decode($v[0]) ? $v[0] : '"'.str_replace(['"'], ["'"], $v[0]).'"')}
+                , '{$v[1]}')
+                <else/>
+                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (!json_decode($v[0]) ? $v[0] : '"'.str_replace(['"'], ["'"], $v[0]).'"')})
+                )
+            </present>
         </foreach>
     </notempty>
 </present>
@@ -46,9 +54,9 @@ ClMigrateField::instance()
     <if condition="$field_info['store_format'] eq 'json'">
         ->storageFormatJson()
     </if>
-    <if condition="is_array($store_format)">
+    <if condition="is_array($field_info['store_format'])">
         <if condition="$field_info['store_format'][0] eq 'password'">
-            ->storageFormatPassword('{$store_format[1]}')
+            ->storageFormatPassword('{$field_info['store_format'][1]}')
         </if>
     </if>
 </present>
