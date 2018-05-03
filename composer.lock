@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b55dde94d7f6ebfa49d7a72f37e38443",
+    "content-hash": "eaf5d2bb5a8efa8d56ed37a40bbd32f2",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -819,7 +819,7 @@
         },
         {
             "name": "skj198568/class_library",
-            "version": "dev-master",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/skj198568/class_library.git",
@@ -863,7 +863,7 @@
         },
         {
             "name": "symfony/inflector",
-            "version": "v4.0.8",
+            "version": "v4.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/inflector.git",
@@ -920,7 +920,7 @@
         },
         {
             "name": "symfony/options-resolver",
-            "version": "v4.0.8",
+            "version": "v4.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
@@ -974,7 +974,7 @@
         },
         {
             "name": "symfony/process",
-            "version": "v4.0.8",
+            "version": "v4.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
@@ -1023,7 +1023,7 @@
         },
         {
             "name": "symfony/property-access",
-            "version": "v4.0.8",
+            "version": "v4.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/property-access.git",
@@ -1138,9 +1138,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "skj198568/class_library": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
