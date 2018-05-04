@@ -48,7 +48,7 @@ class ApiController extends BaseApiController {
         parent::_initialize();
         $token = '';
         if (!in_array(strtolower(request()->controller() . '/' . request()->action()), $this->uncheck_request)) {
-            $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token', '');
+            $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token');
         }
         if (!empty($token)) {
             $this->id = ClCrypt::decrypt($token, CRYPT_KEY);
