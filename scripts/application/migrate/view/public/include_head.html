@@ -13,7 +13,7 @@
 <link href="https://cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css" rel="stylesheet">
 <style type="text/css">
 
-    html,body{
+    html, body {
         font-size: 14px;
     }
 
@@ -88,5 +88,13 @@
     $.ajaxSetup({
         cache: false
     });
+
+    //校验
+    if (['Index/index'].indexOf("{:request()->controller().'/'.request()->action()}") === -1) {
+        if (jCommon.empty(token)) {
+            //跳转至首页
+            window.location.href = '{:url("index/index")}';
+        }
+    }
 
 </script>
