@@ -16,7 +16,7 @@ use ClassLibrary\ClArray;
  * @package app\api\base
  */
 class {$table_name}BaseApiController extends ApiController {
-<if condition="in_array('getList', $create_api)">
+<if condition="in_array('get', $create_api)">
 
     /**
      * 列表
@@ -34,8 +34,6 @@ class {$table_name}BaseApiController extends ApiController {
             return $return;
         }), '{$ar_get_list_json}');
     }
-</if>
-<if condition="in_array('get', $create_api)">
 
     /**
      * 单个信息
