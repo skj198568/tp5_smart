@@ -130,8 +130,8 @@ class SmartInit extends Command {
             if (empty($comment)) {
                 $return['name'] = $each_comment['TABLE_COMMENT'];
             } else {
-                if (!isset($table_comment['is_cache'])) {
-                    $table_comment['is_cache'] = 'null';
+                if (!isset($comment['is_cache']) || is_null($comment['is_cache'])) {
+                    $comment['is_cache'] = 'null';
                 }
                 $return = array_merge($return, $comment);
             }
