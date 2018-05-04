@@ -36,10 +36,10 @@ ClMigrateField::instance()
     <notempty name="field_info['show_format']">
         <foreach name="field_info['show_format']" item="v" key="k">
             <present name="v[1]">
-                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (!json_decode($v[0]) ? sprintf('"%s"', $v[0]) : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))}
+                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (json_decode($v[0]) ? $v[0] : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))}
                 , '{$v[1]}')
                 <else/>
-                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (!json_decode($v[0]) ? sprintf('"%s"', $v[0]) : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))})
+                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (json_decode($v[0]) ? $v[0] : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))})
                 )
             </present>
         </foreach>
