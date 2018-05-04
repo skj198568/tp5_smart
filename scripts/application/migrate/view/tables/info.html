@@ -656,15 +656,23 @@
                         if (!v.hasOwnProperty('const_values')) {
                             v.const_values = '';
                         }else{
-                            v.const_values = JSON.stringify(v.const_values);
+                            if(jCommon.isArray(v.const_values)){
+                                v.const_values = JSON.stringify(v.const_values);
+                            }
                         }
                         if (!v.hasOwnProperty('show_map_fields')) {
                             v.show_map_fields = '';
                         }else{
-                            v.show_map_fields = JSON.stringify(v.show_map_fields);
+                            if(jCommon.isArray(v.show_map_fields)) {
+                                v.show_map_fields = JSON.stringify(v.show_map_fields);
+                            }
                         }
                         if (!v.hasOwnProperty('show_format')) {
                             v.show_format = [];
+                        }else{
+                            if(jCommon.isArray(v.show_format)){
+                                v.show_format = JSON.stringify(v.show_format);
+                            }
                         }
                         if(!v.hasOwnProperty('store_format')){
                             v.store_format = 'string';
