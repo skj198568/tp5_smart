@@ -45,7 +45,8 @@ class MigrateBaseController extends Controller {
      */
     public function _initialize() {
         if (!ClVerify::isLocalIp()) {
-            return '<h1 style="text-align: center;font-size: 5em;">404</h1>';
+            echo('<h1 style="text-align: center;font-size: 5em;">404</h1>');
+            exit;
         }
         if (App::$debug) {
             log_info('$_REQUEST:', request()->request());
