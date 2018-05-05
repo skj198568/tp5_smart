@@ -700,7 +700,29 @@
                         field: 'field_name',
                         title: '字段',
                         formatter: function (value, row, index) {
-                            return value;
+                            var btn = [value];
+                            if (!table_info.is_add) {
+                                btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
+                            }
+                            btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
+                            btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
+                            if (!table_info.is_add) {
+                                //编辑
+                                btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
+                            } else {
+                                //新增
+                                if (index > 0) {
+                                    btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$move(\'' + value + '\', \'up\')"><i class="fa fa-arrow-up"></i> 上移</button>');
+                                } else {
+                                    btn.push('<button class="btn btn-info btn-xs" disabled="disabled"><i class="fa fa-arrow-up"></i> 上移</button>');
+                                }
+                                if (index == table_info.$items.length - 1) {
+                                    btn.push('<button class="btn btn-warning btn-xs" disabled="disabled"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                } else {
+                                    btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$move(\'' + value + '\', \'down\')"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                }
+                            }
+                            return btn.join('&nbsp;&nbsp;')
                         }
                     },
                     {
@@ -816,36 +838,6 @@
                         field: 'store_format',
                         title: '存储类型',
                         visible: false
-                    },
-                    {
-                        field: 'field_name',
-                        title: '操作',
-                        align: 'center',
-                        formatter: function (value, row, index) {
-                            var btn = [];
-                            if (!table_info.is_add) {
-                                btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
-                            }
-                            btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
-                            btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
-                            if (!table_info.is_add) {
-                                //编辑
-                                btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
-                            } else {
-                                //新增
-                                if (index > 0) {
-                                    btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$move(\'' + value + '\', \'up\')"><i class="fa fa-arrow-up"></i> 上移</button>');
-                                } else {
-                                    btn.push('<button class="btn btn-info btn-xs" disabled="disabled"><i class="fa fa-arrow-up"></i> 上移</button>');
-                                }
-                                if (index == table_info.$items.length - 1) {
-                                    btn.push('<button class="btn btn-warning btn-xs" disabled="disabled"><i class="fa fa-arrow-down"></i> 下移</button>');
-                                } else {
-                                    btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$move(\'' + value + '\', \'down\')"><i class="fa fa-arrow-down"></i> 下移</button>');
-                                }
-                            }
-                            return btn.join('&nbsp;&nbsp;')
-                        }
                     }
                 ]
             });
@@ -1274,7 +1266,7 @@
         },
         $fieldRename: function (field_name) {
             //prompt层
-            layer.prompt({title: '请输入新的字段名'}, function (new_name, index) {
+            layer.prompt({title: '将字段“<span class="text-danger">'+field_name+'</span>”改为', value:field_name}, function (new_name, index) {
                 if (jCommon.empty(new_name)) {
                     //不处理
                     return;
