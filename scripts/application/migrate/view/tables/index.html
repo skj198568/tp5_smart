@@ -151,6 +151,7 @@
                     tables.del_loading = false;
                     layer.msg('删除成功', function () {
                     });
+                    $('#id_modal_del').modal('hide');
                     tables.$refresh();
                 });
             });
@@ -164,7 +165,7 @@
         rename_new_table_name: '',
         $rename: function (table_name) {
             tables.rename_table_name = table_name;
-            tables.rename_new_table_name = '';
+            tables.rename_new_table_name = table_name;
             $('#id_modal_rename').modal('show');
         },
         $doRename: function () {
