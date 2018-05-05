@@ -911,7 +911,7 @@
             table_info.field_type = 'int';
             table_info.field_default_value = 0;
             table_info.field_scale = 0;
-            table_info.verifies_selected.clear();
+            table_info.verifies_selected = ['number'];
             table_info.common_settings_selected = ['visible'];
             table_info.is_password = 0;
             table_info.password_min_length = 6;
@@ -1386,6 +1386,7 @@
             table_info.show_map_fields = 0;
             table_info.show_format = 0;
             table_info.field_scale = 0;
+            table_info.verifies_selected = ['number'];
         } else {
             table_info.field_default_value = '空';
             table_info.verifies = ['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash'];
@@ -1395,8 +1396,8 @@
             table_info.str_length_max = 0;
             table_info.str_length_min = 0;
             table_info.field_scale = 0;
+            table_info.verifies_selected.clear();
         }
-        table_info.verifies_selected.clear();
         //设置数据
         switch (new_value) {
             case 'decimal':
