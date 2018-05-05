@@ -48,6 +48,14 @@
      */
     var token = jCommon.cookieGet('token');
 
+    /**
+     * ajax完成回调函数
+     * @param XMLHttpRequest
+     * @param textStatus
+     */
+    var ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+    };
+
     //重写ajax方法
     (function ($) {
         // 备份jquery的ajax方法
@@ -80,6 +88,10 @@
             if (!_opt.data.hasOwnProperty('token') && !jCommon.empty(token)) {
                 _opt.data.token = token;
             }
+            //回调函数
+            _opt.complete = function (XMLHttpRequest, textStatus) {
+                ajax_complete_call_back(XMLHttpRequest, textStatus);
+            };
             return _ajax(_opt);
         };
     })(jQuery);

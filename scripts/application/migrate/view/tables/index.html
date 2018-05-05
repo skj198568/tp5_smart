@@ -154,6 +154,11 @@
                     tables.$refresh();
                 });
             });
+            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                setTimeout(function () {
+                    tables.del_loading = false;
+                }, 3000);
+            };
         },
         rename_table_name: '',
         rename_new_table_name: '',

@@ -655,26 +655,26 @@
                         }
                         if (!v.hasOwnProperty('const_values')) {
                             v.const_values = '';
-                        }else{
-                            if(jCommon.isArray(v.const_values)){
+                        } else {
+                            if (jCommon.isArray(v.const_values)) {
                                 v.const_values = JSON.stringify(v.const_values);
                             }
                         }
                         if (!v.hasOwnProperty('show_map_fields')) {
                             v.show_map_fields = '';
-                        }else{
-                            if(jCommon.isArray(v.show_map_fields)) {
+                        } else {
+                            if (jCommon.isArray(v.show_map_fields)) {
                                 v.show_map_fields = JSON.stringify(v.show_map_fields);
                             }
                         }
                         if (!v.hasOwnProperty('show_format')) {
                             v.show_format = [];
-                        }else{
-                            if(jCommon.isArray(v.show_format)){
+                        } else {
+                            if (jCommon.isArray(v.show_format)) {
                                 v.show_format = JSON.stringify(v.show_format);
                             }
                         }
-                        if(!v.hasOwnProperty('store_format')){
+                        if (!v.hasOwnProperty('store_format')) {
                             v.store_format = 'string';
                         }
                         r.items[k] = v;
@@ -823,7 +823,7 @@
                         align: 'center',
                         formatter: function (value, row, index) {
                             var btn = [];
-                            if(!table_info.is_add){
+                            if (!table_info.is_add) {
                                 btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
                             }
                             btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
@@ -911,7 +911,7 @@
             table_info.field_type = 'int';
             table_info.field_default_value = 0;
             table_info.field_scale = 0;
-            table_info.verifies_selected = [];
+            table_info.verifies_selected.clear();
             table_info.common_settings_selected = ['visible'];
             table_info.is_password = 0;
             table_info.password_min_length = 6;
@@ -951,6 +951,7 @@
             if (table_info.$items.length > 0) {
                 table_info.after_field = table_info.$items[table_info.$items.length - 1].field_name;
             }
+            console.log(table_info.in_array, table_info.in_array_value, table_info.verifies_selected);
             $('#id_modal_add_field').modal('show');
             setTimeout(function () {
                 $('#id_field_name').focus();
@@ -1048,12 +1049,14 @@
                 param.show_format = table_info.show_format_str;
             }
             var verifies = table_info.verifies_selected.$model;
+            console.log('verifies', verifies);
             if (table_info.store_format == 'json') {
                 param.store_format = 'json';
             }
             if (table_info.store_format == 'password') {
                 param.store_format = ['password', table_info.password_salt];
             }
+            console.log(table_info.in_array);
             if (table_info.in_array) {
                 verifies.push(['in_array', table_info.in_array_value]);
             }
@@ -1079,6 +1082,7 @@
                 verifies.push(['length_max', table_info.str_length_max_value]);
             }
             param.verifies = verifies;
+            console.log('verifies_end:', verifies);
             if (table_info.const_values) {
                 param.const_values = table_info.const_values_json;
             }
@@ -1108,6 +1112,11 @@
                 $('#id_modal_add_field').modal('hide');
                 table_info.$refresh();
             });
+            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                setTimeout(function () {
+                    table_info.do_add_or_update_loading = false;
+                }, 3000);
+            };
         },
         edit_field_name: '',
         $edit: function (field_name) {
@@ -1222,6 +1231,11 @@
                 //刷新数据
                 table_info.$refresh();
             });
+            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                setTimeout(function () {
+                    table_info.del_loading = false;
+                }, 3600);
+            };
         },
         $move: function (field_name, type) {
             $.post('/migrate/field/move', {
@@ -1246,12 +1260,17 @@
                 api_functions: table_info.api_functions_selected.$model,
                 engine: table_info.engine
             }, function (r) {
-                table_info.create_loading = false;
                 layer.msg('创建成功，文件地址：' + r.file_name, function () {
                 });
                 //跳转
                 window.location.href = "/migrate/tables/index.html";
+                table_info.create_loading = false;
             });
+            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                setTimeout(function () {
+                    table_info.create_loading = false;
+                }, 3000)
+            };
         },
         $fieldRename: function (field_name) {
             //prompt层
@@ -1323,16 +1342,21 @@
                 //刷新数据
                 table_info.$refresh();
             });
+            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                setTimeout(function () {
+                    table_info.change_position_loading = false;
+                }, 3000);
+            };
         },
-        $updateTable: function(){
+        $updateTable: function () {
             $.get('/migrate/table/update', {
                 table_name: table_info.table_name,
                 table_desc: table_info.table_desc,
                 engine: table_info.engine,
                 api_functions: table_info.api_functions_selected.$model,
                 cache_seconds: table_info.cache_seconds
-            }, function(r){
-                layer.msg('更新成功', function(){
+            }, function (r) {
+                layer.msg('更新成功', function () {
 
                 });
                 table_info.$getTableInfo();
@@ -1372,7 +1396,7 @@
             table_info.str_length_min = 0;
             table_info.field_scale = 0;
         }
-        table_info.verifies_selected = [];
+        table_info.verifies_selected.clear();
         //设置数据
         switch (new_value) {
             case 'decimal':
