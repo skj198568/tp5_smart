@@ -907,8 +907,10 @@
             table_info.field_type = 'int';
             table_info.field_default_value = 0;
             table_info.field_scale = 0;
-            table_info.verifies_selected = ['number'];
-            table_info.common_settings_selected = ['visible'];
+            table_info.verifies_selected.clear();
+            table_info.verifies_selected.push('number');
+            table_info.common_settings_selected.clear();
+            table_info.common_settings_selected.push('visible');
             table_info.is_password = 0;
             table_info.password_min_length = 6;
             table_info.password_max_length = 18;
@@ -940,7 +942,8 @@
         $add: function () {
             table_info.$setFieldDefaultValue();
             table_info.after_field = '';
-            table_info.after_field_select_options = ['id'];
+            table_info.after_field_select_options.clear();
+            table_info.after_field_select_options.push('id');
             $.each(table_info.$items, function (k, v) {
                 table_info.after_field_select_options.push(v.field_name);
             });
@@ -1151,7 +1154,7 @@
                                     break;
                                 case 'in_array':
                                     table_info.in_array = 1;
-                                    table_info.in_array_value = v_verify[1];
+                                    table_info.in_array_value = JSON.stringify(v_verify[1]);
                                     break;
                                 case 'in_scope':
                                     table_info.in_scope = 1;
@@ -1302,7 +1305,8 @@
         $changePosition: function (field_name) {
             table_info.$change_position_field_name = field_name;
             table_info.after_field = '';
-            table_info.after_field_select_options = ['id'];
+            table_info.after_field_select_options.clear();
+            table_info.after_field_select_options.push('id');
             $.each(table_info.$items, function (k, v) {
                 if (v.field_name != field_name) {
                     table_info.after_field_select_options.push(v.field_name);
@@ -1379,7 +1383,8 @@
         //设置类型
         if (table_info.$fieldTypeIsInt()) {
             table_info.field_default_value = 0;
-            table_info.verifies = ['is_required', 'ip', 'postcode', 'id_card', 'number', 'is_date', 'unique'];
+            table_info.verifies.clear();
+            table_info.verifies.pushArray(['is_required', 'ip', 'postcode', 'id_card', 'number', 'is_date', 'unique']);
             table_info.in_scope = 0;
             table_info.min = 0;
             table_info.max = 0;
@@ -1387,10 +1392,12 @@
             table_info.show_map_fields = 0;
             table_info.show_format = 0;
             table_info.field_scale = 0;
-            table_info.verifies_selected = ['number'];
+            table_info.verifies_selected.clear();
+            table_info.verifies_selected.push('number');
         } else {
             table_info.field_default_value = '空';
-            table_info.verifies = ['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash'];
+            table_info.verifies.clear();
+            table_info.verifies.pushArray(['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash']);
             table_info.store_format = 'string';
             table_info.is_password = 0;
             table_info.str_length_fixed = 0;
