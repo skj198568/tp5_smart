@@ -647,7 +647,11 @@
                     $.each(r.items, function (k, v) {
                         $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_field, v_field) {
                             if (!v.hasOwnProperty(v_field)) {
-                                v[v_field] = 0;
+                                if (v_field == 'visible') {
+                                    v[v_field] = 1;
+                                } else {
+                                    v[v_field] = 0;
+                                }
                             }
                         });
                         if (!v.hasOwnProperty('verifies')) {
@@ -943,7 +947,6 @@
             if (table_info.$items.length > 0) {
                 table_info.after_field = table_info.$items[table_info.$items.length - 1].field_name;
             }
-            console.log(table_info.in_array, table_info.in_array_value, table_info.verifies_selected);
             $('#id_modal_add_field').modal('show');
             setTimeout(function () {
                 $('#id_field_name').focus();
@@ -1034,6 +1037,10 @@
             $.each(table_info.common_settings_selected, function (k, v) {
                 param[v] = 1;
             });
+            //不可见，特殊处理
+            if (!param.hasOwnProperty('visible')) {
+                param.visible = 0;
+            }
             if (!jCommon.empty(table_info.show_map_fields)) {
                 param.show_map_fields = table_info.show_map_fields_json;
             }
@@ -1041,14 +1048,12 @@
                 param.show_format = table_info.show_format_str;
             }
             var verifies = table_info.verifies_selected.$model;
-            console.log('verifies', verifies);
             if (table_info.store_format == 'json') {
                 param.store_format = 'json';
             }
             if (table_info.store_format == 'password') {
                 param.store_format = ['password', table_info.password_salt];
             }
-            console.log(table_info.in_array);
             if (table_info.in_array) {
                 verifies.push(['in_array', table_info.in_array_value]);
             }
@@ -1074,7 +1079,6 @@
                 verifies.push(['length_max', table_info.str_length_max_value]);
             }
             param.verifies = verifies;
-            console.log('verifies_end:', verifies);
             if (table_info.const_values) {
                 param.const_values = table_info.const_values_json;
             }
@@ -1129,6 +1133,8 @@
                             table_info.verifies_selected.push(v_verify);
                         }
                     });
+                    //清空
+                    table_info.common_settings_selected.clear();
                     $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_common_settings, v_common_settings) {
                         if (v.hasOwnProperty(v_common_settings) && v[v_common_settings] == 1) {
                             table_info.common_settings_selected.push(v_common_settings);
@@ -1266,7 +1272,10 @@
         },
         $fieldRename: function (field_name) {
             //prompt层
-            layer.prompt({title: '将字段“<span class="text-danger">'+field_name+'</span>”改为', value:field_name}, function (new_name, index) {
+            layer.prompt({
+                title: '将字段“<span class="text-danger">' + field_name + '</span>”改为',
+                value: field_name
+            }, function (new_name, index) {
                 if (jCommon.empty(new_name)) {
                     //不处理
                     return;
