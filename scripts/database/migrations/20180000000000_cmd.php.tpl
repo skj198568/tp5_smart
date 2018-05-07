@@ -43,22 +43,22 @@ class Cmd extends \think\migration\Migrator {
     /**
      * 清缓存，用于升级
      */
-    protected function clearCache(){
+    protected function clearCache() {
         $type = config('cache.type');
         $type = strtolower($type);
-        if($type == 'file'){
+        if ($type == 'file') {
             //文件缓存
             $cmd = sprintf('rm %s -rf', CACHE_PATH);
             //执行
             exec($cmd);
-        }else if($type == 'redis'){
+        } else if ($type == 'redis') {
             //redis缓存
             $redis_host = config('redis.host');
-            if(empty($redis_host)){
+            if (empty($redis_host)) {
                 $redis_host = '127.0.0.1';
             }
             $redis_port = config('redis.port');
-            if(empty($redis_port)){
+            if (empty($redis_port)) {
                 $redis_port = 6379;
             }
             $redis = new \think\cache\driver\Redis([
