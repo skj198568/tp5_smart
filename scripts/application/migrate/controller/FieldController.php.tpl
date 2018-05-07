@@ -190,6 +190,27 @@ class FieldController extends MigrateBaseController {
     }
 
     /**
+     * 创建表的过程中删除字段
+     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function deleteForCreateTable() {
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
+        $key        = $this->getKey([$table_name]);
+        $fields     = cache($key);
+        foreach ($fields as $k => $each_field) {
+            if ($each_field['field_name'] == $field_name) {
+                unset($fields[$k]);
+                break;
+            }
+        }
+        $fields = array_values($fields);
+        //写入缓存
+        cache($key, $fields, 3600 * 24);
+        return $this->ar(1, ['message' => '删除成功']);
+    }
+
+    /**
      * 移动位置
      * @return \think\response\Json|\think\response\Jsonp
      */

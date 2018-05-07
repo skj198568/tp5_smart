@@ -1221,13 +1221,17 @@
         },
         $doDel: function () {
             table_info.del_loading = true;
-            $.post('/migrate/field/delete', {
+            var url = '/migrate/field/delete';
+            if (table_info.is_add) {
+                url = '/migrate/field/deleteForCreateTable';
+            }
+            $.post(url, {
                 table_name: table_info.table_name,
                 field_name: table_info.del_field_name
             }, function (r) {
                 table_info.del_loading = false;
                 $('#id_modal_del').modal('hide');
-                layer.msg('删除成功，' + r.file_name, function () {
+                layer.msg('删除成功，' + r.hasOwnProperty('file_name') ? r.file_name : r.message, function () {
 
                 });
                 //刷新数据
