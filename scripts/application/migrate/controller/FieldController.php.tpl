@@ -84,6 +84,7 @@ class FieldController extends MigrateBaseController {
             $key = $this->getKey([$table_name]);
             //获取
             $table_fields = cache($key);
+            $table_fields = [];
             if (empty($table_fields)) {
                 $table_fields = [];
                 if ($this->tableIsExist($table_name)) {
@@ -107,18 +108,18 @@ class FieldController extends MigrateBaseController {
                             }
                             $field_detail               = explode(',', $field_detail);
                             $cache_filed['field_scale'] = $field_detail[1];
-                        } else if (strpos($each_field['Type'], 'int') !== false) {
-                            $cache_filed['field_type'] = 'int';
                         } else if (strpos($each_field['Type'], 'bigint') !== false) {
                             $cache_filed['field_type'] = 'int_big';
                         } else if (strpos($each_field['Type'], 'tinyint') !== false) {
                             $cache_filed['field_type'] = 'int_tiny';
                         } else if (strpos($each_field['Type'], 'smallint') !== false) {
                             $cache_filed['field_type'] = 'int_small';
-                        } else if (strpos($each_field['Type'], 'text') !== false) {
-                            $cache_filed['field_type'] = 'text';
+                        } else if (strpos($each_field['Type'], 'int') !== false) {
+                            $cache_filed['field_type'] = 'int';
                         } else if (strpos($each_field['Type'], 'longtext') !== false) {
                             $cache_filed['field_type'] = 'text_long';
+                        } else if (strpos($each_field['Type'], 'text') !== false) {
+                            $cache_filed['field_type'] = 'text';
                         } else if (strpos($each_field['Type'], 'varchar') !== false) {
                             $cache_filed['field_type'] = 'string';
                         }
