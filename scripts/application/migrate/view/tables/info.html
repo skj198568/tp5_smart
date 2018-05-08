@@ -1082,7 +1082,14 @@
             if (table_info.str_length_max) {
                 verifies.push(['length_max', table_info.str_length_max_value]);
             }
-            param.verifies = verifies;
+            //去重
+            var verifies_unique = [];
+            $.each(verifies, function(k, v){
+                if(verifies_unique.indexOf(v) === -1){
+                    verifies_unique.push(v);
+                }
+            });
+            param.verifies = verifies_unique;
             if (table_info.const_values) {
                 param.const_values = table_info.const_values_json;
             }
