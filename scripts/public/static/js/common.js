@@ -799,7 +799,7 @@ var jCommon = {
      */
     cookieDel: function (name) {
         var d = new Date();
-        d.setTime(d.getTime()-1);
+        d.setTime(d.getTime() - 1);
         document.cookie = name + '=; expires=' + d.toGMTString() + ';path=/';
     },
 
@@ -974,6 +974,19 @@ var jCommon = {
             }
         }
         return str;
+    },
+
+    /**
+     * 字符串是否是json
+     * @param str
+     * @returns {boolean}
+     */
+    isJson: function (str) {
+        if (/^[\],:{}\s]*$/.test(str.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 };
