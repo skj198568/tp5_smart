@@ -84,7 +84,6 @@ class FieldController extends MigrateBaseController {
             $key = $this->getKey([$table_name]);
             //获取
             $table_fields = cache($key);
-            $table_fields = [];
             if (empty($table_fields)) {
                 $table_fields = [];
                 if ($this->tableIsExist($table_name)) {
