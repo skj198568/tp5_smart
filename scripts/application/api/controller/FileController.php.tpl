@@ -40,4 +40,28 @@ class FileController extends ApiController {
         return $this->ar(1, $result, '{"status":"api\/file\/uploadfile\/1","result":true,"msg":"上传成功","file":"\/upload\/2018\/03\/06\/104945_2748152867.xlsx"}');
     }
 
+    /**
+     * 图片处理
+     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function img() {
+        $img_url = get_param('img_url', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '图片地址');
+        //替换域名
+        $img_url      = str_replace(ClHttp::getServerDomain(), '', $img_url);
+        $image_width  = get_param('image_width', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '图片宽度，可不传', 0);
+        $image_height = get_param('image_height', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '图片高度，可不传', 0);
+        if ($image_height + $image_width > 0) {
+            //自动截取图片
+            ClImage::centerCut(DOCUMENT_ROOT_PATH . $img_url, $image_width, $image_height);
+        }
+        $png2jpg = get_param('png2jpg', ClFieldVerify::instance()->verifyInArray([0, 1])->fetchVerifies(), '是否转换png为jpg', 1);
+        //png转jpg
+        if ($png2jpg) {
+            $img_url = ClImage::png2jpg(DOCUMENT_ROOT_PATH . $img_url);
+            //替换为相对路径
+            $img_url = str_replace(DOCUMENT_ROOT_PATH, '', $img_url);
+        }
+        return $this->ar(1, ['url' => $img_url], '{"status":"api\/file\/img\/1","url":"\/static\/lib\/file_upload\/server\/php\/files\/265286_20180508231249.jpg"}');
+    }
+
 }
