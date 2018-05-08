@@ -1097,7 +1097,11 @@
                 param.show_map_fields = table_info.show_map_fields_json;
             }
             if (table_info.show_format) {
-                param.show_format = [[table_info.show_format_str, '_show']];
+                if (jCommon.isJson(table_info.show_format_str)) {
+                    param.show_format = table_info.show_format_str;
+                } else {
+                    param.show_format = [[table_info.show_format_str, '_show']];
+                }
             }
             param.table_name = table_info.table_name;
             param.after_field = table_info.after_field;
