@@ -22,7 +22,7 @@ class AreaMap extends BaseModel {
      * @var string
      */
     protected $table = 't_area';
-
+    
     /**
      * 名称
      * Type: varchar(255)
@@ -64,9 +64,9 @@ class AreaMap extends BaseModel {
      * @var array
      */
     public static $fields_verifies = [
-        self::F_NAME => ["is_required", "chinese", ["length_max", 255]],
-        self::F_F_ID => ["is_required", "number", ["length_max", 11]],
-        self::F_TYPE => ["is_required", "number", ["in_array", ["1", "2", "3"]], ["length_max", 11]],
+        self::F_NAME => ["is_required","chinese",["length_max",255]], 
+        self::F_F_ID => ["is_required","number",["length_max",11]], 
+        self::F_TYPE => ["is_required","number",["in_array",["1","2","3"]],["length_max",11]], 
     ];
 
     /**
@@ -92,7 +92,7 @@ class AreaMap extends BaseModel {
      * @var array
      */
     protected static $fields_show_format = [
-        self::F_TYPE => [[[["1", "省\/直辖市"], ["2", "城市"], ["3", "区县"]], "_show"]]
+        self::F_TYPE => [[[["1","省\/直辖市"],["2","城市"],["3","区县"]],"_show"]]
     ];
 
     /**
