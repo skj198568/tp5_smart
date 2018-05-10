@@ -15,7 +15,7 @@ class {$class_name} extends Cmd {
         if(!$this->table($table)->hasColumn('{$field_name}')){
             return;
         }
-        //修改字段名
+        //修改字段
         $this->table($table)
             {$field_str}
             ->update();
@@ -29,7 +29,7 @@ class {$class_name} extends Cmd {
         if(!$this->table($table)->hasColumn('{$field_name}')){
             return;
         }
-        //修改字段名
+        //修改字段
         $this->table($table)
             {$old_field_str}
             ->update();
