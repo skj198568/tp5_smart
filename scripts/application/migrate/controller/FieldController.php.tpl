@@ -13,6 +13,7 @@ use ClassLibrary\ClArray;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
+use function PHPSTORM_META\type;
 use think\db\Query;
 
 /**
@@ -92,6 +93,10 @@ class FieldController extends MigrateBaseController {
                     foreach ($fields as $each_field) {
                         if ($each_field['Field'] == 'id') {
                             continue;
+                        }
+                        //设置字段默认值
+                        if (strtolower($each_field['Default']) == 'null' || is_null($each_field['Default'])) {
+                            $each_field['Default'] = '';
                         }
                         //字段名
                         $cache_filed = [

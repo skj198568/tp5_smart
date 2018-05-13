@@ -455,7 +455,7 @@
                         </div>
                         <!--内联表单end-->
                     </div>
-                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                    <div class="form-group" ms-if="show_map_is_show">
                         <label class="text-warning">map field 映射字段</label>
                         <!--内联表单begin-->
                         <div class="form-inline">
@@ -1028,6 +1028,18 @@
                 return false;
             }
         },
+        show_map_is_show: false,
+        $storeFormatIsJson: function () {
+            if (jCommon.isArray(table_info.store_format)) {
+                return false;
+            } else {
+                if (table_info.store_format == 'json') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
         do_add_or_update_loading: false,
         $doAddOrUpdate: function () {
             var param = {
@@ -1084,8 +1096,8 @@
             }
             //去重
             var verifies_unique = [];
-            $.each(verifies, function(k, v){
-                if(verifies_unique.indexOf(v) === -1){
+            $.each(verifies, function (k, v) {
+                if (verifies_unique.indexOf(v) === -1) {
                     verifies_unique.push(v);
                 }
             });
@@ -1134,7 +1146,6 @@
             table_info.$setFieldDefaultValue();
             //用于控制add还是editor
             table_info.edit_field_name = field_name;
-            $('#id_modal_add_field').modal('show');
             //设置数据
             $.each(table_info.$items, function (k, v) {
                 if (v.field_name == field_name) {
@@ -1215,11 +1226,14 @@
                         } else {
                             table_info.store_format = v.store_format;
                         }
+                        console.log('aaa', table_info.store_format);
                     } else {
                         table_info.store_format = 'string';
                     }
                 }
             });
+            $('#id_modal_add_field').modal('show');
+            table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
             setTimeout(function () {
                 $('#id_field_name').focus();
             }, 1000);
