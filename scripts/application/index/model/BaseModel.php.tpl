@@ -665,19 +665,19 @@ class BaseModel extends Query {
 
     /**
      * 表是否存在
-     * @param string $table_name
+     * @param string $table_name_with_prefix
      * @return bool
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function tableIsExist($table_name = '') {
-        if (empty($table_name)) {
-            $table_name = $this->table;
+    public function tableIsExist($table_name_with_prefix = '') {
+        if (empty($table_name_with_prefix)) {
+            $table_name_with_prefix = $this->table;
         }
-        $key = 'TABLE_IS_EXIST_' . $table_name;
+        $key = 'TABLE_IS_EXIST_' . $table_name_with_prefix;
         if (!cache($key)) {
             //判断是否有此表
-            $tables = $this->query("SHOW TABLES LIKE '$table_name'");
+            $tables = $this->query("SHOW TABLES LIKE '$table_name_with_prefix'");
             if (empty($tables)) {
                 //创建表
                 return false;
@@ -690,15 +690,15 @@ class BaseModel extends Query {
 
     /**
      * 复制表
-     * @param $source_table_name
-     * @param $new_table_name
+     * @param string $source_table_name_with_prefix
+     * @param string $new_table_name_with_prefix
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function tableCopy($source_table_name, $new_table_name) {
-        if ($this->tableIsExist($source_table_name) && !$this->tableIsExist($new_table_name)) {
+    public function tableCopy($source_table_name_with_prefix, $new_table_name_with_prefix) {
+        if ($this->tableIsExist($source_table_name_with_prefix) && !$this->tableIsExist($new_table_name_with_prefix)) {
             //创建表
-            $this->execute("CREATE TABLE `$new_table_name` LIKE `$source_table_name`");
+            $this->execute("CREATE TABLE `$source_table_name_with_prefix` LIKE `$new_table_name_with_prefix`");
         }
     }
 
