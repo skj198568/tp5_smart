@@ -237,6 +237,7 @@ class BaseModel extends Query {
                     }
                 }
             }
+            $dataSet[$k_data] = $data;
         }
         $result = parent::insertAll($dataSet);
         //执行
@@ -660,6 +661,45 @@ class BaseModel extends Query {
             }
         }
         return false;
+    }
+
+    /**
+     * 表是否存在
+     * @param string $table_name
+     * @return bool
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function tableIsExist($table_name = '') {
+        if (empty($table_name)) {
+            $table_name = $this->table;
+        }
+        $key = 'TABLE_IS_EXIST_' . $table_name;
+        if (!cache($key)) {
+            //判断是否有此表
+            $tables = $this->query("SHOW TABLES LIKE '$table_name'");
+            if (empty($tables)) {
+                //创建表
+                return false;
+            }
+            //记录
+            cache($key, 1);
+        }
+        return true;
+    }
+
+    /**
+     * 复制表
+     * @param $source_table_name
+     * @param $new_table_name
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function tableCopy($source_table_name, $new_table_name) {
+        if ($this->tableIsExist($source_table_name) && !$this->tableIsExist($new_table_name)) {
+            //创建表
+            $this->execute("CREATE TABLE `$new_table_name` LIKE `$source_table_name`");
+        }
     }
 
 }
