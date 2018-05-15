@@ -100,7 +100,7 @@ class MigrateBaseController extends Controller {
             }
         }
         $file = implode('', $file);
-        $file = str_replace(['/_'], ['/'], $file);
+        $file = str_replace([DS.'_'], [DS], $file);
         $file = strtolower($file);
         if (is_file(APP_PATH . $file)) {
             return $this->fetch(APP_PATH . $file);
