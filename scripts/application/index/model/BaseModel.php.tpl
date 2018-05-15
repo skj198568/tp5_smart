@@ -472,15 +472,6 @@ class BaseModel extends Query {
     }
 
     /**
-     * 实例对象
-     * @param int $id
-     * @return mixed|null|static
-     */
-    public static function instance($id = 0) {
-        return null;
-    }
-
-    /**
      * 缓存清除触发器
      * @param $item
      */
