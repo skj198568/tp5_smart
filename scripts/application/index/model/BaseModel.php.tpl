@@ -141,6 +141,8 @@ class BaseModel extends Query {
      * @param bool $getLastInsID
      * @param null $sequence
      * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //校验参数
@@ -197,7 +199,9 @@ class BaseModel extends Query {
      * @param mixed $dataSet 数据集
      * @param boolean $replace 是否replace
      * @param integer $limit 每次写入数据限制
-     * @return integer|string
+     * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
      */
     public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
@@ -259,6 +263,7 @@ class BaseModel extends Query {
      * @param array $data
      * @return int|string
      * @throws \think\Exception
+     * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
     public function update(array $data = []) {
@@ -306,7 +311,7 @@ class BaseModel extends Query {
 
     /**
      * 拼接额外展现字段
-     * @param array $items
+     * @param $items
      * @return array|mixed
      */
     private static function showMapFields($items) {
@@ -594,7 +599,7 @@ class BaseModel extends Query {
      * @param string $field
      * @param null $default
      * @param bool $force
-     * @return mixed
+     * @return array|mixed
      */
     public function value($field, $default = null, $force = false) {
         $value = parent::value($field, $default, $force);
