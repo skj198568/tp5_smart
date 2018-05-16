@@ -21,8 +21,7 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 列表
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\Exception
      * @throws \think\exception\DbException
      */
     public function getList() {
@@ -38,8 +37,7 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 单个信息
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\Exception
      * @throws \think\exception\DbException
      */
     public function get() {
@@ -54,8 +52,7 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 多个信息
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\Exception
      * @throws \think\exception\DbException
      */
     public function getByIds() {
@@ -72,8 +69,7 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 创建
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\Exception
      * @throws \think\exception\DbException
      */
     public function create() {
@@ -92,8 +88,7 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 更新
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\Exception
      * @throws \think\exception\DbException
      */
     public function update() {
@@ -116,7 +111,7 @@ class {$table_name}BaseApiController extends ApiController {
      * 删除
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\Exception
-     * @throws \think\exception\PDOException
+     * @throws \think\exception\DbException
      */
     public function delete() {
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
