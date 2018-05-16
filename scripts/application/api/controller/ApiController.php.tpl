@@ -53,7 +53,7 @@ class ApiController extends BaseApiController {
         if (!empty($token)) {
             $this->id = ClCrypt::decrypt($token, CRYPT_KEY);
             if (empty($this->id)) {
-                if (ClVerify::isLocalIp(request()->ip())) {
+                if (ClVerify::isLocalIp(request()->ip()) && is_numeric($token)) {
                     //本机请求
                     $this->id = $token;
                 } else {
