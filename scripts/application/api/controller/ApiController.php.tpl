@@ -79,7 +79,7 @@ class ApiController extends BaseApiController {
      * @return string
      */
     public function _empty() {
-        if (strtolower(request()->controller() . DS . request()->action()) == 'index/index' && ClVerify::isLocalIp()) {
+        if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && ClVerify::isLocalIp()) {
             $api_file_name = get_param('api_file_name', [], '接口文件名', '');
             $api_doc_dir   = DOCUMENT_ROOT_PATH . '/../doc/api';
             if (!empty($api_file_name)) {
