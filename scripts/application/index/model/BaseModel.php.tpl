@@ -141,8 +141,6 @@ class BaseModel extends Query {
      * @param bool $getLastInsID
      * @param null $sequence
      * @return int|string
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //校验参数
@@ -199,9 +197,7 @@ class BaseModel extends Query {
      * @param mixed $dataSet 数据集
      * @param boolean $replace 是否replace
      * @param integer $limit 每次写入数据限制
-     * @return int|string
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
+     * @return integer|string
      */
     public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
@@ -263,7 +259,6 @@ class BaseModel extends Query {
      * @param array $data
      * @return int|string
      * @throws \think\Exception
-     * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
     public function update(array $data = []) {
@@ -311,7 +306,7 @@ class BaseModel extends Query {
 
     /**
      * 拼接额外展现字段
-     * @param $items
+     * @param array $items
      * @return array|mixed
      */
     private static function showMapFields($items) {
@@ -599,7 +594,7 @@ class BaseModel extends Query {
      * @param string $field
      * @param null $default
      * @param bool $force
-     * @return array|mixed
+     * @return mixed
      */
     public function value($field, $default = null, $force = false) {
         $value = parent::value($field, $default, $force);
@@ -703,7 +698,7 @@ class BaseModel extends Query {
     public function tableCopy($source_table_name_with_prefix, $new_table_name_with_prefix) {
         if ($this->tableIsExist($source_table_name_with_prefix) && !$this->tableIsExist($new_table_name_with_prefix)) {
             //创建表
-            $this->execute("CREATE TABLE `$source_table_name_with_prefix` LIKE `$new_table_name_with_prefix`");
+            $this->execute("CREATE TABLE `$new_table_name_with_prefix` LIKE `$source_table_name_with_prefix`");
         }
     }
 
