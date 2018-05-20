@@ -74,6 +74,12 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
     if (strpos($desc, ',') !== false) {
         exit(sprintf('%s含有非法字符","，请改成中文"，"', $desc));
     }
+    //如果默认值为int类型，则过滤器则要添加intval
+    if ($default !== null) {
+        if (is_numeric($default)) {
+            $filter .= ',intval';
+        }
+    }
     try {
         $value = input($key, $default, $filter);
     } catch (\InvalidArgumentException $exception) {
@@ -761,5 +767,5 @@ if (!function_exists('mime_content_type')) {
             return 'application/octet-stream';
         }
     }
-    
+
 }
