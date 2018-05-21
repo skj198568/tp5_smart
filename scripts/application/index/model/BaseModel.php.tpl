@@ -147,6 +147,8 @@ class BaseModel extends Query {
      * @param bool $getLastInsID
      * @param null $sequence
      * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //校验参数
@@ -204,6 +206,8 @@ class BaseModel extends Query {
      * @param boolean $replace 是否replace
      * @param integer $limit 每次写入数据限制
      * @return integer|string
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
      */
     public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
