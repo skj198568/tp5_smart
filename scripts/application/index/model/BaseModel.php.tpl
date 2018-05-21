@@ -21,6 +21,12 @@ use think\db\Query;
 class BaseModel extends Query {
 
     /**
+     * 是否分表
+     * @var bool
+     */
+    public $is_divide_table = false;
+
+    /**
      * @var int 有效数字标识 1
      */
     const V_VALID = 1;
