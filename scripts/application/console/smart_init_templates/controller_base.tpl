@@ -16,12 +16,13 @@ use ClassLibrary\ClArray;
  * @package app\api\base
  */
 class {$table_name}BaseApiController extends ApiController {
-<if condition="in_array('get', $create_api)">
+<if condition="!empty($create_api) && in_array('get', $create_api)">
 
     /**
      * 列表
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public function getList() {
@@ -37,7 +38,8 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 单个信息
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public function get() {
@@ -52,7 +54,8 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 多个信息
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public function getByIds() {
@@ -64,12 +67,13 @@ class {$table_name}BaseApiController extends ApiController {
         return $this->ar(1, ['items' => $items], '{$ar_get_by_ids_json}');
     }
 </if>
-<if condition="in_array('create', $create_api)">
+<if condition="!empty($create_api) && in_array('create', $create_api)">
 
     /**
      * 创建
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public function create() {
@@ -83,12 +87,13 @@ class {$table_name}BaseApiController extends ApiController {
         return $this->ar(1, ['info' => $info], '{$ar_create_json}');
     }
 </if>
-<if condition="in_array('update', $create_api)">
+<if condition="!empty($create_api) && in_array('update', $create_api)">
 
     /**
      * 更新
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public function update() {
@@ -105,13 +110,13 @@ class {$table_name}BaseApiController extends ApiController {
         return $this->ar(1, ['info' => $info], '{$ar_update_json}');
     }
 </if>
-<if condition="in_array('delete', $create_api)">
+<if condition="!empty($create_api) && in_array('delete', $create_api)">
 
     /**
      * 删除
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\Exception
-     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
     public function delete() {
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
