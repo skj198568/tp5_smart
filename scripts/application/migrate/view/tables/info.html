@@ -941,7 +941,7 @@
         },
         $add: function () {
             table_info.$setFieldDefaultValue();
-            table_info.after_field = '';
+            table_info.after_field = 'id';
             table_info.after_field_select_options.clear();
             table_info.after_field_select_options.push('id');
             $.each(table_info.$items, function (k, v) {
@@ -1334,7 +1334,7 @@
         change_position_loading: false,
         $changePosition: function (field_name) {
             table_info.$change_position_field_name = field_name;
-            table_info.after_field = '';
+            table_info.after_field = 'id';
             table_info.after_field_select_options.clear();
             table_info.after_field_select_options.push('id');
             $.each(table_info.$items, function (k, v) {
