@@ -91,9 +91,7 @@ class {$table_name}Map extends BaseModel {
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
-     * @return array|false|\PDOStatement|string|\think\Model
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
+     * @return array
      */
     public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
@@ -129,8 +127,6 @@ class {$table_name}Map extends BaseModel {
      * @param bool $is_convert_to_int 是否转换为int
      * @param int|null $duration 缓存时间
      * @return int|mixed|string
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
      */
     public static function getValueById($id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
@@ -158,8 +154,6 @@ class {$table_name}Map extends BaseModel {
      * @param bool $is_convert_to_int
      * @param int|null $duration
      * @return array|false|\PDOStatement|string|\think\Model
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
      */
     public static function getColumnByIds($ids, $field, $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
@@ -189,8 +183,6 @@ class {$table_name}Map extends BaseModel {
      * @param array $exclude_fields
      * @param int|null $duration
      * @return array|false|null|\PDOStatement|string|\think\Collection
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
      */
     public static function getItemsByIds($ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
