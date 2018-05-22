@@ -950,6 +950,7 @@
             if (table_info.$items.length > 0) {
                 table_info.after_field = table_info.$items[table_info.$items.length - 1].field_name;
             }
+            table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
             $('#id_modal_add_field').modal('show');
             setTimeout(function () {
                 $('#id_field_name').focus();
