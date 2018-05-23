@@ -431,7 +431,7 @@
                         </div>
                         <!--内联表单end-->
                     </div>
-                    <div class="form-group" ms-if="$fieldTypeIsInt()">
+                    <div class="form-group">
                         <label class="text-warning">const定义值</label>
                         <!--内联表单begin-->
                         <div class="form-inline">
@@ -1211,6 +1211,8 @@
                         table_info.const_values = 1;
                         table_info.const_values_json = v.const_values;
                     }
+                    console.log(table_info.const_values,
+                    table_info.const_values_json);
                     if (v.hasOwnProperty('show_map_fields') && !jCommon.empty(v.show_map_fields)) {
                         table_info.show_map_fields = 1;
                         table_info.show_map_fields_json = v.show_map_fields;
