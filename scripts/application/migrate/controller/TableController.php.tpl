@@ -225,6 +225,9 @@ class TableController extends MigrateBaseController {
                 }
             }
         }
+        if (empty($items)) {
+            return $this->ar(2, ['message' => '数据为空，不可备份']);
+        }
         $this->assign('fields', $fields);
         $this->assign('items', $items);
         $this->assign('class_name', $class_name);

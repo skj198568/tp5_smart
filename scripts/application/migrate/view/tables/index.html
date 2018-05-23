@@ -196,8 +196,13 @@
                 $.get('/migrate/table/backUpData', {
                     table_name: table_name
                 }, function (r) {
-                    layer.msg('备份成功，文件为：' + r.file, function () {
-                    });
+                    if (r.status == 'migrate/table/backupdata/1') {
+                        layer.msg('备份成功，文件为：' + r.file, function () {
+                        });
+                    } else {
+                        layer.msg(r.message, function () {
+                        });
+                    }
                 });
             });
         }
