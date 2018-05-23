@@ -26,7 +26,7 @@ class BrowserSyncJsMerge
      * @param $content
      */
     public function run(&$content){
-        if(App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(request()->module(), ['Api', 'api'])){
+        if(App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(strtolower(request()->module()), ['api', 'migrate'])){
             //拼接socket监听js
             $content .= BrowserSync::instance()->getJsContent();
         }
