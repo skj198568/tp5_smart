@@ -169,9 +169,9 @@ class TableController extends MigrateBaseController {
         $this->assign('old_engine', $old_table_comment['engine']);
         $this->assign('old_api_functions', $old_table_comment['create_api']);
         $this->assign('old_cache_seconds', $old_table_comment['is_cache']);
-        $class_name = $this->getClassName([$table_name, 'update']);
+        $class_name    = $this->getClassName([$table_name, 'update']);
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_update.tpl'));
-        $file_path = $this->getMigrateFilePath($class_name);
+        $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
@@ -183,18 +183,55 @@ class TableController extends MigrateBaseController {
      * 重命名
      * @return \think\response\Json|\think\response\Jsonp
      */
-    public function rename(){
+    public function rename() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
         $new_table_name = get_param('new_table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '新表名');
         $this->assign('new_table_name', $new_table_name);
-        $class_name = $this->getClassName([$table_name, 'rename']);
+        $class_name    = $this->getClassName([$table_name, 'rename']);
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_rename.tpl'));
-        $file_path = $this->getMigrateFilePath($class_name);
+        $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name);
+        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+    }
+
+    /**
+     * 备份数据
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function backUpData() {
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $class_name = $this->getClassName([$table_name, 'data']);
+        $table_name = $this->getTableNameWithPrefix($table_name);
+        $this->assign('table_name', $table_name);
+        $query = new Query();
+        $query->setTable($table_name);
+        $all_count = $query->count();
+        $limit     = 100;
+        $all_page  = ceil($all_count / $limit);
+        $fields    = [];
+        $items     = [];
+        for ($page = 1; $page <= $all_page; $page++) {
+            $items = array_merge($items, $query->page($page)->limit($limit)->select());
+            if (empty($fields)) {
+                if (!empty($items)) {
+                    $fields = array_keys($items[0]);
+                }
+            }
+        }
+        $this->assign('fields', $fields);
+        $this->assign('items', $items);
+        $this->assign('class_name', $class_name);
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_data.tpl'));
+        $file_path     = $this->getMigrateFilePath($class_name);
+        //写入文件
+        file_put_contents($file_path, "<?php\n" . $table_content);
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
     }
 
