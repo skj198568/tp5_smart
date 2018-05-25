@@ -11,6 +11,7 @@ namespace app\console;
 
 
 use ClassLibrary\ClDataCronTab;
+use ClassLibrary\ClFile;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
@@ -62,9 +63,12 @@ class TaskRun extends Command {
         //进程名称
         $task->name = __FILE__;
         //设置进程id文件地址
-        $task::$pidFile = LOG_PATH . 'task_run.pid';
+        $pid_file = RUNTIME_PATH . 'worker_man/task_run/pid.txt';
+        //创建文件夹
+        ClFile::dirCreate($pid_file);
+        $task::$pidFile = $pid_file;
         //设置日志文件
-        $task::$logFile      = LOG_PATH . 'task_run.log';
+        $task::$logFile = RUNTIME_PATH . 'worker_man/task_run/log.txt';;
         $task->onWorkerStart = function ($task) use ($task_ini_file) {
             $settings = parse_ini_file($task_ini_file);
             foreach ($settings as $command => $cron_date) {
