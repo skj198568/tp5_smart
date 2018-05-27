@@ -58,7 +58,7 @@ class ApiController extends BaseApiController {
                     $this->id = $token;
                 } else {
                     $msg = json_encode([
-                        'status'  => -1,
+                        'status'  => -2,
                         'message' => '无效token'
                     ], JSON_UNESCAPED_UNICODE);
                     if (request()->isAjax()) {
