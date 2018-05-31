@@ -85,7 +85,7 @@ class {$table_name}BaseApiController extends ApiController {
      * @return \think\response\Json|\think\response\Jsonp
      */
     public function update() {
-        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
+        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
         $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
         //更新
         {$table_name}Model::instance()->where([
