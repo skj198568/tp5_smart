@@ -38,9 +38,6 @@ class AreaBaseApiController extends ApiController {
     /**
      * 单个信息
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function get() {
         $id = get_param('id', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
@@ -54,9 +51,6 @@ class AreaBaseApiController extends ApiController {
     /**
      * 多个信息
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function getByIds() {
         $ids = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->verifyArray()->fetchVerifies(), '主键id数组');
