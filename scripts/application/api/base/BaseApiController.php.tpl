@@ -62,7 +62,7 @@ class BaseApiController extends Controller {
     /**
      * 分页数据构建
      * @param $model_instance
-     * @param $where
+     * @param array|object $where
      * @param string $call_back 回调函数
      * @param array $exclude_fields 不包含的字段
      * @param int $limit 每页显示数
@@ -73,16 +73,6 @@ class BaseApiController extends Controller {
      * @throws \think\exception\DbException
      */
     protected function paging(BaseModel $model_instance, $where, $call_back = '', $exclude_fields = [], $limit = PAGES_NUM, $duration = null) {
-        //拆分where_and where_or
-        $where_or = [];
-        if (isset($where['where'])) {
-            $where_and = $where['where'];
-            if (isset($where['where_or'])) {
-                $where_or = $where['where_or'];
-            }
-        } else {
-            $where_and = $where;
-        }
         $limit  = get_param('limit', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '每页显示数量，默认15条', $limit);
         $total  = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
         $offset = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量，默认0', 0);
@@ -95,42 +85,21 @@ class BaseApiController extends Controller {
             'total'  => $total
         ];
         //列表
-        if (empty($where_or)) {
-            $return['items'] = $model_instance
-                ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
-                ->where($where_and)
-                ->field($model_instance::getAllFields($exclude_fields))
-                ->order([
-                    $sort => $order
-                ])
-                ->limit($offset, $limit)
-                ->select();
-        } else {
-            $return['items'] = $model_instance
-                ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
-                ->where($where_and)
-                ->whereOr($where_or)
-                ->field($model_instance::getAllFields($exclude_fields))
-                ->order([
-                    $sort => $order
-                ])
-                ->limit($offset, $limit)
-                ->select();
-        }
+        $return['items'] = $model_instance
+            ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
+            ->where($where)
+            ->field($model_instance::getAllFields($exclude_fields))
+            ->order([
+                $sort => $order
+            ])
+            ->limit($offset, $limit)
+            ->select();
         //总数
         if (empty($total)) {
-            if (empty($where_or)) {
-                $return['total'] = $model_instance
-                    ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'total'], $duration)
-                    ->where($where_and)
-                    ->count();
-            } else {
-                $return['total'] = $model_instance
-                    ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'total'], $duration)
-                    ->where($where_and)
-                    ->whereOr($where_or)
-                    ->count();
-            }
+            $return['total'] = $model_instance
+                ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'total'], $duration)
+                ->where($where)
+                ->count();
         }
         //回调函数处理
         if (!empty($call_back) && gettype($call_back) == 'object') {
