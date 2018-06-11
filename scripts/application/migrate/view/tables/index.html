@@ -107,7 +107,7 @@
                         formatter: function (value, row, index) {
                             var btn = [];
                             btn.push(value);
-                            btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-refresh"></i> 重命名</button>');
+                            btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
                             btn.push('<button class="btn btn-info btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
                             btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                             btn.push('<button class="btn btn-warning btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
