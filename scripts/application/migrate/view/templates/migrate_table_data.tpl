@@ -8,15 +8,16 @@ class {$class_name} extends Cmd {
         $this->execute('set global max_allowed_packet = 1024*1024*1024*1024');
         //清空
         $this->execute('TRUNCATE TABLE `{$table_name}`');
+<foreach name="all_items" item="items" key="k_all">
         //插入数据
         $this->execute('INSERT INTO `{$table_name}`
-(`{:implode('`, `', $fields)}`)
-VALUES
-<foreach name="items" item="info" key="k">
-(\'{:implode("\\', \\'", $info)}\')<if condition="$k != count($items)-1">,
-</if>
+    (`{:implode('`, `', $fields)}`)
+    VALUES
+    <foreach name="items" item="info" key="k">
+    (\'{:implode("\\', \\'", $info)}\')<if condition="$k != count($items)-1">,
+    </if>
+    </foreach>
+    ');
 </foreach>
-
-');
     }
 }

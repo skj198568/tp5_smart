@@ -216,20 +216,20 @@ class TableController extends MigrateBaseController {
         $limit     = 100;
         $all_page  = ceil($all_count / $limit);
         $fields    = [];
-        $items     = [];
+        $all_items = [];
         for ($page = 1; $page <= $all_page; $page++) {
-            $items = array_merge($items, $query->page($page)->limit($limit)->select());
+            $all_items[] = $query->page($page)->limit($limit)->select();
             if (empty($fields)) {
-                if (!empty($items)) {
-                    $fields = array_keys($items[0]);
+                if (!empty($all_items[0])) {
+                    $fields = array_keys($all_items[0][0]);
                 }
             }
         }
-        if (empty($items)) {
+        if (empty($all_items)) {
             return $this->ar(2, ['message' => '数据为空，不可备份']);
         }
         $this->assign('fields', $fields);
-        $this->assign('items', $items);
+        $this->assign('all_items', $all_items);
         $this->assign('class_name', $class_name);
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_data.tpl'));
         $file_path     = $this->getMigrateFilePath($class_name);
