@@ -218,7 +218,15 @@ class TableController extends MigrateBaseController {
         $fields    = [];
         $all_items = [];
         for ($page = 1; $page <= $all_page; $page++) {
-            $all_items[] = $query->page($page)->limit($limit)->select();
+            $items = $query->page($page)->limit($limit)->select();
+            //添加转义
+            foreach ($items as $k_item => $each_item) {
+                array_walk($each_item, function (&$each_value) {
+                    $each_value = addslashes($each_value);
+                });
+                $items[$k_item] = $each_item;
+            }
+            $all_items[] = $items;
             if (empty($fields)) {
                 if (!empty($all_items[0])) {
                     $fields = array_keys($all_items[0][0]);
