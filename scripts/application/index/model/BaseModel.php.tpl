@@ -12,6 +12,7 @@ use ClassLibrary\ClArray;
 use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
+use ClassLibrary\ClVerify;
 use think\db\Query;
 
 /**
@@ -173,7 +174,11 @@ class BaseModel extends Query {
                                 if (empty($data[$k_field])) {
                                     $data[$k_field] = [];
                                 } else if (!is_array($data[$k_field])) {
-                                    $data[$k_field] = [$data[$k_field]];
+                                    if (ClVerify::isJson($data[$k_field])) {
+                                        $data[$k_field] = json_decode($data[$k_field], true);
+                                    }  else {
+                                        $data[$k_field] = [$data[$k_field]];
+                                    }
                                 }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                 break;
@@ -234,7 +239,11 @@ class BaseModel extends Query {
                                     if (empty($data[$k_field])) {
                                         $data[$k_field] = [];
                                     } else if (!is_array($data[$k_field])) {
-                                        $data[$k_field] = [$data[$k_field]];
+                                        if (ClVerify::isJson($data[$k_field])) {
+                                            $data[$k_field] = json_decode($data[$k_field], true);
+                                        } else {
+                                            $data[$k_field] = [$data[$k_field]];
+                                        }
                                     }
                                     $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                     break;
@@ -292,7 +301,11 @@ class BaseModel extends Query {
                                 if (empty($data[$k_field])) {
                                     $data[$k_field] = [];
                                 } else if (!is_array($data[$k_field])) {
-                                    $data[$k_field] = [$data[$k_field]];
+                                    if (ClVerify::isJson($data[$k_field])) {
+                                        $data[$k_field] = json_decode($data[$k_field], true);
+                                    } else {
+                                        $data[$k_field] = [$data[$k_field]];
+                                    }
                                 }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                 break;
