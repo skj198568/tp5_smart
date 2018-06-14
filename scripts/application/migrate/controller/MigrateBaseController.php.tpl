@@ -100,7 +100,7 @@ class MigrateBaseController extends Controller {
             }
         }
         $file = implode('', $file);
-        $file = str_replace([DS.'_'], [DS], $file);
+        $file = str_replace([DS . '_'], [DS], $file);
         $file = strtolower($file);
         if (is_file(APP_PATH . $file)) {
             return $this->fetch(APP_PATH . $file);
@@ -203,6 +203,25 @@ class MigrateBaseController extends Controller {
     }
 
     /**
+     * Model名
+     * @param $table_name
+     * @param bool $with_model
+     * @return string
+     */
+    protected function getModelName($table_name, $with_model = true) {
+        if (strpos($table_name, '_')) {
+            $table_name_array = explode('_', $table_name);
+            $table_name       = '';
+            foreach ($table_name_array as $v) {
+                $table_name .= ucfirst($v);
+            }
+            return $table_name . ($with_model ? 'Model' : '');
+        } else {
+            return ucfirst($table_name) . ($with_model ? 'Model' : '');
+        }
+    }
+
+    /**
      * 获取表名
      * @param array $table_name table_name or array
      * @return string
@@ -212,24 +231,7 @@ class MigrateBaseController extends Controller {
             $table_name = [$table_name];
         }
         $class_name = implode('_', $table_name);
-        //驼峰处理
-        $class_name_array = ClString::toArray($class_name);
-        $class_name       = '';
-        $to_upper         = false;
-        foreach ($class_name_array as $k => $each) {
-            if (empty($class_name)) {
-                $to_upper = true;
-            }
-            if ($each == '_') {
-                $to_upper = true;
-            } else {
-                if ($to_upper) {
-                    $to_upper = false;
-                    $each     = strtoupper($each);
-                }
-                $class_name .= $each;
-            }
-        }
+        $class_name = $this->getModelName($class_name, false);
         $class_name = $class_name . date('YmdHi');
         //赋值
         $this->assign('class_name', $class_name);

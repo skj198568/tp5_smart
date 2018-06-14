@@ -207,31 +207,36 @@ class TableController extends MigrateBaseController {
      */
     public function backUpData() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $this->assign('model_name', $this->getModelName($table_name));
         $class_name = $this->getClassName([$table_name, 'data']);
         $table_name = $this->getTableNameWithPrefix($table_name);
-        $this->assign('table_name', $table_name);
+        $this->assign('table_name_with_prefix', $table_name);
         $query = new Query();
         $query->setTable($table_name);
-        $all_count = $query->count();
-        $limit     = 100;
-        $all_page  = ceil($all_count / $limit);
-        $fields    = [];
-        $all_items = [];
+        $all_count  = $query->count();
+        $limit      = 1;
+        $all_page   = ceil($all_count / $limit);
+        $fields     = [];
+        $all_items  = [];
+        $items      = [];
+        $max_length = 10240;
         for ($page = 1; $page <= $all_page; $page++) {
-            $items = $query->page($page)->limit($limit)->select();
-            //添加转义
-            foreach ($items as $k_item => $each_item) {
-                array_walk($each_item, function (&$each_value) {
-                    $each_value = addslashes($each_value);
-                });
-                $items[$k_item] = $each_item;
-            }
-            $all_items[] = $items;
-            if (empty($fields)) {
-                if (!empty($all_items[0])) {
-                    $fields = array_keys($all_items[0][0]);
+            $items = array_merge($items, $query->page($page)->limit($limit)->select());
+            if (strlen(json_encode($items, JSON_UNESCAPED_UNICODE)) > $max_length) {
+                //赋值
+                $all_items[] = $items;
+                //置空
+                $items = [];
+                if (empty($fields)) {
+                    if (!empty($all_items[0])) {
+                        $fields = array_keys($all_items[0][0]);
+                    }
                 }
             }
+        }
+        if (count($items) > 0) {
+            //赋值
+            $all_items[] = $items;
         }
         if (empty($all_items)) {
             return $this->ar(2, ['message' => '数据为空，不可备份']);
