@@ -201,7 +201,9 @@ $file = $document_root_dir . '/think';
 if (is_file($file)) {
     $file_content = file_get_contents($file);
     //替换内容
-    $file_content = str_replace("define('APP_PATH', __DIR__ . '/application/');", "define('DOCUMENT_ROOT_PATH', __DIR__);\ndefine('APP_PATH', DOCUMENT_ROOT_PATH . '/application/');", $file_content);
+    $file_content = str_replace("define('APP_PATH', __DIR__ . '/application/');", "define('DOCUMENT_ROOT_PATH', __DIR__.'/public');\ndefine('APP_PATH', DOCUMENT_ROOT_PATH . '/../application/');", $file_content);
+    //兼容老版本
+    $file_content = str_replace(["define('DOCUMENT_ROOT_PATH', __DIR__);", "define('APP_PATH', DOCUMENT_ROOT_PATH . '/application/');"], ["define('DOCUMENT_ROOT_PATH', __DIR__.'/public');", "define('APP_PATH', DOCUMENT_ROOT_PATH . '/../application/');"], $file_content);
     //回写
     file_put_contents($file, $file_content);
 }
