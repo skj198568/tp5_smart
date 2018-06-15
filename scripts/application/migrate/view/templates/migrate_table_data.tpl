@@ -12,10 +12,26 @@ class {$class_name} extends Cmd {
     public function up() {
         //清空
         {$model_name}::instance()->execute('TRUNCATE TABLE `{$table_name_with_prefix}`');
-<foreach name="all_items" item="items" key="k_all">
-        //插入数据 {:count($items)} 条
-        {$model_name}::instance()->insertAll(json_decode(stripslashes('{:addslashes(json_encode($items, JSON_UNESCAPED_UNICODE))}'), true));
-</foreach>
+        //db存储文件
+        $db_file    = DOCUMENT_ROOT_PATH.'{$db_file}';
+        $f_handle   = fopen($db_file, 'r');
+        $max_length = 1024 * 1024;
+        $items      = [];
+        while (!feof($f_handle)) {
+            $line_content = fgets($f_handle);
+            $line_content = json_decode($line_content, true);
+            $items[]      = $line_content;
+            if (strlen(json_encode($items)) > $max_length) {
+                //批量插入
+                {$model_name}::instance()->insertAll($items);
+                $items = [];
+            }
+        }
+        if(!empty($items)){
+            //批量插入
+            {$model_name}::instance()->insertAll($items);
+        }
+        fclose($f_handle);
     }
 
 }

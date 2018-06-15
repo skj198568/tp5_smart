@@ -10,6 +10,7 @@
 namespace app\migrate\controller;
 
 use ClassLibrary\ClFieldVerify;
+use ClassLibrary\ClFile;
 use think\db\Query;
 
 /**
@@ -213,36 +214,27 @@ class TableController extends MigrateBaseController {
         $this->assign('table_name_with_prefix', $table_name);
         $query = new Query();
         $query->setTable($table_name);
-        $all_count  = $query->count();
-        $limit      = 1;
-        $all_page   = ceil($all_count / $limit);
-        $fields     = [];
-        $all_items  = [];
-        $items      = [];
-        $max_length = 10240;
-        for ($page = 1; $page <= $all_page; $page++) {
-            $items = array_merge($items, $query->page($page)->limit($limit)->select());
-            if (strlen(json_encode($items, JSON_UNESCAPED_UNICODE)) > $max_length) {
-                //赋值
-                $all_items[] = $items;
-                //置空
-                $items = [];
-                if (empty($fields)) {
-                    if (!empty($all_items[0])) {
-                        $fields = array_keys($all_items[0][0]);
-                    }
-                }
-            }
-        }
-        if (count($items) > 0) {
-            //赋值
-            $all_items[] = $items;
-        }
-        if (empty($all_items)) {
+        $all_count = $query->count();
+        if (empty($all_count)) {
             return $this->ar(2, ['message' => '数据为空，不可备份']);
         }
-        $this->assign('fields', $fields);
-        $this->assign('all_items', $all_items);
+        $limit    = 100;
+        $all_page = ceil($all_count / $limit);
+        $db_file  = '/../database/data/' . $table_name . date('YmdHi') . '.json';
+        $this->assign('db_file', $db_file);
+        $db_file = DOCUMENT_ROOT_PATH . $db_file;
+        ClFile::dirCreate($db_file);
+        $db_handle = fopen($db_file, 'w+');
+        $is_write  = false;
+        for ($page = 1; $page <= $all_page; $page++) {
+            $items = $query->page($page)->limit($limit)->select();
+            foreach ($items as $each_item) {
+                fputs($db_handle, ($is_write ? "\n" : '') . json_encode($each_item, JSON_UNESCAPED_UNICODE));
+                $is_write = true;
+            }
+        }
+        fclose($db_handle);
+        $this->assign('all_items', []);
         $this->assign('class_name', $class_name);
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_data.tpl'));
         $file_path     = $this->getMigrateFilePath($class_name);
