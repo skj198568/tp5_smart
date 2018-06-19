@@ -158,7 +158,7 @@ class ApiDoc extends Command {
             'menu'        => array_values($menu)
         ]);
         //处理api
-        $file_absolute_url = sprintf(DOCUMENT_ROOT_PATH . '/doc/api/%s.html', date('y.m.d.H.i'));
+        $file_absolute_url = sprintf(DOCUMENT_ROOT_PATH . '/../doc/api/%s.html', date('y.m.d.H.i'));
         //创建文件夹
         ClFile::dirCreate($file_absolute_url);
         file_put_contents($file_absolute_url, $api_content);
