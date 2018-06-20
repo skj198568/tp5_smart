@@ -176,7 +176,7 @@ class BaseModel extends Query {
                                 } else if (!is_array($data[$k_field])) {
                                     if (ClVerify::isJson($data[$k_field])) {
                                         $data[$k_field] = json_decode($data[$k_field], true);
-                                    }  else {
+                                    } else {
                                         $data[$k_field] = [$data[$k_field]];
                                     }
                                 }
@@ -220,7 +220,7 @@ class BaseModel extends Query {
             //自动完成字段
             if (in_array('create_time', static::getAllFields())) {
                 if (!isset($data['create_time']) || empty($data['create_time'])) {
-                    $dataSet[$k_data]['create_time'] = time();
+                    $data['create_time'] = time();
                 }
             }
             //存储格式处理
