@@ -12,62 +12,103 @@
 <h3 style="padding-left: 1em;">表</h3>
 <div style="border: 1px dashed #00b7ee;margin: 1em;padding: 1em;">
     <div class="row">
-        <div class="col-md-2">
-            <div class="form-group">
-                <label>表名</label>
-                <input id="id_table_name" type="text" class="form-control" placeholder="Enter name"
-                       ms-duplex="table_name"
-                       ms-if="is_add == 1">
-                <p class="form-control-static" ms-if="is_add == 0"><span class="text-warning">{{table_name}}</span></p>
-                <p class="form-control-static">不含前缀，例如: <span class="text-danger">user_friends</span></p>
+        <div class="col-md-4">
+            <div class="col-md-7">
+                <div class="form-group">
+                    <label>表名（不含前缀，例如: <span class="text-danger">user_friends</span>）</label>
+                    <input id="id_table_name" type="text" class="form-control" placeholder="Enter name"
+                           ms-duplex="table_name"
+                           ms-if="is_add == 1">
+                    <p class="form-control-static" ms-if="is_add == 0"><span class="text-warning">{{table_name}}</span>
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label>注释</label>
-                <input type="text" class="form-control" placeholder="Enter name" ms-duplex="table_desc">
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label>默认创建的接口</label>
-                <div ms-each="api_functions">
-                    <label ms-class="text-success: $apiIsChecked(el)" style="cursor:pointer;margin-right: 1em;"
-                           ms-click="$apiChecked(el)">
-                        <i class="fa fa-check-square-o" ms-visible="$apiIsChecked(el)"></i>
-                        <i class="fa fa-square-o" ms-visible="!$apiIsChecked(el)"></i>
-                        {{el}}
-                    </label>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label>注释</label>
+                    <input type="text" class="form-control" placeholder="Enter name" ms-duplex="table_desc">
                 </div>
             </div>
         </div>
-        <div class="col-md-1">
-            <div class="form-group">
-                <label>引擎</label>
-                <select class="form-control" ms-duplex="engine">
-                    <option value="MyISAM">MyISAM</option>
-                    <option value="InnoDB">InnoDB</option>
-                </select>
+        <div class="col-md-8">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>引擎</label>
+                    <select class="form-control" ms-duplex="engine">
+                        <option value="MyISAM">MyISAM</option>
+                        <option value="InnoDB">InnoDB</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>是否使用缓存</label>
-                        <select class="form-control" ms-duplex="using_cache">
-                            <option value="0">否</option>
-                            <option value="1">是</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <div ms-visible="using_cache == 1">
-                            <label>缓存时间</label>
-                            <input type="text" class="form-control" placeholder="Enter seconds"
-                                   ms-duplex="cache_seconds">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>是否使用缓存</label>
+                            <select class="form-control" ms-duplex="using_cache">
+                                <option value="0">否</option>
+                                <option value="1">是</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div ms-visible="using_cache == 1">
+                                <label>缓存时间</label>
+                                <input type="text" class="form-control" placeholder="Enter seconds"
+                                       ms-duplex="cache_seconds">
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>默认创建的接口</label>
+                    <div ms-each="api_functions">
+                        <label ms-class="text-success: $apiIsChecked(el)" style="cursor:pointer;margin-right: 1em;"
+                               ms-click="$apiChecked(el)">
+                            <i class="fa fa-check-square-o" ms-visible="$apiIsChecked(el)"></i>
+                            <i class="fa fa-square-o" ms-visible="!$apiIsChecked(el)"></i>
+                            {{el}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8" ms-visible="!is_add">
+            <div class="col-md-2">
+                <label>是否分表</label>
+                <select class="form-control" ms-duplex="is_partition">
+                    <option value="0">否</option>
+                    <option value="1">是</option>
+                </select>
+            </div>
+            <div class="col-md-3" style="display: none;">
+                <div ms-visible="is_partition == 1">
+                    <label>规则</label>
+                    <select class="form-control" ms-duplex="partition_type">
+                        <option value="field">field</option>
+                        <option value="date('Y')">date('Y')</option>
+                        <option value="date('Ym')">date('Ym')</option>
+                        <option value="date('Ymd')">date('Ymd')</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div ms-visible="is_partition == 1 && partition_type == 'field'">
+                    <label>字段</label>
+                    <select class="form-control" ms-duplex="partition_field" ms-each="items">
+                        <option ms-attr-value="el.field_name">{{el.field_name}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4" ms-visible="is_partition == 1 && partition_type == 'field'">
+                <label>范围值(每*一张表)</label>
+                <input type="text" class="form-control" placeholder="每*一张表"
+                       ms-duplex="partition_value">
             </div>
         </div>
     </div>
@@ -449,7 +490,8 @@
                                     <input class="form-control" type="text" style="width: 835px;" placeholder="json格式定义"
                                            ms-duplex="const_values_json">
                                 </div>
-                                <p class="form-control-static">例：<span class="text-danger">[['yes',1,'是'],['no',0,'否']]</span></p>
+                                <p class="form-control-static">例：<span
+                                        class="text-danger">[['yes',1,'是'],['no',0,'否']]</span></p>
                             </div>
                         </div>
                         <!--内联表单end-->
@@ -592,6 +634,10 @@
         table_desc: '',
         using_cache: 0,
         cache_seconds: 0,
+        is_partition: 0,
+        partition_type: 'field',
+        partition_field: '',
+        partition_value: 1,
         api_functions: ['get', 'create', 'delete', 'update'],
         api_functions_selected: ['get', 'create', 'delete', 'update'],
         engine: 'InnoDB',
@@ -607,6 +653,16 @@
                 table_info.cache_seconds = r.info.is_cache;
                 table_info.api_functions_selected = r.info.create_api;
                 table_info.engine = r.info.engine;
+                if (r.info.hasOwnProperty('partition')) {
+                    table_info.is_partition = 1;
+                    table_info.partition_type = r.info.partition[0];
+                    if (r.info.partition.length == 3) {
+                        table_info.partition_field = r.info.partition[1];
+                        table_info.partition_value = r.info.partition[2];
+                    }
+                } else {
+                    table_info.is_partition = 0;
+                }
             });
         },
         $apiIsChecked: function (function_name) {
@@ -625,7 +681,7 @@
                 table_info.api_functions_selected.push(function_name);
             }
         },
-        $items: [],
+        items: [],
         $initTable: function () {
             $('#id_table').bootstrapTable({
                 url: '{:url("/migrate/field/getList")}',
@@ -683,7 +739,11 @@
                         }
                         r.items[k] = v;
                     });
-                    table_info.$items = r.items;
+                    //设置分表字段值
+                    if (r.items.length > 0) {
+                        table_info.partition_field = r.items[0].field_name;
+                    }
+                    table_info.items = r.items;
                     return {
                         'rows': r.items,
                         'total': r.total,
@@ -720,7 +780,7 @@
                                 } else {
                                     btn.push('<button class="btn btn-info btn-xs" disabled="disabled"><i class="fa fa-arrow-up"></i> 上移</button>');
                                 }
-                                if (index == table_info.$items.length - 1) {
+                                if (index == table_info.items.length - 1) {
                                     btn.push('<button class="btn btn-warning btn-xs" disabled="disabled"><i class="fa fa-arrow-down"></i> 下移</button>');
                                 } else {
                                     btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$move(\'' + value + '\', \'down\')"><i class="fa fa-arrow-down"></i> 下移</button>');
@@ -944,11 +1004,11 @@
             table_info.after_field = 'id';
             table_info.after_field_select_options.clear();
             table_info.after_field_select_options.push('id');
-            $.each(table_info.$items, function (k, v) {
+            $.each(table_info.items, function (k, v) {
                 table_info.after_field_select_options.push(v.field_name);
             });
-            if (table_info.$items.length > 0) {
-                table_info.after_field = table_info.$items[table_info.$items.length - 1].field_name;
+            if (table_info.items.length > 0) {
+                table_info.after_field = table_info.items[table_info.items.length - 1].field_name;
             }
             table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
             $('#id_modal_add_field').modal('show');
@@ -1147,7 +1207,7 @@
             //用于控制add还是editor
             table_info.edit_field_name = field_name;
             //设置数据
-            $.each(table_info.$items, function (k, v) {
+            $.each(table_info.items, function (k, v) {
                 if (v.field_name == field_name) {
                     table_info.field_name = v.field_name;
                     table_info.field_desc = v.field_desc;
@@ -1212,7 +1272,7 @@
                         table_info.const_values_json = v.const_values;
                     }
                     console.log(table_info.const_values,
-                    table_info.const_values_json);
+                        table_info.const_values_json);
                     if (v.hasOwnProperty('show_map_fields') && !jCommon.empty(v.show_map_fields)) {
                         table_info.show_map_fields = 1;
                         table_info.show_map_fields_json = v.show_map_fields;
@@ -1339,12 +1399,12 @@
             table_info.after_field = 'id';
             table_info.after_field_select_options.clear();
             table_info.after_field_select_options.push('id');
-            $.each(table_info.$items, function (k, v) {
+            $.each(table_info.items, function (k, v) {
                 if (v.field_name != field_name) {
                     table_info.after_field_select_options.push(v.field_name);
                 } else {
                     if (k > 0) {
-                        table_info.after_field = table_info.$items[k - 1].field_name;
+                        table_info.after_field = table_info.items[k - 1].field_name;
                     }
                 }
             });
@@ -1353,12 +1413,12 @@
         $doChangePosition: function () {
             //如果位置没改变，则不提交
             var old_after_field_name = '';
-            $.each(table_info.$items, function (k, v) {
+            $.each(table_info.items, function (k, v) {
                 if (v.field_name == table_info.$change_position_field_name) {
                     if (k == 0) {
                         old_after_field_name = 'id';
                     } else {
-                        old_after_field_name = table_info.$items[k - 1].field_name;
+                        old_after_field_name = table_info.items[k - 1].field_name;
                     }
                     return false;
                 }
@@ -1386,13 +1446,32 @@
             };
         },
         $updateTable: function () {
-            $.get('/migrate/table/update', {
+            var param = {
                 table_name: table_info.table_name,
                 table_desc: table_info.table_desc,
                 engine: table_info.engine,
                 api_functions: table_info.api_functions_selected.$model,
-                cache_seconds: table_info.cache_seconds
-            }, function (r) {
+                cache_seconds: table_info.cache_seconds,
+                partition: []
+            };
+            if (table_info.is_partition) {
+                if (table_info.partition_type == 'field') {
+                    if (table_info.partition_field.length == 0) {
+                        layer.msg('请选择字段', function () {
+                        });
+                        return;
+                    }
+                    if (!jCommon.isNumber(table_info.partition_value)) {
+                        layer.msg('请输入数字类型的范围值', function () {
+                        });
+                        return;
+                    }
+                    param.partition = [table_info.partition_type, table_info.partition_field, table_info.partition_value];
+                } else {
+                    param.partition = [table_info.partition_type];
+                }
+            }
+            $.get('/migrate/table/update', param, function (r) {
                 layer.msg('更新成功', function () {
 
                 });

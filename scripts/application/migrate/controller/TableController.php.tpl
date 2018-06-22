@@ -170,6 +170,10 @@ class TableController extends MigrateBaseController {
         $this->assign('old_engine', $old_table_comment['engine']);
         $this->assign('old_api_functions', $old_table_comment['create_api']);
         $this->assign('old_cache_seconds', $old_table_comment['is_cache']);
+        //分表信息
+        $partition = get_param('partition', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '分表规则', []);
+        $this->assign('partition', $partition);
+        $this->assign('old_partition', isset($old_table_comment['partition']) ? $old_table_comment['partition'] : []);
         $class_name    = $this->getClassName([$table_name, 'update']);
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_update.tpl'));
         $file_path     = $this->getMigrateFilePath($class_name);
