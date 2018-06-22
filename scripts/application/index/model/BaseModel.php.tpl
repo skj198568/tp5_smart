@@ -151,7 +151,7 @@ class BaseModel extends Query {
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
         //自动完成字段
         if (in_array('create_time', static::getAllFields())) {
             if (!isset($data['create_time']) || empty($data['create_time'])) {
@@ -213,7 +213,7 @@ class BaseModel extends Query {
     public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
         foreach ($dataSet as $data) {
-            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
+            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
         }
         //字段处理
         foreach ($dataSet as $k_data => $data) {
@@ -278,7 +278,7 @@ class BaseModel extends Query {
      */
     public function update(array $data = []) {
         //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance());
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', $this->is_divide_table ? null : static::instance());
         //自动完成字段
         if (in_array('update_time', static::getAllFields())) {
             if (!isset($data['update_time']) || empty($data['update_time'])) {
