@@ -18,6 +18,12 @@ use ClassLibrary\ClCache;
 class AreaMap extends BaseModel {
 
     /**
+     * 实例对象存放数组
+     * @var array
+     */
+    private static $instances_array = [];
+
+    /**
      * 当前数据表名称（含前缀）
      * @var string
      */
@@ -119,6 +125,26 @@ class AreaMap extends BaseModel {
         $fields = [self::F_ID, self::F_NAME, self::F_F_ID, self::F_TYPE];
         return array_diff($fields, $exclude_fields);
     }
+    
+    /**
+     * 实例对象
+     * @param int $id -1/获取实例数量，-2/自动新增一个实例
+     * @return int|mixed|null|static
+     */
+    public static function instance($id = 0) {
+        if($id >= 0) {
+            if (!isset(self::$instances_array[$id])) {
+                self::$instances_array[$id] = new self();
+            }
+            return self::$instances_array[$id];
+        }else if($id == -1) {
+            return count(self::$instances_array);
+        }else if($id == -2) {
+            return self::instance(count(self::$instances_array));
+        }else{
+            return null;
+        }
+    }
 
     /**
      * 缓存清除触发器
@@ -135,7 +161,10 @@ class AreaMap extends BaseModel {
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
-     * @return array
+     * @return array|false|null|\PDOStatement|string|\think\Model
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getById($id, $exclude_fields = [], $duration = 3600) {
         if (is_numeric($duration)) {
@@ -165,12 +194,15 @@ class AreaMap extends BaseModel {
 
     /**
      * 获取某个字段值
-     * @param integer $id 主键
+     * @param int $id 主键
      * @param string $field 字段
      * @param string $default 默认值
      * @param bool $is_convert_to_int 是否转换为int
      * @param int|null $duration 缓存时间
      * @return int|mixed|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getValueById($id, $field, $default = '', $is_convert_to_int = false, $duration = 3600) {
         if (is_numeric($duration)) {
@@ -198,6 +230,9 @@ class AreaMap extends BaseModel {
      * @param bool $is_convert_to_int
      * @param int|null $duration
      * @return array|false|\PDOStatement|string|\think\Model
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getColumnByIds($ids, $field, $is_convert_to_int = false, $duration = 3600) {
         if (!is_array($ids) || empty($ids)) {
@@ -227,6 +262,9 @@ class AreaMap extends BaseModel {
      * @param array $exclude_fields
      * @param int|null $duration
      * @return array|false|null|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getItemsByIds($ids, $exclude_fields = [], $duration = 3600) {
         if (!is_array($ids) || empty($ids)) {
