@@ -28,7 +28,7 @@ class {$table_name}BaseApiController extends ApiController {
     public function getList() {
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         <if condition="isset($table_comment['partition'][1])">$where = [
-            '{$table_comment['partition'][0]}' => ${$table_comment['partition'][0]}<php>echo "\n";</php>
+            {$table_name}Model::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]}<php>echo "\n";</php>
         ];
         <else/>$where = [];
         </if>return $this->ar(1, $this->paging({$table_name}Model::instance(${$table_comment['partition'][0]}), $where, function ($return) {
