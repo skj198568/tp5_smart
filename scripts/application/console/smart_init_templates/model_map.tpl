@@ -95,9 +95,9 @@ class {$table_name}Map extends BaseModel {
      * 实例对象
      * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param int $id -1/获取实例数量，-2/自动新增一个实例
-     * @return int|mixed|null
+     * @return int|mixed|null|static
      */
-    public static function instance(${$table_comment['partition'][0]}<if condition="isset($table_comment['partition'][1])"> = 0</if>, $id = 0) {
+    public static function instance(${$table_comment['partition'][0]}<if condition="!isset($table_comment['partition'][1])"> = 0</if>, $id = 0) {
         if ($id >= 0) {
             if (!isset(self::$instances_array[$id])) {
                 self::$instances_array[$id] = new self();
@@ -114,7 +114,7 @@ class {$table_name}Map extends BaseModel {
         }
     }
     <else/>
-    
+
     /**
      * 实例对象
      * @param int $id -1/获取实例数量，-2/自动新增一个实例
