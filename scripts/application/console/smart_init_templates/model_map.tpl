@@ -174,7 +174,8 @@ class {$table_name}Map extends BaseModel {
     public static function getById(${$table_comment['partition'][0]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
             $info = static::instance(${$table_comment['partition'][0]})->cache([${$table_comment['partition'][0]}, $id], $duration)->where([
-                static::F_ID => $id
+                <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                </if>static::F_ID => $id
             ])->find();
             if (empty($info)) {
                 return [];
@@ -267,7 +268,8 @@ class {$table_name}Map extends BaseModel {
             }
         } else {
             return static::instance(${$table_comment['partition'][0]})->where([
-                static::F_ID => $id
+                <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                </if>static::F_ID => $id
             ])->value($field, $default, $is_convert_to_int);
         }
     }
@@ -329,7 +331,8 @@ class {$table_name}Map extends BaseModel {
             }
         } else {
             $items = static::instance(${$table_comment['partition'][0]})->where([
-                static::F_ID => ['in', $ids]
+                <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                </if>static::F_ID => ['in', $ids]
             ])->column($field);
         }
         if (!empty($items) && $is_convert_to_int) {
@@ -402,7 +405,8 @@ class {$table_name}Map extends BaseModel {
             return $items;
         } else {
             return static::instance(${$table_comment['partition'][0]})->where([
-                static::F_ID => ['in', $ids]
+                <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                </if>static::F_ID => ['in', $ids]
             ])->field(static::getAllFields($exclude_fields))->select();
         }
     }

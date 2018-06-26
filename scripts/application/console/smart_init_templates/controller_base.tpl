@@ -37,6 +37,7 @@ class {$table_name}BaseApiController extends ApiController {
             //返回
             return $return;
         }), '{$ar_get_list_json}');
+    }
         <else/>$where = [];
         return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($return) {
             //拼接额外字段 & 格式化相关字段
@@ -44,7 +45,8 @@ class {$table_name}BaseApiController extends ApiController {
             //返回
             return $return;
         }), '{$ar_get_list_json}');
-    </present>}
+    }
+    </present>
 
     /**
      * 单个信息
@@ -124,7 +126,8 @@ class {$table_name}BaseApiController extends ApiController {
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //更新
         {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
-            {$table_name}Model::F_ID => $id
+            <if condition="isset($table_comment['partition'][1])">{$table_name}Model::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+            </if>{$table_name}Model::F_ID => $id
         ])->setField($fields);
         //获取
         $info = {$table_name}Model::getById(${$table_comment['partition'][0]}, $id);
@@ -152,7 +155,8 @@ class {$table_name}BaseApiController extends ApiController {
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //删除
         {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
-            {$table_name}Model::F_ID => is_array($id) ? ['in', $id] : $id
+            <if condition="isset($table_comment['partition'][1])">{$table_name}Model::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+            </if>{$table_name}Model::F_ID => is_array($id) ? ['in', $id] : $id
         ])->delete();
         <else/>//删除
         {$table_name}Model::instance()->where([
