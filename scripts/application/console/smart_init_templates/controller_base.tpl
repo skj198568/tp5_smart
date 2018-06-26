@@ -127,7 +127,7 @@ class {$table_name}BaseApiController extends ApiController {
             {$table_name}Model::F_ID => $id
         ])->setField($fields);
         //获取
-        $info = {$table_name}Model::getById($id);
+        $info = {$table_name}Model::getById(${$table_comment['partition'][0]}, $id);
         <else/>//更新
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => $id
