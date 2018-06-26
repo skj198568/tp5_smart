@@ -96,6 +96,12 @@ class BaseModel extends Query {
     public static $fields_names = [];
 
     /**
+     * 分表规则
+     * @var array
+     */
+    public static $partition = ["platform_id", "1"];
+
+    /**
      * 获取所有的字段
      * @param array $exclude_fields 不包含的字段
      * @return array

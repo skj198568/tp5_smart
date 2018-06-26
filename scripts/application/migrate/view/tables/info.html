@@ -4,7 +4,9 @@
 <!--面包屑路径导航begin-->
 <ol class="breadcrumb" style="margin-bottom: 1em;">
     <li><a href="{:url('tables/index')}">首页</a></li>
-    <li class="active">新建表</li>
+    <li class="active" ms-if="is_add">新建表</li>
+    <li class="active" ms-if="!is_add">编辑</li>
+    <li class="active" ms-if="!is_add">{{table_name}}</li>
 </ol>
 <!--面包屑路径导航end-->
 <hr>
@@ -86,7 +88,7 @@
                     <option value="1">是</option>
                 </select>
             </div>
-            <div class="col-md-3" style="display: none;">
+            <div class="col-md-3">
                 <div ms-visible="is_partition == 1">
                     <label>规则</label>
                     <select class="form-control" ms-duplex="partition_type">
@@ -656,9 +658,9 @@
                 if (r.info.hasOwnProperty('partition')) {
                     table_info.is_partition = 1;
                     table_info.partition_type = r.info.partition[0];
-                    if (r.info.partition.length == 3) {
-                        table_info.partition_field = r.info.partition[1];
-                        table_info.partition_value = r.info.partition[2];
+                    if (r.info.partition.length == 2) {
+                        table_info.partition_field = r.info.partition[0];
+                        table_info.partition_value = r.info.partition[1];
                     }
                 } else {
                     table_info.is_partition = 0;
@@ -1466,7 +1468,7 @@
                         });
                         return;
                     }
-                    param.partition = [table_info.partition_type, table_info.partition_field, table_info.partition_value];
+                    param.partition = [table_info.partition_field, table_info.partition_value];
                 } else {
                     param.partition = [table_info.partition_type];
                 }

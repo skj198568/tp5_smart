@@ -93,16 +93,16 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 实例对象
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param int $id -1/获取实例数量，-2/自动新增一个实例
      * @return int|mixed|null
      */
-    public static function instance(${$table_comment['partition'][1]}, $id = 0) {
+    public static function instance(${$table_comment['partition'][0]}<if condition="isset($table_comment['partition'][1])"> = 0</if>, $id = 0) {
         if ($id >= 0) {
             if (!isset(self::$instances_array[$id])) {
                 self::$instances_array[$id] = new self();
                 //设置分表
-                self::$instances_array[$id]->autoDivideTable(${$table_comment['partition'][1]});
+                self::$instances_array[$id]->autoDivideTable(${$table_comment['partition'][0]});
             }
             return self::$instances_array[$id];
         } else if ($id == -1) {
@@ -142,8 +142,8 @@ class {$table_name}Map extends BaseModel {
      * @param $item
      */
     protected function cacheRemoveTrigger($item) {
-        if (is_numeric({$table_comment['is_cache']}) && isset($item['{$table_comment['partition'][1]}']) && isset($item[static::F_ID])) {
-            static::getByIdRc($item['{$table_comment['partition'][1]}'], $item[static::F_ID]);
+        if (is_numeric({$table_comment['is_cache']}) && isset($item['{$table_comment['partition'][0]}']) && isset($item[static::F_ID])) {
+            static::getByIdRc($item['{$table_comment['partition'][0]}'], $item[static::F_ID]);
         }
     }
     <else/>
@@ -162,15 +162,15 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 按id或id数组获取
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
      * @return array
      */
-    public static function getById(${$table_comment['partition'][1]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+    public static function getById(${$table_comment['partition'][0]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
-            $info = static::instance(${$table_comment['partition'][1]})->cache([${$table_comment['partition'][1]}, $id], $duration)->where([
+            $info = static::instance(${$table_comment['partition'][0]})->cache([${$table_comment['partition'][0]}, $id], $duration)->where([
                 static::F_ID => $id
             ])->find();
             if (empty($info)) {
@@ -179,7 +179,7 @@ class {$table_name}Map extends BaseModel {
                 return ClArray::getByKeys($info, static::getAllFields($exclude_fields));
             }
         } else {
-            return static::instance(${$table_comment['partition'][1]})->where([
+            return static::instance(${$table_comment['partition'][0]})->where([
                 static::F_ID => $id
             ])->field(static::getAllFields($exclude_fields))->find();
         }
@@ -217,12 +217,12 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 清除缓存
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param $id
      * @return bool
      */
-    protected static function getByIdRc(${$table_comment['partition'][1]}, $id) {
-        return ClCache::remove(${$table_comment['partition'][1]}, $id);
+    protected static function getByIdRc(${$table_comment['partition'][0]}, $id) {
+        return ClCache::remove(${$table_comment['partition'][0]}, $id);
     }
     <else/>
 
@@ -239,7 +239,7 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 获取某个字段值
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param int $id 主键
      * @param string $field 字段
      * @param string $default 默认值
@@ -247,9 +247,9 @@ class {$table_name}Map extends BaseModel {
      * @param int|null $duration 缓存时间
      * @return int|mixed|string
      */
-    public static function getValueById(${$table_comment['partition'][1]}, $id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
+    public static function getValueById(${$table_comment['partition'][0]}, $id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
-            $info = static::getById(${$table_comment['partition'][1]}, $id, [], $duration);
+            $info = static::getById(${$table_comment['partition'][0]}, $id, [], $duration);
             if (empty($info)) {
                 return $default;
             } else {
@@ -260,7 +260,7 @@ class {$table_name}Map extends BaseModel {
                 }
             }
         } else {
-            return static::instance(${$table_comment['partition'][1]})->where([
+            return static::instance(${$table_comment['partition'][0]})->where([
                 static::F_ID => $id
             ])->value($field, $default, $is_convert_to_int);
         }
@@ -302,24 +302,24 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 按id数组获取某一列的值
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param array $ids
      * @param string $field
      * @param bool $is_convert_to_int
      * @param int|null $duration
      * @return array
      */
-    public static function getColumnByIds(${$table_comment['partition'][1]}, $ids, $field, $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
+    public static function getColumnByIds(${$table_comment['partition'][0]}, $ids, $field, $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
         if (is_numeric($duration)) {
-            $items = static::getItemsByIds(${$table_comment['partition'][1]}, $ids, [], $duration);
+            $items = static::getItemsByIds(${$table_comment['partition'][0]}, $ids, [], $duration);
             if (!empty($items)) {
                 $items = array_column($items, $field);
             }
         } else {
-            $items = static::instance(${$table_comment['partition'][1]})->where([
+            $items = static::instance(${$table_comment['partition'][0]})->where([
                 static::F_ID => ['in', $ids]
             ])->column($field);
         }
@@ -369,27 +369,27 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 按ids获取
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param array $ids
      * @param array $exclude_fields
      * @param int|null $duration
      * @return array
      */
-    public static function getItemsByIds(${$table_comment['partition'][1]}, $ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+    public static function getItemsByIds(${$table_comment['partition'][0]}, $ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
         if (is_numeric($duration)) {
             $items = [];
             foreach ($ids as $each_id) {
-                $info = static::getById(${$table_comment['partition'][1]}, $each_id, $exclude_fields, $duration);
+                $info = static::getById(${$table_comment['partition'][0]}, $each_id, $exclude_fields, $duration);
                 if (!empty($info)) {
                     $items[] = $info;
                 }
             }
             return $items;
         } else {
-            return static::instance(${$table_comment['partition'][1]})->where([
+            return static::instance(${$table_comment['partition'][0]})->where([
                 static::F_ID => ['in', $ids]
             ])->field(static::getAllFields($exclude_fields))->select();
         }
@@ -430,29 +430,37 @@ class {$table_name}Map extends BaseModel {
 
     /**
      * 设置分表
-     * @param int ${$table_comment['partition'][1]}<php>echo "\n";</php>
+     * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @throws \Exception
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function autoDivideTable(${$table_comment['partition'][1]} = 0) {
-        if (!is_numeric(${$table_comment['partition'][1]}) || ${$table_comment['partition'][1]} == 0) {
-            exit('{$table_name_with_prefix} instance required valid ${$table_comment['partition'][1]}');
-        }
+    public function autoDivideTable(${$table_comment['partition'][0]} = 0) {
         $this->is_divide_table = true;
-        $source_table_name     = '{$table_name_with_prefix}';
+    <if condition="isset($table_comment['partition'][1])">
+    if (!is_numeric(${$table_comment['partition'][0]}) || ${$table_comment['partition'][0]} == 0) {
+            exit('{$table_name_with_prefix} instance required valid ${$table_comment['partition'][0]}');
+        }
+        $suffix = ceil(${$table_comment['partition'][0]} / {$table_comment['partition'][1]});
+    <else/>
+        if(${$table_comment['partition'][0]} == 0) {
+            $suffix = date('{$table_comment['partition'][1]}');
+        }
+    </if>
+    //拼接
+        $suffix = '_' . $suffix;
         //分表表名
-        if ($this->table == $source_table_name) {
-            $new_table_name = $this->table . '_' . ${$table_comment['partition'][1]};
+        if (substr($this->table, -strlen($suffix), strlen($suffix)) != $suffix) {
+            $source_table_name = $this->table;
+            //设置当前表名
+            $this->table .= $suffix;
         } else {
-            $new_table_name = $this->table;
+            $source_table_name = substr($this->table, 0, strlen($this->table) - strlen($suffix));
         }
         //表是否存在
-        if (!$this->tableIsExist($new_table_name)) {
-            $this->tableCopy($source_table_name, $new_table_name);
+        if (!$this->tableIsExist($this->table)) {
+            $this->tableCopy($source_table_name, $this->table);
         }
-        //设置当前表名
-        $this->table = $new_table_name;
     }
 </present>
 

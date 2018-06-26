@@ -16,32 +16,6 @@ use app\index\map\AreaMap;
 class AreaModel extends AreaMap {
 
     /**
-     * 实例对象存放数组
-     * @var array
-     */
-    private static $instances_array = [];
-
-    /**
-     * 实例对象
-     * @param int $id -1/获取实例数量，-2/自动新增一个实例
-     * @return int|mixed|null|static
-     */
-    public static function instance($id = 0) {
-        if ($id >= 0) {
-            if (!isset(self::$instances_array[$id])) {
-                self::$instances_array[$id] = new self();
-            }
-            return self::$instances_array[$id];
-        } else if ($id == -1) {
-            return count(self::$instances_array);
-        } else if ($id == -2) {
-            return self::instance(count(self::$instances_array));
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * 缓存清除触发器
      * @param $item
      */

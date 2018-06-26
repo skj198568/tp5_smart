@@ -71,7 +71,7 @@ class TableController extends MigrateBaseController {
         }
         $this->assign('table_desc', $table_desc);
         if ($type == 'create') {
-            $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间');
+            $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间', null);
         } else {
             $cache_seconds = $table_comment['is_cache'];
         }
@@ -163,7 +163,7 @@ class TableController extends MigrateBaseController {
         $this->assign('engine', $engine);
         $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数');
         $this->assign('api_functions', $api_functions);
-        $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间');
+        $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间', null);
         $this->assign('cache_seconds', $cache_seconds);
         $old_table_comment = $this->getTableComment($table_name);
         $this->assign('old_table_desc', $old_table_comment['name']);
