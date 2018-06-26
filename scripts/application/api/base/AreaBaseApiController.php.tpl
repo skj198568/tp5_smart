@@ -34,10 +34,13 @@ class AreaBaseApiController extends ApiController {
             return $return;
         }), '{"status":"api\/area\/getlist\/1","limit":10,"offset":0,"total":10,"items":[{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}]}');
     }
-
+    
     /**
      * 单个信息
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function get() {
         $id = get_param('id', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
@@ -51,6 +54,9 @@ class AreaBaseApiController extends ApiController {
     /**
      * 多个信息
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getByIds() {
         $ids = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->verifyArray()->fetchVerifies(), '主键id数组');
