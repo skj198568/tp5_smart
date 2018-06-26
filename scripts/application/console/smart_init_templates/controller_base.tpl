@@ -49,10 +49,10 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 单个信息
      * @return \think\response\Json|\think\response\Jsonp
-     <notpresent name="table_comment['partition']">* @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     </notpresent>*/
+     */
     public function get() {
         $id = get_param('id', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
@@ -68,10 +68,10 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 多个信息
      * @return \think\response\Json|\think\response\Jsonp
-     <notpresent name="table_comment['partition']">* @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     </notpresent>*/
+     */
     public function getByIds() {
         $ids = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->verifyArray()->fetchVerifies(), '主键id数组');
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
@@ -89,10 +89,10 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 创建
      * @return \think\response\Json|\think\response\Jsonp
-     <notpresent name="table_comment['partition']">* @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     </notpresent>*/
+     */
     public function create() {
         $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
@@ -114,10 +114,10 @@ class {$table_name}BaseApiController extends ApiController {
     /**
      * 更新
      * @return \think\response\Json|\think\response\Jsonp
-     <notpresent name="table_comment['partition']">* @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     </notpresent>*/
+     */
     public function update() {
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
         $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());

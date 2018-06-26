@@ -167,6 +167,9 @@ class {$table_name}Map extends BaseModel {
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
      * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getById(${$table_comment['partition'][0]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
@@ -246,6 +249,9 @@ class {$table_name}Map extends BaseModel {
      * @param bool $is_convert_to_int 是否转换为int
      * @param int|null $duration 缓存时间
      * @return int|mixed|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getValueById(${$table_comment['partition'][0]}, $id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
         if (is_numeric($duration)) {
@@ -308,6 +314,9 @@ class {$table_name}Map extends BaseModel {
      * @param bool $is_convert_to_int
      * @param int|null $duration
      * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getColumnByIds(${$table_comment['partition'][0]}, $ids, $field, $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
@@ -374,6 +383,9 @@ class {$table_name}Map extends BaseModel {
      * @param array $exclude_fields
      * @param int|null $duration
      * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getItemsByIds(${$table_comment['partition'][0]}, $ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
