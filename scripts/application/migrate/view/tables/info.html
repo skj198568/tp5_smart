@@ -659,6 +659,7 @@
                     table_info.is_partition = 1;
                     table_info.partition_type = r.info.partition[0];
                     if (r.info.partition.length == 2) {
+                        table_info.partition_type = 'field';
                         table_info.partition_field = r.info.partition[0];
                         table_info.partition_value = r.info.partition[1];
                     }
@@ -742,7 +743,7 @@
                         r.items[k] = v;
                     });
                     //设置分表字段值
-                    if (r.items.length > 0) {
+                    if (r.items.length > 0 && table_info.partition_field.length == 0) {
                         table_info.partition_field = r.items[0].field_name;
                     }
                     table_info.items = r.items;
@@ -1456,7 +1457,7 @@
                 cache_seconds: table_info.cache_seconds,
                 partition: []
             };
-            if (table_info.is_partition) {
+            if (table_info.is_partition == 1) {
                 if (table_info.partition_type == 'field') {
                     if (table_info.partition_field.length == 0) {
                         layer.msg('请选择字段', function () {
@@ -1472,6 +1473,8 @@
                 } else {
                     param.partition = [table_info.partition_type];
                 }
+            } else {
+                param.partition = [];
             }
             $.get('/migrate/table/update', param, function (r) {
                 layer.msg('更新成功', function () {

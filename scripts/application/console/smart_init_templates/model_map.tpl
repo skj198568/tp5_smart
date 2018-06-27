@@ -108,7 +108,7 @@ class {$table_name}Map extends BaseModel {
         } else if ($id == -1) {
             return count(self::$instances_array);
         } else if ($id == -2) {
-            return self::instance(count(self::$instances_array));
+            return self::instance(${$table_comment['partition'][0]}, count(self::$instances_array));
         } else {
             return null;
         }
@@ -457,14 +457,17 @@ class {$table_name}Map extends BaseModel {
     if (!is_numeric(${$table_comment['partition'][0]}) || ${$table_comment['partition'][0]} == 0) {
             exit('{$table_name_with_prefix} instance required valid ${$table_comment['partition'][0]}');
         }
-        $suffix = ceil(${$table_comment['partition'][0]} / {$table_comment['partition'][1]});
-    <else/>
-        if(${$table_comment['partition'][0]} == 0) {
-            $suffix = date('{$table_comment['partition'][1]}');
+        $suffix = floor(${$table_comment['partition'][0]} / {$table_comment['partition'][1]})-1;
+        if ($suffix < 0) {
+            $suffix = 0;
         }
-    </if>
-    //拼接
-        $suffix = '_' . $suffix;
+        <else/>if(${$table_comment['partition'][0]} == 0) {
+            $suffix = date('{$table_comment['partition'][0]}');
+        }
+        </if>//拼接
+        if (!empty($suffix)) {
+            $suffix = '_' . $suffix;
+        }
         //分表表名
         if (substr($this->table, -strlen($suffix), strlen($suffix)) != $suffix) {
             $source_table_name = $this->table;
