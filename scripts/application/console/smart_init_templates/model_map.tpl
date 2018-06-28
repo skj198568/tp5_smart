@@ -20,7 +20,7 @@ class {$table_name}Map extends BaseModel {
      * 实例对象存放数组
      * @var array
      */
-    private static $instances_array = [];
+    protected static $instances_array = [];
 
     /**
      * 当前数据表名称（含前缀）
