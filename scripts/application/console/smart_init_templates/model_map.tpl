@@ -99,16 +99,16 @@ class {$table_name}Map extends BaseModel {
      */
     public static function instance(${$table_comment['partition'][0]}<if condition="!isset($table_comment['partition'][1])"> = 0</if>, $id = 0) {
         if ($id >= 0) {
-            if (!isset(self::$instances_array[$id])) {
-                self::$instances_array[$id] = new self();
+            if (!isset(static::$instances_array[$id])) {
+                static::$instances_array[$id] = new static();
                 //设置分表
-                self::$instances_array[$id]->autoDivideTable(${$table_comment['partition'][0]});
+                static::$instances_array[$id]->autoDivideTable(${$table_comment['partition'][0]});
             }
-            return self::$instances_array[$id];
+            return static::$instances_array[$id];
         } else if ($id == -1) {
-            return count(self::$instances_array);
+            return count(static::$instances_array);
         } else if ($id == -2) {
-            return self::instance(${$table_comment['partition'][0]}, count(self::$instances_array));
+            return static::instance(${$table_comment['partition'][0]}, count(static::$instances_array));
         } else {
             return null;
         }
@@ -122,14 +122,14 @@ class {$table_name}Map extends BaseModel {
      */
     public static function instance($id = 0) {
         if($id >= 0) {
-            if (!isset(self::$instances_array[$id])) {
-                self::$instances_array[$id] = new self();
+            if (!isset(static::$instances_array[$id])) {
+                static::$instances_array[$id] = new static();
             }
-            return self::$instances_array[$id];
+            return static::$instances_array[$id];
         }else if($id == -1) {
-            return count(self::$instances_array);
+            return count(static::$instances_array);
         }else if($id == -2) {
-            return self::instance(count(self::$instances_array));
+            return static::instance(count(static::$instances_array));
         }else{
             return null;
         }
