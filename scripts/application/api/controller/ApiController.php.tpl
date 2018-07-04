@@ -57,17 +57,11 @@ class ApiController extends BaseApiController {
                     //本机请求
                     $this->id = $token;
                 } else {
-                    $msg = json_encode([
-                        'status'  => -2,
+                    $response = json_return([
+                        'status'  => -1,
                         'message' => '无效token'
-                    ], JSON_UNESCAPED_UNICODE);
-                    if (request()->isAjax()) {
-                        //输出结果并退出
-                        header('Content-Type:application/json; charset=utf-8');
-                        echo($msg);
-                    } else {
-                        echo($msg . PHP_EOL);
-                    }
+                    ]);
+                    $response->send();
                     exit;
                 }
             }
