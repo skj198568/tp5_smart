@@ -21,7 +21,7 @@ class AreaMap extends BaseModel {
      * 实例对象存放数组
      * @var array
      */
-    private static $instances_array = [];
+    protected static $instances_array = [];
 
     /**
      * 当前数据表名称（含前缀）
@@ -125,7 +125,7 @@ class AreaMap extends BaseModel {
         $fields = [self::F_ID, self::F_NAME, self::F_F_ID, self::F_TYPE];
         return array_diff($fields, $exclude_fields);
     }
-    
+
     /**
      * 实例对象
      * @param int $id -1/获取实例数量，-2/自动新增一个实例
@@ -133,14 +133,14 @@ class AreaMap extends BaseModel {
      */
     public static function instance($id = 0) {
         if($id >= 0) {
-            if (!isset(self::$instances_array[$id])) {
-                self::$instances_array[$id] = new self();
+            if (!isset(static::$instances_array[$id])) {
+                static::$instances_array[$id] = new static();
             }
-            return self::$instances_array[$id];
+            return static::$instances_array[$id];
         }else if($id == -1) {
-            return count(self::$instances_array);
+            return count(static::$instances_array);
         }else if($id == -2) {
-            return self::instance(count(self::$instances_array));
+            return static::instance(count(static::$instances_array));
         }else{
             return null;
         }
