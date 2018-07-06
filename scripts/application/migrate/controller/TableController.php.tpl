@@ -11,6 +11,7 @@ namespace app\migrate\controller;
 
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
+use ClassLibrary\ClString;
 use think\db\Query;
 
 /**
@@ -32,7 +33,7 @@ class TableController extends MigrateBaseController {
         $tables        = [];
         foreach ($tables_select as $k => $table) {
             $table = array_pop($table);
-            $table = ltrim($table, config('database.prefix'));
+            $table = substr($table, strlen(config('database.prefix')));
             if ($table != 'migrations') {
                 $tables[] = [
                     'name' => $table
