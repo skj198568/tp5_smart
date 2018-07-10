@@ -460,9 +460,10 @@ class {$table_name}Map extends BaseModel {
         if ($suffix < 0) {
             $suffix = 0;
         }
-        <else/>$suffix = '';
-        if(${$table_comment['partition'][0]} == 0) {
+        <else/>if (${$table_comment['partition'][0]} == 0) {
             $suffix = date('{$table_comment['partition'][0]}');
+        } else {
+            $suffix = ${$table_comment['partition'][0]};
         }
         </if>//拼接
         if (!empty($suffix)) {
