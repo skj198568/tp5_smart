@@ -453,15 +453,15 @@ class {$table_name}Map extends BaseModel {
      */
     public function autoDivideTable(${$table_comment['partition'][0]} = 0) {
         $this->is_divide_table = true;
-    <if condition="isset($table_comment['partition'][1])">
-    if (!is_numeric(${$table_comment['partition'][0]}) || ${$table_comment['partition'][0]} == 0) {
+        <if condition="isset($table_comment['partition'][1])">if (!is_numeric(${$table_comment['partition'][0]}) || ${$table_comment['partition'][0]} == 0) {
             exit('{$table_name_with_prefix} instance required valid ${$table_comment['partition'][0]}');
         }
         $suffix = floor(${$table_comment['partition'][0]} / {$table_comment['partition'][1]})-1;
         if ($suffix < 0) {
             $suffix = 0;
         }
-        <else/>if(${$table_comment['partition'][0]} == 0) {
+        <else/>$suffix = '';
+        if(${$table_comment['partition'][0]} == 0) {
             $suffix = date('{$table_comment['partition'][0]}');
         }
         </if>//拼接
