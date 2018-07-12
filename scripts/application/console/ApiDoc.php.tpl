@@ -272,7 +272,7 @@ class ApiDoc extends Command {
         if (empty($function_name)) {
             //去除默认执行函数
             foreach ($return as $k => $each_function) {
-                if (strpos($each_function, ' _initialize') !== false) {
+                if (strpos($each_function, ' _initialize') !== false || strpos($each_function, ' __destruct') !== false) {
                     unset($return[$k]);
                     continue;
                 }
