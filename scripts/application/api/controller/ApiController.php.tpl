@@ -58,7 +58,7 @@ class ApiController extends BaseApiController {
                     $this->id = $token;
                 } else {
                     $response = json_return([
-                        'status'  => -1,
+                        'status'  => -2,
                         'message' => '无效token'
                     ]);
                     $response->send();
