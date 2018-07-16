@@ -33,13 +33,15 @@ class TableController extends MigrateBaseController {
         $tables        = [];
         foreach ($tables_select as $k => $table) {
             $table = array_pop($table);
-            $table = substr($table, strlen(config('database.prefix')));
+            if (strpos($table, config('database.prefix')) === 0) {
+                $table = substr($table, strlen(config('database.prefix')));
+            }
             if ($table == 'migrations') {
                 continue;
             }
             $comment = $this->getTableComment($table);
             $comment = json_encode($comment);
-            if (!isset($tables[$comment]) || (isset($tables[$comment]) && strlen($table) < strlen($tables[$comment]))) {
+            if (!isset($tables[$comment]) || (isset($tables[$comment]) && strlen($table) < strlen($tables[$comment]['name']))) {
                 $tables[$comment] = [
                     'name' => $table
                 ];

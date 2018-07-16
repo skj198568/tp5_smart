@@ -746,6 +746,9 @@
                     if (r.items.length > 0 && table_info.partition_field.length == 0) {
                         table_info.partition_field = r.items[0].field_name;
                     }
+                    //先删除所有
+                    table_info.items.removeAll();
+                    //赋值
                     table_info.items = r.items;
                     return {
                         'rows': r.items,
