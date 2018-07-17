@@ -7,6 +7,9 @@ use ClassLibrary\ClVerify;
 use think\App;
 use think\Controller;
 
+/**
+ * index 基础
+ */
 class IndexBaseController extends Controller {
 
     /**
