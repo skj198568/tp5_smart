@@ -89,6 +89,24 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
+    } else if (strpos($target_file, 'ErrorController') !== false) {
+        if (!is_file($target_file)) {
+            //覆盖文件
+            echo 'copy file: ' . $target_file . PHP_EOL;
+            copy($file, $target_file);
+        }
+    } else if (strpos($target_file, 'IndexBaseController') !== false) {
+        if (!is_file($target_file)) {
+            //覆盖文件
+            echo 'copy file: ' . $target_file . PHP_EOL;
+            copy($file, $target_file);
+        }
+    } else if (strpos($target_file, 'IndexController') !== false) {
+        if (!is_file($target_file)) {
+            //覆盖文件
+            echo 'copy file: ' . $target_file . PHP_EOL;
+            copy($file, $target_file);
+        }
     } else {
         //覆盖文件
         echo 'copy file: ' . $target_file . PHP_EOL;
@@ -176,13 +194,8 @@ if (is_file($file)) {
 //Index 文件处理
 $file = $document_root_dir . '/application/index/controller/Index.php';
 if (is_file($file)) {
-    //替换内容
-    $file_content = file_get_contents($file);
-    $file_content = str_replace('class Index', 'class IndexController', $file_content);
-    //回写
-    file_put_contents($file, $file_content);
-    //重命名
-    rename($file, str_replace('Index.php', 'IndexController.php', $file));
+    //删除
+    unlink($file);
 }
 //public/index.php 文件处理
 $file = $document_root_dir . '/public/index.php';
