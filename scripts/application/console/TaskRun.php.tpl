@@ -68,7 +68,7 @@ class TaskRun extends Command {
         ClFile::dirCreate($pid_file);
         $task::$pidFile = $pid_file;
         //设置日志文件
-        $task::$logFile = RUNTIME_PATH . 'worker_man/task_run/log.txt';;
+        $task::$logFile = RUNTIME_PATH . 'worker_man/task_run/log.txt';
         $task->onWorkerStart = function ($task) use ($task_ini_file) {
             $settings = parse_ini_file($task_ini_file);
             foreach ($settings as $command => $cron_date) {

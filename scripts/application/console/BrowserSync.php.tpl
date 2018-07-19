@@ -33,7 +33,7 @@ class BrowserSync extends Command {
 
     /**
      * 实例对象
-     * @var null
+     * @var BrowserSync
      */
     private static $instance_instance = null;
 
@@ -45,7 +45,7 @@ class BrowserSync extends Command {
 
     /**
      * 实例对象
-     * @return BrowserSync|null
+     * @return BrowserSync
      */
     public static function instance() {
         if (self::$instance_instance == null) {
@@ -143,7 +143,7 @@ class BrowserSync extends Command {
         $worker::$pidFile = $this->getPidSrc();
         //设置日志文件
         $worker::$logFile      = $this->getLogSrc();
-        $worker->onWorkerStart = function ($worker) use ($input) {
+        $worker->onWorkerStart = function (Worker $worker) use ($input) {
             //定时器定时监听
             Timer::add(1, function () use ($worker, $input) {
                 //记录端口号，用于生成js自动刷新代码

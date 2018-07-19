@@ -68,10 +68,18 @@ foreach ($files as $file) {
         if (strpos($file_content, '[]') !== false) {
             $file_content = str_replace('];', "\n];", $file_content);
         }
-        foreach (['app\console\SmartInit', 'app\console\BrowserSync', 'app\console\TaskRun', 'app\console\ApiDoc'] as $each_command) {
+        $comands = \ClassLibrary\ClString::getBetween($file_content, '[', ']', false);
+        $comands = explode(',', $comands);
+        foreach ($comands as $k => $v) {
+            $comands[$k] = trim($v);
+            if (empty($v)) {
+                unset($comands[$k]);
+            }
+        }
+        foreach ($comands as $each_command) {
             //判断是否存在
             if (strpos($file_content, $each_command) === false) {
-                $file_content = str_replace('];', "\t'$each_command',\n];", $file_content);
+                $file_content = str_replace('];', "    '$each_command',\n];", $file_content);
             }
         }
         //回写文件
