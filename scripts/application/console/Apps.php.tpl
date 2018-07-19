@@ -162,7 +162,7 @@ class Apps extends Command {
         $worker->onWorkerStop = function (Worker $worker) {
             //关闭所有连接
             foreach ($worker->connections as $connection_each) {
-                $connection_each->close('sync');
+                $connection_each->close('apps close all');
             }
         };
 
