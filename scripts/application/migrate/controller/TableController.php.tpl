@@ -93,7 +93,7 @@ class TableController extends MigrateBaseController {
         }
         $this->assign('engine', $engine);
         if ($type == 'create') {
-            $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数');
+            $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数', []);
         } else {
             $api_functions = $table_comment['create_api'];
         }
@@ -170,7 +170,7 @@ class TableController extends MigrateBaseController {
         $this->assign('table_desc', $table_desc);
         $engine = get_param('engine', ClFieldVerify::instance()->verifyInArray(['MyISAM', 'InnoDB'])->fetchVerifies(), '表引擎');
         $this->assign('engine', $engine);
-        $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数');
+        $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数', []);
         $this->assign('api_functions', $api_functions);
         $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间', null);
         $this->assign('cache_seconds', $cache_seconds);
