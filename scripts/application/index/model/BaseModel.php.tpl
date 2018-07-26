@@ -727,4 +727,11 @@ class BaseModel extends Query {
         }
     }
 
+    /**
+     * 释放数据表信息
+     */
+    public static function tableInfoFree() {
+        self::$info = [];
+    }
+
 }

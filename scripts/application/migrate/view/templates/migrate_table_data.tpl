@@ -10,8 +10,8 @@ class {$class_name} extends Cmd {
      * @throws \think\exception\PDOException
      */
     public function up() {
-        //等待1秒，防止表结构修改，mysql还未执行完毕
-        sleep(1);
+        //释放数据表信息，防止表结构修改导致的错误错误
+        {$model_name}::tableInfoFree();
         //清空
         {$model_name}::instance()->execute('TRUNCATE TABLE `{$table_name_with_prefix}`');
         //db存储文件
