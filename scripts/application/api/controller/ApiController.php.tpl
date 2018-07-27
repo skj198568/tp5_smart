@@ -11,6 +11,7 @@ namespace app\api\controller;
 
 
 use app\api\base\BaseApiController;
+use ClassLibrary\ClArray;
 use ClassLibrary\ClCrypt;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
@@ -41,13 +42,9 @@ class ApiController extends BaseApiController {
      * 初始化
      */
     public function _initialize() {
-        //转小写
-        array_walk($this->uncheck_request, function (&$each) {
-            $each = strtolower($each);
-        });
         parent::_initialize();
         $token = '';
-        if (!in_array(strtolower(request()->controller() . '/' . request()->action()), $this->uncheck_request)) {
+        if (!ClArray::inArrayIgnoreCase(request()->controller() . '/' . request()->action(), $this->uncheck_request)) {
             $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token');
         }
         if (!empty($token)) {
