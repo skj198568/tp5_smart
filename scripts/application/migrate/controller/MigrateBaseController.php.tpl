@@ -44,7 +44,8 @@ class MigrateBaseController extends Controller {
      * 初始化函数
      */
     public function _initialize() {
-        if (!ClVerify::isLocalIp()) {
+        //局域网或debug模式可访问
+        if (!(ClVerify::isLocalIp() || App::$debug)) {
             echo('<h1 style="text-align: center;font-size: 5em;">404</h1>');
             exit;
         }
