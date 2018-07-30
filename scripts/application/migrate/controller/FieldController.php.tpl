@@ -13,7 +13,6 @@ use ClassLibrary\ClArray;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
-use function PHPSTORM_META\type;
 use think\db\Query;
 
 /**
@@ -72,15 +71,16 @@ class FieldController extends MigrateBaseController {
     }
 
     /**
-     * 获取字段列表
-     * @return \think\response\Json|\think\response\Jsonp
+     * 获取表所有的字段
+     * @param $table_name
+     * @return array|mixed
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function getList() {
-        $table_name   = get_param('table_name', ClFieldVerify::instance()->fetchVerifies(), '表名', '');
-        $table_fields = [];
-        if (!empty($table_name)) {
+    private function getTableFields($table_name) {
+        if (empty($table_name)) {
+            $table_fields = [];
+        } else {
             //缓存
             $key = $this->getKey([$table_name]);
             //获取
@@ -150,6 +150,18 @@ class FieldController extends MigrateBaseController {
                 cache($key, $table_fields, 3600 * 24);
             }
         }
+        return $table_fields;
+    }
+
+    /**
+     * 获取字段列表
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function getList() {
+        $table_name   = get_param('table_name', ClFieldVerify::instance()->fetchVerifies(), '表名', '');
+        $table_fields = $this->getTableFields($table_name);
         $return = [
             'limit'  => 1000,
             'offset' => 0,
@@ -162,15 +174,16 @@ class FieldController extends MigrateBaseController {
     /**
      * 字段删除
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
      */
     public function delete() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
-        $class_name       = $this->getClassName([$table_name, 'delete', $field_name]);
-        $key              = $this->getKey([$table_name]);
-        $fields           = cache($key);
+        $class_name = $this->getClassName([$table_name, 'delete', $field_name]);
+        $fields = $this->getTableFields($table_name);
         $field_change_str = '';
         foreach ($fields as $k => $each_field) {
             if ($each_field['field_name'] == $field_name) {
