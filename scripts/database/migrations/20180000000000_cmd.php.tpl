@@ -44,14 +44,14 @@ class Cmd extends \think\migration\Migrator {
      * 清缓存，用于升级
      */
     protected function clearCache() {
+        //文件缓存
+        $cmd = sprintf('rm %s -rf', CACHE_PATH);
+        //执行
+        exec($cmd);
         $type = config('cache.type');
         $type = strtolower($type);
-        if ($type == 'file') {
-            //文件缓存
-            $cmd = sprintf('rm %s -rf', CACHE_PATH);
-            //执行
-            exec($cmd);
-        } else if ($type == 'redis') {
+        //如果是redis缓存，再删除redis缓存
+        if ($type == 'redis') {
             //redis缓存
             $redis_host = config('redis.host');
             if (empty($redis_host)) {
