@@ -313,7 +313,7 @@
                                            ms-duplex="in_array_value">
                                 </div>
                                 <p class="form-control-static" ms-visible="in_array">数组内容(json格式)，例如：<span
-                                        class="text-danger">[1, 2, 'a', 'b']</span></p>
+                                        class="text-danger">[1, 2, "a", "b"]</span></p>
                             </div>
                         </div>
                         <!--内联表单end-->
@@ -493,7 +493,7 @@
                                            ms-duplex="const_values_json">
                                 </div>
                                 <p class="form-control-static">例：<span
-                                        class="text-danger">[['yes',1,'是'],['no',0,'否']]</span></p>
+                                        class="text-danger">[["yes",1,"是"],["no",0,"否"]]</span></p>
                             </div>
                         </div>
                         <!--内联表单end-->
@@ -516,7 +516,7 @@
                                     <input class="form-control" type="text" style="width: 835px;" placeholder="json格式定义"
                                            ms-duplex="show_map_fields_json">
                                 </div>
-                                <p class="form-control-static">例：<span class="text-danger">[['不带前缀的表名.表字段', '显示名称', '字段说明'], ['user.name', 'name_show', '用户名']]</span>
+                                <p class="form-control-static">例：<span class="text-danger">[["不带前缀的表名.表字段", "显示名称", "字段说明"], ["user.name", "name_show", "用户名"]]</span>
                                 </p>
                             </div>
                         </div>
@@ -546,6 +546,10 @@
                             </div>
                         </div>
                         <!--内联表单end-->
+                    </div>
+                    <div class="form-group">
+                        <label class="text-warning">json编辑器</label>
+                        <div id="id_div_editor" style="width: 835px;"></div>
                     </div>
                 </div>
                 <!--基本表单end-->
@@ -1305,6 +1309,16 @@
             setTimeout(function () {
                 $('#id_field_name').focus();
             }, 1000);
+
+            ace.edit("id_div_editor", {
+                theme: "ace/theme/tomorrow_night_eighties",
+                mode: "ace/mode/json",
+                minLines: 2,
+                maxLines: 30,
+                wrap: true,
+                autoScrollEditorIntoView: false
+            });
+            document.getElementById('id_div_editor').style.fontSize='16px';
         },
         del_loading: false,
         del_field_name: '',
