@@ -548,7 +548,7 @@
                         <!--内联表单end-->
                     </div>
                     <div class="form-group">
-                        <label class="text-warning">json编辑器</label>
+                        <label class="text-warning">JSON编辑器</label>
                         <div id="id_div_editor" style="width: 835px;"></div>
                     </div>
                 </div>
@@ -1309,16 +1309,6 @@
             setTimeout(function () {
                 $('#id_field_name').focus();
             }, 1000);
-
-            ace.edit("id_div_editor", {
-                theme: "ace/theme/tomorrow_night_eighties",
-                mode: "ace/mode/json",
-                minLines: 2,
-                maxLines: 30,
-                wrap: true,
-                autoScrollEditorIntoView: false
-            });
-            document.getElementById('id_div_editor').style.fontSize='16px';
         },
         del_loading: false,
         del_field_name: '',
@@ -1569,5 +1559,15 @@
             table_info.$refresh();
         }
     });
+
+    ace.edit("id_div_editor", {
+        theme: "ace/theme/tomorrow_night_eighties",
+        mode: "ace/mode/json",
+        minLines: 2,
+        maxLines: 30,
+        wrap: true,
+        autoScrollEditorIntoView: false
+    });
+    document.getElementById('id_div_editor').style.fontSize='16px';
 
 </script>
