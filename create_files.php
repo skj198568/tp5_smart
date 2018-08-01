@@ -68,18 +68,14 @@ foreach ($files as $file) {
         if (strpos($file_content, '[]') !== false) {
             $file_content = str_replace('];', "\n];", $file_content);
         }
-        $comands = \ClassLibrary\ClString::getBetween($file_content, '[', ']', false);
+        $comands = \ClassLibrary\ClString::getBetween(file_get_contents($file), 'return', ']', true);
+        $comands = \ClassLibrary\ClString::getBetween($comands, '[', ']', false);
         $comands = explode(',', $comands);
-        foreach ($comands as $k => $v) {
-            $comands[$k] = trim($v);
-            if (empty($v)) {
-                unset($comands[$k]);
-            }
-        }
         foreach ($comands as $each_command) {
+            $each_command = trim($each_command);
             //判断是否存在
             if (strpos($file_content, $each_command) === false) {
-                $file_content = str_replace('];', "    '$each_command',\n];", $file_content);
+                $file_content = str_replace('];', "    $each_command,\n];", $file_content);
             }
         }
         //回写文件
