@@ -343,7 +343,7 @@ class MigrateBaseController extends Controller {
             if (empty($comment)) {
                 $return['name'] = $each_comment['TABLE_COMMENT'];
             } else {
-                if (!isset($each_comment['is_cache'])) {
+                if (!isset($comment['is_cache'])) {
                     $comment['is_cache'] = 'null';
                 }
                 $comment['engine'] = $each_comment['ENGINE'];

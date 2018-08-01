@@ -619,6 +619,8 @@
 <!--删除模态框end-->
 <script type="text/javascript">
 
+    var editor_json = null;
+
     var table_info = avalon.define({
         $id: 'avalon_controller',
         $init: function () {
@@ -1000,6 +1002,10 @@
             table_info.show_format_str = '';
             table_info.store_format = 'string';
             table_info.password_salt = '';
+            //清空编辑器的内容
+            if(editor_json !== null){
+                editor_json.setValue("");
+            }
         },
         $add: function () {
             table_info.$setFieldDefaultValue();
@@ -1552,7 +1558,8 @@
         }
     });
 
-    ace.edit("id_div_editor", {
+    //初始化编辑器
+    editor_json = ace.edit("id_div_editor", {
         theme: "ace/theme/tomorrow_night_eighties",
         mode: "ace/mode/json",
         minLines: 3,
@@ -1560,6 +1567,7 @@
         wrap: true,
         autoScrollEditorIntoView: false
     });
+    //设置编辑器字体的大小
     document.getElementById('id_div_editor').style.fontSize='16px';
 
 </script>
