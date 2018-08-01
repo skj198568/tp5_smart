@@ -154,56 +154,80 @@
                             <div class="col-md-6">
                                 <label class="text-warning">字段</label>
                                 <input id="id_field_name" type="text" class="form-control"
-                                       placeholder="Enter field name"
+                                       placeholder="带_time会自动填充"
                                        ms-duplex="field_name" ms-if="edit_field_name.length == 0">
-                                <p class="form-control-static text-danger" ms-if="edit_field_name.length > 0">
-                                    {{field_name}}</p>
-                                <p class="form-control-static">字段名为<span class="text-success">create_time</span>或<span
-                                        class="text-success">update_time</span>程序会自动填充时间戳</p>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="text-warning">注释</label>
                                 <input type="text" class="form-control"
                                        placeholder="Enter field desc"
                                        ms-duplex="field_desc">
                             </div>
+                            <div class="col-md-2">
+                                <div ms-visible="!is_add && edit_field_name.length == 0">
+                                    <label class="text-warning">After</label>
+                                    <select class="form-control" ms-duplex="after_field" ms-each="after_field_select_options">
+                                        <option ms-attr-value="el">{{el}}</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group" ms-visible="!is_add && edit_field_name.length == 0">
-                        <label class="text-warning">After</label>
-                        <select class="form-control" ms-duplex="after_field" ms-each="after_field_select_options"
-                                style="width: 200px;">
-                            <option ms-attr-value="el">{{el}}</option>
-                        </select>
-                    </div>
                     <div class="form-group">
-                        <label class="text-warning">字段类型</label>
                         <div class="row">
-                            <div class="col-md-12">
-                                <!--内联表单begin-->
-                                <div class="form-inline">
-                                    <div class="form-group">
-                                        <select class="form-control" ms-duplex="field_type" ms-each="field_type_values">
-                                            <option ms-attr-value="el">{{el}}</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="input-group"
-                                             ms-if="field_type != 'text' && field_type != 'text_long'">
-                                            <div class="input-group-addon">默认值</div>
-                                            <input class="form-control" type="text" style="width: 60px;"
-                                                   placeholder="default value" ms-duplex="field_default_value">
+                            <div class="col-md-6">
+                                <label class="text-warning">字段类型</label>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <!--内联表单begin-->
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <select class="form-control" ms-duplex="field_type" ms-each="field_type_values">
+                                                    <option ms-attr-value="el">{{el}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="input-group"
+                                                     ms-if="field_type != 'text' && field_type != 'text_long'">
+                                                    <div class="input-group-addon">默认</div>
+                                                    <input class="form-control" type="text" style="width: 60px;"
+                                                           placeholder="default value" ms-duplex="field_default_value">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ms-if="field_type == 'decimal'">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">精度</div>
+                                                    <input class="form-control" type="text" style="width: 60px;"
+                                                           placeholder="精度" ms-duplex="field_scale">
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group" ms-if="field_type == 'decimal'">
-                                        <div class="input-group">
-                                            <div class="input-group-addon">精度</div>
-                                            <input class="form-control" type="text" style="width: 60px;"
-                                                   placeholder="精度" ms-duplex="field_scale">
-                                        </div>
+                                        <!--内联表单end-->
                                     </div>
                                 </div>
-                                <!--内联表单end-->
+                            </div>
+                            <div class="col-md-6">
+                                <div ms-if="!$fieldTypeIsInt()">
+                                    <label class="text-warning">存储类型</label>
+                                    <!--内联表单begin-->
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <select class="form-control" ms-duplex="store_format">
+                                                <option value="string">string</option>
+                                                <option value="json">json</option>
+                                                <option value="password">password</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" ms-visible="store_format == 'password'">
+                                            <div class="input-group">
+                                                <div class="input-group-addon">加盐</div>
+                                                <input class="form-control" type="text" style="width: 100px;"
+                                                       placeholder="Enter salt" ms-duplex="password_salt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--内联表单end-->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -226,27 +250,6 @@
                         <p class="form-control-static">备注: visible / <span class="text-danger">可见</span>，sortable /
                             <span class="text-danger">排序</span>，searchable / <span class="text-danger">检索</span>，read_only
                             / <span class="text-danger">只读，新增之后，不可修改。</span></p>
-                    </div>
-                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
-                        <label class="text-warning">存储类型</label>
-                        <!--内联表单begin-->
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <select class="form-control" ms-duplex="store_format">
-                                    <option value="string">string</option>
-                                    <option value="json">json</option>
-                                    <option value="password">password</option>
-                                </select>
-                            </div>
-                            <div class="form-group" ms-visible="store_format == 'password'">
-                                <div class="input-group">
-                                    <div class="input-group-addon">加盐</div>
-                                    <input class="form-control" type="text" style="width: 100px;"
-                                           placeholder="Enter salt" ms-duplex="password_salt">
-                                </div>
-                            </div>
-                        </div>
-                        <!--内联表单end-->
                     </div>
                     <div class="form-group">
                         <label class="text-warning">校验器-常规</label>
@@ -279,14 +282,14 @@
                             </div>
                             <div class="form-group" ms-visible="is_password">
                                 <div class="input-group">
-                                    <div class="input-group-addon">最小长度</div>
+                                    <div class="input-group-addon">min</div>
                                     <input class="form-control" type="text" style="width: 60px;"
                                            placeholder="Enter length" ms-duplex="password_min_length">
                                 </div>
                             </div>
                             <div class="form-group" ms-visible="is_password">
                                 <div class="input-group">
-                                    <div class="input-group-addon">最大长度</div>
+                                    <div class="input-group-addon">max</div>
                                     <input class="form-control" type="text" style="width: 60px;"
                                            placeholder="Enter length" ms-duplex="password_max_length">
                                 </div>
@@ -319,37 +322,33 @@
                         <!--内联表单end-->
                     </div>
                     <div class="form-group" ms-if="$fieldTypeIsInt()">
-                        <label class="text-warning">在区间内</label>
-                        <!--内联表单begin-->
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <label ms-class="text-success: in_scope == 1" style="cursor:pointer;margin-right: 1em;"
-                                       ms-click="$checkInScope">
-                                    <i class="fa fa-check-square-o" ms-visible="in_scope"></i>
-                                    <i class="fa fa-square-o" ms-visible="!in_scope"></i>
-                                    in_scope
-                                </label>
-                            </div>
-                            <div class="form-group" ms-visible="in_scope">
-                                <div class="input-group">
-                                    <div class="input-group-addon">区间最小值</div>
-                                    <input class="form-control" type="text" style="width: 60px;"
-                                           placeholder="Enter length" ms-duplex="in_scope_min">
-                                </div>
-                            </div>
-                            <div class="form-group" ms-visible="in_scope">
-                                <div class="input-group">
-                                    <div class="input-group-addon">区间最大值</div>
-                                    <input class="form-control" type="text" style="width: 60px;"
-                                           placeholder="Enter length" ms-duplex="in_scope_max">
-                                </div>
-                            </div>
-                        </div>
-                        <!--内联表单end-->
-                    </div>
-                    <div class="form-group" ms-if="$fieldTypeIsInt()">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label class="text-warning">在区间内</label>
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label ms-class="text-success: in_scope == 1" style="cursor:pointer;margin-right: 1em;"
+                                               ms-click="$checkInScope">
+                                            <i class="fa fa-check-square-o" ms-visible="in_scope"></i>
+                                            <i class="fa fa-square-o" ms-visible="!in_scope"></i>
+                                            in_scope
+                                        </label>
+                                    </div>
+                                    <div class="form-group" ms-visible="in_scope">
+                                        <div class="input-group">
+                                            <input class="form-control" type="text" style="width: 50px;"
+                                                   placeholder="Enter length" ms-duplex="in_scope_min">
+                                        </div>
+                                        -
+                                        <div class="input-group">
+                                            <input class="form-control" type="text" style="width: 50px;"
+                                                   placeholder="Enter length" ms-duplex="in_scope_max">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="text-warning">最小值</label>
                                 <!--内联表单begin-->
                                 <div class="form-inline">
@@ -364,15 +363,13 @@
                                     </div>
                                     <div class="form-group" ms-visible="min">
                                         <div class="input-group">
-                                            <div class="input-group-addon">最小值</div>
-                                            <input class="form-control" type="text" placeholder="最小值"
+                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最小值"
                                                    ms-duplex="min_value">
                                         </div>
                                     </div>
                                 </div>
-                                <!--内联表单end-->
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="text-warning">最大值</label>
                                 <!--内联表单begin-->
                                 <div class="form-inline">
@@ -387,92 +384,87 @@
                                     </div>
                                     <div class="form-group" ms-visible="max">
                                         <div class="input-group">
-                                            <div class="input-group-addon">
-                                                最大值
-                                            </div>
-                                            <input class="form-control" type="text" placeholder="最大值"
+                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
                                                    ms-duplex="max_value">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                                <label class="text-warning">字符串-固定长度</label>
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label ms-class="text-success: str_length_fixed == 1"
+                                               style="cursor:pointer;margin-right: 1em;"
+                                               ms-click="$checkStrLengthFixed">
+                                            <i class="fa fa-check-square-o" ms-visible="str_length_fixed"></i>
+                                            <i class="fa fa-square-o" ms-visible="!str_length_fixed"></i>
+                                            str_length_fixed
+                                        </label>
+                                    </div>
+                                    <div class="form-group" ms-visible="str_length_fixed">
+                                        <div class="input-group">
+                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                                   ms-duplex="str_length_fixed_value">
                                         </div>
                                     </div>
                                 </div>
                                 <!--内联表单end-->
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
-                        <label class="text-warning">字符串-固定长度</label>
-                        <!--内联表单begin-->
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <label ms-class="text-success: str_length_fixed == 1"
-                                       style="cursor:pointer;margin-right: 1em;"
-                                       ms-click="$checkStrLengthFixed">
-                                    <i class="fa fa-check-square-o" ms-visible="str_length_fixed"></i>
-                                    <i class="fa fa-square-o" ms-visible="!str_length_fixed"></i>
-                                    str_length_fixed
-                                </label>
-                            </div>
-                            <div class="form-group" ms-visible="str_length_fixed">
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        固定长度
+                        <div class="col-md-4">
+                            <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                                <label class="text-warning">字符串-最小长度</label>
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label ms-class="text-success: str_length_min == 1"
+                                               style="cursor:pointer;margin-right: 1em;"
+                                               ms-click="$checkStrLengthMin">
+                                            <i class="fa fa-check-square-o" ms-visible="str_length_min"></i>
+                                            <i class="fa fa-square-o" ms-visible="!str_length_min"></i>
+                                            str_length_min
+                                        </label>
                                     </div>
-                                    <input class="form-control" type="text" placeholder="最大值"
-                                           ms-duplex="str_length_fixed_value">
+                                    <div class="form-group" ms-visible="str_length_min">
+                                        <div class="input-group">
+                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                                   ms-duplex="str_length_min_value">
+                                        </div>
+                                    </div>
                                 </div>
+                                <!--内联表单end-->
                             </div>
                         </div>
-                        <!--内联表单end-->
-                    </div>
-                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
-                        <label class="text-warning">字符串-最小长度</label>
-                        <!--内联表单begin-->
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <label ms-class="text-success: str_length_min == 1"
-                                       style="cursor:pointer;margin-right: 1em;"
-                                       ms-click="$checkStrLengthMin">
-                                    <i class="fa fa-check-square-o" ms-visible="str_length_min"></i>
-                                    <i class="fa fa-square-o" ms-visible="!str_length_min"></i>
-                                    str_length_min
-                                </label>
-                            </div>
-                            <div class="form-group" ms-visible="str_length_min">
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        最小长度
+                        <div class="col-md-4">
+                            <div class="form-group" ms-if="!$fieldTypeIsInt()">
+                                <label class="text-warning">字符串-最大长度</label>
+                                <!--内联表单begin-->
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <label ms-class="text-success: str_length_max == 1"
+                                               style="cursor:pointer;margin-right: 1em;"
+                                               ms-click="$checkStrLengthMax">
+                                            <i class="fa fa-check-square-o" ms-visible="str_length_max"></i>
+                                            <i class="fa fa-square-o" ms-visible="!str_length_max"></i>
+                                            str_length_max
+                                        </label>
                                     </div>
-                                    <input class="form-control" type="text" placeholder="最大值"
-                                           ms-duplex="str_length_min_value">
+                                    <div class="form-group" ms-visible="str_length_max">
+                                        <div class="input-group">
+                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                                   ms-duplex="str_length_max_value">
+                                        </div>
+                                    </div>
                                 </div>
+                                <!--内联表单end-->
                             </div>
                         </div>
-                        <!--内联表单end-->
-                    </div>
-                    <div class="form-group" ms-if="!$fieldTypeIsInt()">
-                        <label class="text-warning">字符串-最大长度</label>
-                        <!--内联表单begin-->
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <label ms-class="text-success: str_length_max == 1"
-                                       style="cursor:pointer;margin-right: 1em;"
-                                       ms-click="$checkStrLengthMax">
-                                    <i class="fa fa-check-square-o" ms-visible="str_length_max"></i>
-                                    <i class="fa fa-square-o" ms-visible="!str_length_max"></i>
-                                    str_length_max
-                                </label>
-                            </div>
-                            <div class="form-group" ms-visible="str_length_max">
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        最大长度
-                                    </div>
-                                    <input class="form-control" type="text" placeholder="最大值"
-                                           ms-duplex="str_length_max_value">
-                                </div>
-                            </div>
-                        </div>
-                        <!--内联表单end-->
                     </div>
                     <div class="form-group">
                         <label class="text-warning">const定义值</label>
@@ -547,9 +539,9 @@
                         </div>
                         <!--内联表单end-->
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="border: 1px green dashed;padding: 5px;">
                         <label class="text-warning">JSON编辑器</label>
-                        <div id="id_div_editor" style="width: 835px;"></div>
+                        <div id="id_div_editor" style="width: 100%;"></div>
                     </div>
                 </div>
                 <!--基本表单end-->
@@ -1563,8 +1555,8 @@
     ace.edit("id_div_editor", {
         theme: "ace/theme/tomorrow_night_eighties",
         mode: "ace/mode/json",
-        minLines: 2,
-        maxLines: 30,
+        minLines: 3,
+        maxLines: 3,
         wrap: true,
         autoScrollEditorIntoView: false
     });
