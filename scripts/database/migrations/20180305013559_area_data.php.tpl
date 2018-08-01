@@ -6,9 +6,10 @@ use think\migration\db\Column;
 class AreaData extends Migrator {
 
     public function up() {
-        $this->execute("TRUNCATE TABLE `t_area`");
+        $table = config('database.prefix').'area';
+        $this->execute("TRUNCATE TABLE `$table`");
         $this->execute("
-        INSERT INTO `t_area` (`id`, `name`, `f_id`, `type`) VALUES 
+        INSERT INTO `$table` (`id`, `name`, `f_id`, `type`) VALUES 
 ('110000', '北京市', '0', '1'),
 ('110101', '东城区', '110000', '2'),
 ('110102', '西城区', '110000', '2'),
@@ -3244,6 +3245,7 @@ class AreaData extends Migrator {
     }
 
     public function down() {
-        $this->execute("TRUNCATE TABLE `t_area`");
+        $table = config('database.prefix').'area';
+        $this->execute("TRUNCATE TABLE `$table`");
     }
 }
