@@ -156,6 +156,7 @@
                                 <input id="id_field_name" type="text" class="form-control"
                                        placeholder="带_time会自动填充"
                                        ms-duplex="field_name" ms-if="edit_field_name.length == 0">
+                                <p style="color: blue;" ms-if="edit_field_name.length > 0">{{field_name}}</p>
                             </div>
                             <div class="col-md-4">
                                 <label class="text-warning">注释</label>
