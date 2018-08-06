@@ -260,7 +260,7 @@ class BaseModel extends Query {
             }
             $dataSet[$k_data] = $data;
         }
-        $result = parent::insertAll($dataSet);
+        $result = parent::insertAll($dataSet, $replace, $limit);
         //执行
         if (!ClArray::isLinearArray($dataSet)) {
             //多维数组
