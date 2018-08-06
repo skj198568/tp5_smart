@@ -19,7 +19,7 @@
 ```
 #### 执行命令
 ```
-composer require "skj198568/tp5_smart"
+composer require "skj198568/tp5_smart:1.0.*"
 ```
 #### 帮助手册
 [https://www.kancloud.cn/songkejing/tp5-smart/506234](https://www.kancloud.cn/songkejing/tp5-smart/506234)
