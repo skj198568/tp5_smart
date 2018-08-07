@@ -69,4 +69,61 @@ class Cmd extends \think\migration\Migrator {
         }
     }
 
+    /**
+     * 获取所有的表名
+     * @param $table_name_without_prefix
+     * @return array
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    protected function getAllTables($table_name_without_prefix) {
+        $table_comment = $this->getTableComment($this->getTableNameWithPrefix($table_name_without_prefix));
+        $database      = config('database.database');
+        $query         = new \think\db\Query();
+        $result        = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
+        $tables        = [];
+        foreach ($result as $each) {
+            if ($this->getTableComment($each['table_name']) == $table_comment) {
+                $tables[] = $this->getTableNameWithoutPrefix($each['table_name']);
+            }
+        }
+        return $tables;
+    }
+
+    /**
+     * 获取表注释
+     * @param $table_name_with_prefix
+     * @return string
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    protected function getTableComment($table_name_with_prefix) {
+        $query         = new \think\db\Query();
+        $table_comment = $query->query(sprintf("SELECT TABLE_COMMENT,ENGINE FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name_with_prefix));
+        $comment       = '';
+        if (!empty($table_comment)) {
+            $comment = $table_comment[0]['TABLE_COMMENT'];
+        }
+        return $comment;
+    }
+
+    /**
+     * 获取带前缀的表名
+     * @param $table_name
+     * @return string
+     */
+    protected function getTableNameWithPrefix($table_name) {
+        return config('database.prefix') . $table_name;
+    }
+
+    /**
+     * 获取不带前缀的表名
+     * @param $table_name
+     * @return mixed
+     */
+    protected function getTableNameWithoutPrefix($table_name) {
+        return \ClassLibrary\ClString::replaceOnce(config('database.prefix'), '', $table_name);
+    }
+
+
 }
