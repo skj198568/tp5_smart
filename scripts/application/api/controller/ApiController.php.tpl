@@ -16,6 +16,7 @@ use ClassLibrary\ClCrypt;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClVerify;
+use think\App;
 
 /**
  * 基础Api接口
@@ -70,7 +71,7 @@ class ApiController extends BaseApiController {
      * @return string
      */
     public function _empty() {
-        if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && ClVerify::isLocalIp()) {
+        if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && App::$debug) {
             $api_file_name = get_param('api_file_name', [], '接口文件名', '');
             $api_doc_dir   = DOCUMENT_ROOT_PATH . '/../doc/api';
             if (!empty($api_file_name)) {
