@@ -12,10 +12,10 @@ class {$class_name} extends Cmd {
         $tables = $this->getAllTables($table);
         foreach ($tables as $table) {
             if (!$this->hasTable($table)) {
-                return;
+                continue;
             }
             if(!$this->table($table)->hasColumn('{$field_name}')){
-                return;
+                continue;
             }
             //修改字段
             $this->table($table)
@@ -29,10 +29,10 @@ class {$class_name} extends Cmd {
         $tables = $this->getAllTables($table);
         foreach ($tables as $table) {
             if (!$this->hasTable($table)) {
-                return;
+                continue;
             }
             if(!$this->table($table)->hasColumn('{$field_name}')){
-                return;
+                continue;
             }
             //修改字段
             $this->table($table)

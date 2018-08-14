@@ -12,7 +12,7 @@ class {$class_name} extends Cmd {
         $tables = $this->getAllTables($table);
         foreach ($tables as $table) {
             if (!$this->hasTable($table)) {
-                return;
+                continue;
             }
             $sql = ClMigrateTable::instance()
                 ->usingCache({$cache_seconds})
@@ -28,7 +28,7 @@ class {$class_name} extends Cmd {
         $tables = $this->getAllTables($table);
         foreach ($tables as $table) {
             if (!$this->hasTable($table)) {
-                return;
+                continue;
             }
             $sql = ClMigrateTable::instance()
                 ->usingCache({$old_cache_seconds})
