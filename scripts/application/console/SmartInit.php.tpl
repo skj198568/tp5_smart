@@ -13,12 +13,12 @@ use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClMysql;
 use ClassLibrary\ClString;
-use think\Config;
+use think\facade\Config;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
-use think\View;
+use think\facade\View;
 
 /**
  * 依据数据库表创建Model
@@ -281,7 +281,7 @@ class SmartInit extends Command {
                 'fields_invisible'            => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
                 'fields_names'                => $fields_names,
                 'fields_names_keys'           => array_keys($fields_names),
-            ]);
+            ], ['default_filter' => '']);
         $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         $old_content = '';
         if (is_file($map_file)) {
@@ -320,7 +320,7 @@ class SmartInit extends Command {
                 'time'          => date('H:i:s') . "\n",
                 'table_name'    => $this->tableNameFormat($table_name),
                 'table_comment' => $this->getTableComment($table_name)
-            ]);
+            ], ['default_filter' => '']);
         if (!empty($content)) {
             //写入
             file_put_contents($model_name_file, $content);
@@ -467,7 +467,7 @@ class SmartInit extends Command {
                 'ar_update_json'   => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'   => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
                 'create_api'       => $table_comment['create_api']
-            ]);
+            ], ['default_filter' => '']);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
             $old_content    = '';
@@ -510,7 +510,7 @@ class SmartInit extends Command {
                 'time'          => date('H:i:s') . "\n",
                 'table_name'    => $this->tableNameFormat($table_name),
                 'table_comment' => $table_comment
-            ]);
+            ], ['default_filter' => '']);
         if (!empty($content)) {
             //写入
             file_put_contents($api_controller_file, $content);

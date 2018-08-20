@@ -16,7 +16,7 @@ use ClassLibrary\ClCrypt;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClVerify;
-use think\App;
+use think\facade\App;
 
 /**
  * 基础Api接口
@@ -42,8 +42,8 @@ class ApiController extends BaseApiController {
     /**
      * 初始化
      */
-    public function _initialize() {
-        parent::_initialize();
+    public function initialize() {
+        parent::initialize();
         $token = '';
         if (!ClArray::inArrayIgnoreCase(request()->controller() . '/' . request()->action(), $this->uncheck_request)) {
             $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token');
@@ -71,7 +71,7 @@ class ApiController extends BaseApiController {
      * @return string
      */
     public function _empty() {
-        if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && App::$debug) {
+        if (strtolower(request()->controller() . DIRECTORY_SEPARATOR . request()->action()) == 'index' . DIRECTORY_SEPARATOR . 'index' && App::isDebug()) {
             $api_file_name = get_param('api_file_name', [], '接口文件名', '');
             $api_doc_dir   = DOCUMENT_ROOT_PATH . '/../doc/api';
             if (!empty($api_file_name)) {

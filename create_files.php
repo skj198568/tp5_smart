@@ -129,54 +129,60 @@ foreach ($files as $file) {
         copy($file, $target_file);
     }
 }
-//linux 环境处理mkdir 755问题
-$files = [
-    //日志
-    $document_root_dir . '/thinkphp/library/think/File.php',
-    //日志
-    $document_root_dir . '/thinkphp/library/think/log/driver/File.php',
-    //缓存
-    $document_root_dir . '/thinkphp/library/think/cache/driver/File.php',
-    //模板缓存
-    $document_root_dir . '/thinkphp/library/think/template/driver/File.php',
-];
 //系统config文件修复
-$file = $document_root_dir . '/application/config.php';
+$file = $document_root_dir . '/config/app.php';
 if (is_file($file)) {
     $file_content = file_get_contents($file);
     //控制器
     $search       = \ClassLibrary\ClString::getBetween($file_content, 'controller_suffix', ',');
     $file_content = str_replace($search, "controller_suffix' => true,", $file_content);
-    //模板
+    //回写
+    file_put_contents($file, $file_content);
+}
+
+//模板
+$file = $document_root_dir . '/config/template.php';
+if (is_file($file)) {
+    $file_content = file_get_contents($file);
     $search       = \ClassLibrary\ClString::getBetween($file_content, 'taglib_begin', ',');
     $file_content = str_replace($search, "taglib_begin' => '<',", $file_content);
     $search       = \ClassLibrary\ClString::getBetween($file_content, 'taglib_end', ',');
     $file_content = str_replace($search, "taglib_end' => '>',", $file_content);
-    //日志级别修改
-    $search  = \ClassLibrary\ClString::getBetween($file_content, 'level', ']');
-    $replace = \ClassLibrary\ClString::getBetween($search, '[', ']', false);
-    $replace = trim($replace, ',');
-    foreach (['\think\Log::ERROR', '\think\Log::NOTICE', '\think\Log::SQL', '\think\Log::LOG'] as $each_level) {
+    //回写
+    file_put_contents($file, $file_content);
+}
+
+//日志级别修改
+$file = $document_root_dir . '/config/log.php';
+if (is_file($file)) {
+    $file_content = file_get_contents($file);
+    $search       = \ClassLibrary\ClString::getBetween($file_content, 'level', ']');
+    $replace      = \ClassLibrary\ClString::getBetween($search, '[', ']', false);
+    $replace      = trim($replace, ',');
+    foreach (['\think\Log::ERROR', '\think\Log::NOTICE', '\think\Log::SQL', '\think\Log::DEBUG'] as $each_level) {
         if (strpos($replace, $each_level) === false) {
             $replace .= ', ' . $each_level;
         }
     }
     $replace      = trim(trim($replace), ',');
     $file_content = str_replace($search, "level' => [$replace]", $file_content);
-    //加载函数库
-    if (strpos($file_content, 'common_for_smart') === false) {
-        //解析
-        $search       = \ClassLibrary\ClString::getBetween($file_content, 'extra_file_list', ']', true);
-        $search       = \ClassLibrary\ClString::getBetween($search, '[', '', true);
-        $replace      = \ClassLibrary\ClString::getBetween($search, '[', ']', false);
-        $replace      = trim($replace, ',');
-        $replace      .= ", APP_PATH. 'common_for_smart' . EXT";
-        $replace      = sprintf('[%s]', $replace);
-        $file_content = str_replace($search, $replace, $file_content);
-    }
-    //回写
     file_put_contents($file, $file_content);
 }
+
+//加载函数库
+$file = $document_root_dir . '/application/common.php';
+if (is_file($file)) {
+    $file_content = file_get_contents($file);
+    if (strpos($file_content, 'common_for_smart') === false) {
+        if (strpos($file_content, '// 应用公共文件') !== false) {
+            $file_content = str_replace('// 应用公共文件', "//smart公共函数\nrequire_once ('common_for_smart.php');\n// 应用公共文件", $file_content);
+        } else {
+            $file_content .= "//smart公共函数\nrequire_once ('common_for_smart.php');";
+        }
+        file_put_contents($file, $file_content);
+    }
+}
+
 //Index 文件处理
 $file = $document_root_dir . '/application/index/controller/Index.php';
 if (is_file($file)) {
@@ -189,20 +195,26 @@ if (is_file($file)) {
     $file_content = file_get_contents($file);
     if (strpos($file_content, 'DOCUMENT_ROOT_PATH') === false) {
         //替换内容
-        $file_content = str_replace('// [ 应用入口文件 ]', "// [ 应用入口文件 ]\ndefine('DOCUMENT_ROOT_PATH', __DIR__);", $file_content);
-        $file_content = str_replace("__DIR__ . '/../application/'", "DOCUMENT_ROOT_PATH . '/../application/'", $file_content);
-        //回写
-        file_put_contents($file, $file_content);
+        $file_content = str_replace('namespace think;', "namespace think;\n// 定义web根目录\ndefine('DOCUMENT_ROOT_PATH', __DIR__);", $file_content);
     }
+    if(strpos($file_content, 'APP_PATH') === false){
+        // 定义应用目录
+        $file_content = str_replace('define(\'DOCUMENT_ROOT_PATH\', __DIR__);', "define('DOCUMENT_ROOT_PATH', __DIR__);\n// 定义应用目录\ndefine('APP_PATH', DOCUMENT_ROOT_PATH . '/../application/');", $file_content);
+    }
+    //回写
+    file_put_contents($file, $file_content);
 }
 // think 文件处理
 $file = $document_root_dir . '/think';
 if (is_file($file)) {
     $file_content = file_get_contents($file);
-    //替换内容
-    $file_content = str_replace("define('APP_PATH', __DIR__ . '/application/');", "define('DOCUMENT_ROOT_PATH', __DIR__.'/public');\ndefine('APP_PATH', DOCUMENT_ROOT_PATH . '/../application/');", $file_content);
-    //兼容老版本
-    $file_content = str_replace(["define('DOCUMENT_ROOT_PATH', __DIR__);", "define('APP_PATH', DOCUMENT_ROOT_PATH . '/application/');"], ["define('DOCUMENT_ROOT_PATH', __DIR__.'/public');", "define('APP_PATH', DOCUMENT_ROOT_PATH . '/../application/');"], $file_content);
+    if (strpos($file_content, 'DOCUMENT_ROOT_PATH') === false) {
+        //替换内容
+        $file_content = str_replace('namespace think;', "namespace think;\n// 定义web根目录\ndefine('DOCUMENT_ROOT_PATH', __DIR__.'/public');", $file_content);
+    }
+    if(strpos($file_content, 'APP_PATH') === false){
+        $file_content = str_replace("define('DOCUMENT_ROOT_PATH', __DIR__.'/public');", "define('DOCUMENT_ROOT_PATH', __DIR__.'/public');\n// 定义应用目录\ndefine('APP_PATH', DOCUMENT_ROOT_PATH . '/../application/');", $file_content);
+    }
     //回写
     file_put_contents($file, $file_content);
 }

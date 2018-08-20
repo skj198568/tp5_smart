@@ -216,7 +216,7 @@ class BaseModel extends Query {
      * @param integer $limit 每次写入数据限制
      * @return integer|string
      */
-    public function insertAll(array $dataSet, $replace = false, $limit = null) {
+    public function insertAll(array $dataSet = [], $replace = false, $limit = null) {
         //校验参数
         foreach ($dataSet as $data) {
             ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());

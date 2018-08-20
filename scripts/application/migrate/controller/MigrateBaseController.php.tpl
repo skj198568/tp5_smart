@@ -15,7 +15,7 @@ use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
 use Phinx\Util\Util;
-use think\App;
+use think\facade\App;
 use think\Controller;
 use think\db\Query;
 
@@ -43,16 +43,16 @@ class MigrateBaseController extends Controller {
     /**
      * 初始化函数
      */
-    public function _initialize() {
+    public function initialize() {
         //局域网或debug模式可访问
-        if (!(ClVerify::isLocalIp() || App::$debug)) {
+        if (!(ClVerify::isLocalIp() || App::isDebug())) {
             echo('<h1 style="text-align: center;font-size: 5em;">404</h1>');
             exit;
         }
-        if (App::$debug) {
+        if (App::isDebug()) {
             log_info('$_REQUEST:', request()->request());
         }
-        parent::_initialize();
+        parent::initialize();
         $token = '';
         if (!ClArray::inArrayIgnoreCase(request()->controller() . '/' . request()->action(), $this->uncheck_request)) {
             $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token', '');
@@ -89,7 +89,7 @@ class MigrateBaseController extends Controller {
      * @return string
      */
     public function _empty() {
-        $file = request()->module() . DS . 'view' . DS . request()->controller() . DS . request()->action() . '.html';
+        $file = request()->module() . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . request()->controller() . DIRECTORY_SEPARATOR . request()->action() . '.html';
         $file = ClString::toArray($file);
         foreach ($file as $k_char => $char) {
             if (ClVerify::isAlphaCapital($char)) {
@@ -97,12 +97,12 @@ class MigrateBaseController extends Controller {
             }
         }
         $file = implode('', $file);
-        $file = str_replace([DS . '_'], [DS], $file);
+        $file = str_replace([DIRECTORY_SEPARATOR . '_'], [DIRECTORY_SEPARATOR], $file);
         $file = strtolower($file);
         if (is_file(APP_PATH . $file)) {
             return $this->fetch(APP_PATH . $file);
         } else {
-            if (ClVerify::isLocalIp() || APP::$debug) {
+            if (ClVerify::isLocalIp() || App::isDebug()) {
                 log_info(request()->controller(), request()->action());
                 echo sprintf("the file '<span style=\"color: red;\">%s</span>' is not exist", $file);
                 exit;
@@ -318,7 +318,7 @@ class MigrateBaseController extends Controller {
             $field_info['field_default_value'] = '';
         }
         $this->assign('field_info', $field_info);
-        return $this->fetch($this->getTemplateFilePath('migrate_field.tpl')) . "\n";
+        return $this->fetch($this->getTemplateFilePath('migrate_field.tpl'), [], ['default_filter' => '']) . "\n";
     }
 
     /**

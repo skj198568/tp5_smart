@@ -4,7 +4,7 @@ namespace app\index\controller;
 
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
-use think\App;
+use think\facade\App;
 use think\Controller;
 
 /**
@@ -15,9 +15,9 @@ class IndexBaseController extends Controller {
     /**
      * 初始化函数
      */
-    public function _initialize() {
-        parent::_initialize();
-        if (App::$debug) {
+    public function initialize() {
+        parent::initialize();
+        if (App::isDebug()) {
             log_info('$_REQUEST:', request()->request());
         }
     }
@@ -27,7 +27,7 @@ class IndexBaseController extends Controller {
      * @return string
      */
     public function _empty() {
-        $file = request()->module() . DS . 'view' . DS . request()->controller() . DS . request()->action() . '.html';
+        $file = request()->module() . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . request()->controller() . DIRECTORY_SEPARATOR . request()->action() . '.html';
         $file = ClString::toArray($file);
         foreach ($file as $k_char => $char) {
             if (ClVerify::isAlphaCapital($char)) {
@@ -35,7 +35,7 @@ class IndexBaseController extends Controller {
             }
         }
         $file = implode('', $file);
-        $file = str_replace([DS . '_'], [DS], $file);
+        $file = str_replace([DIRECTORY_SEPARATOR . '_'], [DIRECTORY_SEPARATOR], $file);
         $file = strtolower($file);
         if (is_file(APP_PATH . $file)) {
             return $this->fetch(APP_PATH . $file);

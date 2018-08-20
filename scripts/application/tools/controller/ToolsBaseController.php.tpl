@@ -11,7 +11,7 @@ namespace app\tools\controller;
 
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
-use think\App;
+use think\facade\App;
 use think\Controller;
 
 /**
@@ -25,13 +25,13 @@ class ToolsBaseController extends Controller
     /**
      * 初始化函数
      */
-    public function _initialize()
+    public function initialize()
     {
-        parent::_initialize();
+        parent::initialize();
         if(!request()->isCli()){
             return '只能命令行访问';
         }
-        if (App::$debug) {
+        if (App::isDebug()) {
             log_info('$_REQUEST:', $_REQUEST);
         }
     }

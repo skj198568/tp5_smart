@@ -199,7 +199,7 @@ class FieldController extends MigrateBaseController {
         //设置执行修改命令
         $this->assign('field_change_str', $field_change_str);
         $file    = $this->getMigrateFilePath($class_name);
-        $content = $this->fetch($this->getTemplateFilePath('migrate_field_delete.tpl'));
+        $content = $this->fetch($this->getTemplateFilePath('migrate_field_delete.tpl'), [], ['default_filter' => '']);
         //写入文件
         file_put_contents($file, "<?php\n" . $content);
         //执行
@@ -286,7 +286,7 @@ class FieldController extends MigrateBaseController {
         //设置执行修改命令
         $this->assign('field_change_str', $field_change_str);
         $file    = $this->getMigrateFilePath($class_name);
-        $content = $this->fetch($this->getTemplateFilePath('migrate_field_rename.tpl'));
+        $content = $this->fetch($this->getTemplateFilePath('migrate_field_rename.tpl'), [], ['default_filter' => '']);
         //写入文件
         file_put_contents($file, "<?php\n" . $content);
         //执行
@@ -336,7 +336,7 @@ class FieldController extends MigrateBaseController {
         //写入文件
         $class_name    = $this->getClassName([$table_name, $field_name, 'change_position']);
         $file_path     = $this->getMigrateFilePath($class_name);
-        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_change_position.tpl'));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_change_position.tpl'), [], ['default_filter' => '']);
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name);
@@ -384,7 +384,7 @@ class FieldController extends MigrateBaseController {
         //写入文件
         $class_name    = $this->getClassName([$table_name, $field_name, 'update']);
         $file_path     = $this->getMigrateFilePath($class_name);
-        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_update.tpl'));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_update.tpl'), [], ['default_filter' => '']);
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name);
@@ -423,7 +423,7 @@ class FieldController extends MigrateBaseController {
         //写入文件
         $class_name    = $this->getClassName([$table_name, 'add', $field_name]);
         $file_path     = $this->getMigrateFilePath($class_name);
-        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_add.tpl'));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_add.tpl'), [], ['default_filter' => '']);
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name);

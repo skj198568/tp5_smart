@@ -16,6 +16,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\facade\Env;
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 
@@ -54,7 +55,7 @@ class Apps extends Command {
      * @return string
      */
     private function getPidSrc() {
-        return RUNTIME_PATH . 'worker_man/apps/pid.txt';
+        return Env::get('runtime_path') . 'worker_man/apps/pid.txt';
     }
 
     /**
@@ -62,7 +63,7 @@ class Apps extends Command {
      * @return string
      */
     private function getLogSrc() {
-        return RUNTIME_PATH . 'worker_man/apps/log.txt';
+        return Env::get('runtime_path') . 'worker_man/apps/log.txt';
     }
 
     /**
@@ -70,7 +71,7 @@ class Apps extends Command {
      * @return string
      */
     private function getPortSrc() {
-        return RUNTIME_PATH . 'worker_man/apps/port.txt';
+        return Env::get('runtime_path') . 'worker_man/apps/port.txt';
     }
 
     /**

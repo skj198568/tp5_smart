@@ -13,7 +13,7 @@ use app\index\model\BaseModel;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
-use think\App;
+use think\facade\App;
 use think\Controller;
 
 /**
@@ -26,9 +26,9 @@ class BaseApiController extends Controller {
     /**
      * 初始化函数
      */
-    public function _initialize() {
-        parent::_initialize();
-        if (App::$debug) {
+    public function initialize() {
+        parent::initialize();
+        if (App::isDebug()) {
             log_info('$_REQUEST:', request()->request());
         }
     }

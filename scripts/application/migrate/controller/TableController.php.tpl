@@ -33,7 +33,7 @@ class TableController extends MigrateBaseController {
         $tables        = [];
         foreach ($tables_select as $k => $table) {
             $table = array_pop($table);
-            if (strpos($table, config('database.prefix')) === 0) {
+            if (!empty(config('database.prefix')) && strpos($table, config('database.prefix')) === 0) {
                 $table = substr($table, strlen(config('database.prefix')));
             }
             if ($table == 'migrations') {
@@ -117,7 +117,7 @@ class TableController extends MigrateBaseController {
         $this->assign('fields_str', $fields_str);
         $this->assign('table_is_exist', $table_is_exist);
         $tpl_file_name = ($type == 'create') ? 'migrate_table_create.tpl' : 'migrate_table_delete.tpl';
-        $table_content = $this->fetch($this->getTemplateFilePath($tpl_file_name));
+        $table_content = $this->fetch($this->getTemplateFilePath($tpl_file_name), [], ['default_filter' => '']);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
@@ -184,7 +184,7 @@ class TableController extends MigrateBaseController {
         $this->assign('partition', $partition);
         $this->assign('old_partition', isset($old_table_comment['partition']) ? $old_table_comment['partition'] : []);
         $class_name    = $this->getClassName([$table_name, 'update']);
-        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_update.tpl'));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_update.tpl'), [], ['default_filter' => '']);
         $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
@@ -203,7 +203,7 @@ class TableController extends MigrateBaseController {
         $new_table_name = get_param('new_table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '新表名');
         $this->assign('new_table_name', $new_table_name);
         $class_name    = $this->getClassName([$table_name, 'rename']);
-        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_rename.tpl'));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_rename.tpl'), [], ['default_filter' => '']);
         $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
@@ -249,7 +249,7 @@ class TableController extends MigrateBaseController {
         fclose($db_handle);
         $this->assign('all_items', []);
         $this->assign('class_name', $class_name);
-        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_data.tpl'));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_data.tpl'), [], ['default_filter' => '']);
         $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);

@@ -13,12 +13,12 @@ use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
-use think\Config;
+use think\facade\Config;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
 use think\exception\ThrowableError;
-use think\View;
+use think\facade\View;
 
 /**
  * Api文档
@@ -135,7 +135,7 @@ class ApiDoc extends Command {
                 'ar_returns' => $each_content[2],
                 'a_name'     => $a_name,
                 'item_index' => $item_index
-            ]);
+            ], ['default_filter' => '']);
             $item_index++;
             $request_url_array = explode('/', trim($request_url, '/'));
             if (!isset($menu[$request_url_array[1]])) {
@@ -156,7 +156,7 @@ class ApiDoc extends Command {
             'create_time' => date('Y-m-d H:i:s'),
             'api_count'   => $item_index,
             'menu'        => array_values($menu)
-        ]);
+        ], ['default_filter' => '']);
         //处理api
         $file_absolute_url = sprintf(DOCUMENT_ROOT_PATH . '/../doc/api/%s.html', date('y.m.d.H.i'));
         //创建文件夹
@@ -272,7 +272,7 @@ class ApiDoc extends Command {
         if (empty($function_name)) {
             //去除默认执行函数
             foreach ($return as $k => $each_function) {
-                if (strpos($each_function, ' _initialize') !== false || strpos($each_function, ' __destruct') !== false) {
+                if (strpos($each_function, ' initialize') !== false || strpos($each_function, ' __destruct') !== false) {
                     unset($return[$k]);
                     continue;
                 }

@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
-use think\Log;
+use think\facade\Log;
 
 /**
  * 写日志函数
@@ -21,7 +21,7 @@ function log_info() {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
         $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
-        Log::record($str, Log::LOG);
+        Log::record($str, 'debug');
     }
 }
 
@@ -51,7 +51,7 @@ function le_info() {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
         $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
-        Log::record($str, Log::LOG);
+        Log::record($str, 'debug');
         //输出
         if (request()->isCli() || request()->isAjax()) {
             echo $str . "\n";
@@ -110,7 +110,7 @@ const PAGES_NUM = 15;
  */
 function json_return($data, $is_log = false) {
     //调试模式下，记录信息
-    if (\think\App::$debug || $is_log) {
+    if (\think\facade\App::isDebug() || $is_log) {
         //将请求地址加入返回数组中，用于区别请求内容
         log_info(json_encode($data, JSON_UNESCAPED_UNICODE), $data);
     }

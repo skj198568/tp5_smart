@@ -15,6 +15,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\facade\Env;
 use Workerman\Lib\Timer;
 use Workerman\Worker;
 
@@ -59,7 +60,7 @@ class BrowserSync extends Command {
      * @return string
      */
     private function getPidSrc() {
-        return RUNTIME_PATH . 'worker_man/browser_sync/pid.txt';
+        return Env::get('runtime_path') . 'worker_man/browser_sync/pid.txt';
     }
 
     /**
@@ -67,7 +68,7 @@ class BrowserSync extends Command {
      * @return string
      */
     private function getLogSrc() {
-        return RUNTIME_PATH . 'worker_man/browser_sync/log.txt';
+        return Env::get('runtime_path') . 'worker_man/browser_sync/log.txt';
     }
 
     /**
@@ -75,7 +76,7 @@ class BrowserSync extends Command {
      * @return string
      */
     private function getPortSrc() {
-        return RUNTIME_PATH . 'worker_man/browser_sync/port.txt';
+        return Env::get('runtime_path') . 'worker_man/browser_sync/port.txt';
     }
 
     /**

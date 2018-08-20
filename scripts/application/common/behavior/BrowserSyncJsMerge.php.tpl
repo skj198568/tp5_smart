@@ -11,7 +11,7 @@ namespace app\common\behavior;
 
 
 use app\console\BrowserSync;
-use think\App;
+use think\facade\App;
 
 /**
  * 自动拼接浏览器自动刷新js
@@ -26,7 +26,7 @@ class BrowserSyncJsMerge
      * @param $content
      */
     public function run(&$content){
-        if(App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(strtolower(request()->module()), ['api', 'migrate'])){
+        if(App::isDebug() && !request()->isAjax() && !request()->isCli() && !in_array(strtolower(request()->module()), ['api', 'migrate'])){
             //拼接socket监听js
             $content .= BrowserSync::instance()->getJsContent();
         }
