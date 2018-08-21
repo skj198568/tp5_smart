@@ -33,7 +33,7 @@ class TableController extends MigrateBaseController {
         $tables        = [];
         foreach ($tables_select as $k => $table) {
             $table = array_pop($table);
-            if (strpos($table, config('database.prefix')) === 0) {
+            if (!empty(config('database.prefix')) && strpos($table, config('database.prefix')) === 0) {
                 $table = substr($table, strlen(config('database.prefix')));
             }
             if ($table == 'migrations') {
