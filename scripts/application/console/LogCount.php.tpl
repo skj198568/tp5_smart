@@ -175,6 +175,9 @@ class LogCount extends Command {
                     continue;
                 }
                 $table_name = trim($table_name, '`');
+                if (strpos($table_name, config('database.prefix')) === false || strpos($table_name, '(') !== false) {
+                    continue;
+                }
                 if (isset($sql[$table_name])) {
                     $sql[$table_name]++;
                 } else {
