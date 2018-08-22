@@ -73,6 +73,9 @@ foreach ($files as $file) {
         $comands = explode(',', $comands);
         foreach ($comands as $each_command) {
             $each_command = trim($each_command);
+            if(empty($each_command)){
+                continue;
+            }
             //判断是否存在
             if (strpos($file_content, $each_command) === false) {
                 $file_content = str_replace('];', "    $each_command,\n];", $file_content);
