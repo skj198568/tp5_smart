@@ -129,17 +129,6 @@ foreach ($files as $file) {
         copy($file, $target_file);
     }
 }
-//linux 环境处理mkdir 755问题
-$files = [
-    //日志
-    $document_root_dir . '/thinkphp/library/think/File.php',
-    //日志
-    $document_root_dir . '/thinkphp/library/think/log/driver/File.php',
-    //缓存
-    $document_root_dir . '/thinkphp/library/think/cache/driver/File.php',
-    //模板缓存
-    $document_root_dir . '/thinkphp/library/think/template/driver/File.php',
-];
 //系统config文件修复
 $file = $document_root_dir . '/application/config.php';
 if (is_file($file)) {

@@ -14,5 +14,6 @@ return [
     'app\console\BrowserSync',
     'app\console\TaskRun',
     'app\console\ApiDoc',
-    'app\console\Apps'
+    'app\console\Apps',
+    'app\console\LogCount',
 ];
