@@ -11,12 +11,11 @@ namespace app\console;
 
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
-use think\Config;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
-use think\View;
+use think\facade\View;
 
 /**
  * 日志统计
@@ -45,7 +44,7 @@ class LogCount extends Command {
      * @param Input $input
      * @param Output $output
      * @return int|null|void
-     * @throws \think\Exception
+     * @throws \Exception
      */
     protected function execute(Input $input, Output $output) {
         if ($input->hasOption('start_day')) {
@@ -54,7 +53,7 @@ class LogCount extends Command {
             $start_day = 0;
         }
         //设置view
-        $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
+        $this->view = View::instance(config('template'), config('view_replace_str'));
         $log_dir    = DOCUMENT_ROOT_PATH . str_replace('/', DIRECTORY_SEPARATOR, '/../runtime/log/');
         $files      = ClFile::dirGetFiles($log_dir);
         //忽略cli日志
@@ -90,7 +89,7 @@ class LogCount extends Command {
      * 处理api
      * @param Output $output
      * @param $files
-     * @throws \think\Exception
+     * @throws \Exception
      */
     protected function dealRequest(Output $output, $files) {
         //统计接口请求次数
@@ -153,10 +152,10 @@ class LogCount extends Command {
     }
 
     /**
-     * 处理sql统计
+     * 处理sql
      * @param Output $output
      * @param $files
-     * @throws \think\Exception
+     * @throws \Exception
      */
     protected function dealSql(Output $output, $files) {
         $sql = [];
@@ -176,6 +175,9 @@ class LogCount extends Command {
                     continue;
                 }
                 $table_name = trim($table_name, '`');
+                if (strpos($table_name, config('database.prefix')) === false || strpos($table_name, '(') !== false) {
+                    continue;
+                }
                 if (isset($sql[$table_name])) {
                     $sql[$table_name]++;
                 } else {
@@ -208,7 +210,7 @@ class LogCount extends Command {
      * @param Input $input
      * @param Output $output
      * @param $files
-     * @throws \think\Exception
+     * @throws \Exception
      */
     protected function dealSqlSlowQuery(Input $input, Output $output, $files) {
         if ($input->hasOption('slow_microsecond')) {

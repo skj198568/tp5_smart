@@ -21,11 +21,11 @@
     <li role="presentation" class="active"><a href="sql_slow.html">慢查询统计</a></li>
 </ul>
 <!--表格begin-->
-<table class="table table-striped table-hover table-bordered table-condensed">
+<table class="table table-striped table-hover table-bordered table-condensed" style="word-break:break-all; word-wrap:break-all;">
     <thead>
     <tr>
         <th>ID</th>
-        <th>SQL</th>
+        <th style="width:80%;">SQL</th>
         <th>数量</th>
         <th>执行毫秒</th>
         <th>占比%</th>
@@ -35,7 +35,7 @@
     <foreach name="sql_array" item="v" key="k">
         <tr>
             <td>{$k+1}</td>
-            <td style="width: 80%;">{$v[0]}</td>
+            <td>{$v[0]}</td>
             <td>{$v[1]}</td>
             <td>{$v[2]}</td>
             <td>{$v[3]}</td>
