@@ -73,7 +73,7 @@ foreach ($files as $file) {
         $comands = explode(',', $comands);
         foreach ($comands as $each_command) {
             $each_command = trim($each_command);
-            if(empty($each_command)){
+            if (empty($each_command)) {
                 continue;
             }
             //判断是否存在
@@ -121,6 +121,12 @@ foreach ($files as $file) {
             copy($file, $target_file);
         }
     } else if (strpos($target_file, 'TaskController.php') !== false) {
+        if (!is_file($target_file)) {
+            //覆盖文件
+            echo 'copy file: ' . $target_file . PHP_EOL;
+            copy($file, $target_file);
+        }
+    } else if (strpos($target_file, 'users.ini') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
