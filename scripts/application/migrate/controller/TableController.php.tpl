@@ -233,7 +233,7 @@ class TableController extends MigrateBaseController {
         }
         $limit    = 100;
         $all_page = ceil($all_count / $limit);
-        $db_file  = '/../database/data/' . $table_name . date('YmdHi') . '.json';
+        $db_file  = '/../database/data/' . $table_name . date('YmdHis') . '.json';
         $this->assign('db_file', $db_file);
         $db_file = DOCUMENT_ROOT_PATH . $db_file;
         ClFile::dirCreate($db_file);

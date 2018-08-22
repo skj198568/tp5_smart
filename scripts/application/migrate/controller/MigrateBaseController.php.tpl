@@ -229,7 +229,7 @@ class MigrateBaseController extends Controller {
         }
         $class_name = implode('_', $table_name);
         $class_name = $this->getModelName($class_name, false);
-        $class_name = $class_name . date('YmdHi');
+        $class_name = $class_name . date('YmdHis');
         //赋值
         $this->assign('class_name', $class_name);
         return $class_name;
