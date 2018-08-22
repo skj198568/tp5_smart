@@ -79,7 +79,7 @@ class LogCount extends Command {
         }
         $files = array_values($files);
         //request
-//        $this->dealRequest($output, $files);
+        $this->dealRequest($output, $files);
         //sql
         $this->dealSql($output, $files);
         //处理慢查询
