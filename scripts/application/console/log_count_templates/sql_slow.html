@@ -25,9 +25,9 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>表名</th>
-        <th>查询数量</th>
-        <th>平均执行毫秒数</th>
+        <th>SQL</th>
+        <th>数量</th>
+        <th>执行毫秒</th>
         <th>占比%</th>
     </tr>
     </thead>
@@ -35,7 +35,7 @@
     <foreach name="sql_array" item="v" key="k">
         <tr>
             <td>{$k+1}</td>
-            <td>{$v[0]}</td>
+            <td style="width: 80%;">{$v[0]}</td>
             <td>{$v[1]}</td>
             <td>{$v[2]}</td>
             <td>{$v[3]}</td>
