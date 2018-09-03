@@ -1,13 +1,23 @@
 # tp5_smart
 基于tp5，实现智能化、敏捷化开发。
-#### 修改php版本要求
+#### 修改composer.json php版本要求
 ```
 "require": {
     "php": ">=7.0.0",
 }
 ```
-#### 添加执行脚本
+#### 添加composer.json 配置文件及执行脚本
 ```
+"repositories": [
+    {
+        "type": "git",
+        "url": "https://github.com/skj198568/class_library.git"
+    },
+    {
+        "type": "git",
+        "url": "https://github.com/skj198568/smart_tp5.git"
+    }
+],
 "scripts":{
     "post-install-cmd": [
         "php vendor/skj198568/tp5_smart/create_files.php"
