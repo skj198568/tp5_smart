@@ -15,7 +15,7 @@
     },
     {
         "type": "git",
-        "url": "https://github.com/skj198568/smart_tp5.git"
+        "url": "https://github.com/skj198568/tp5_smart.git"
     }
 ],
 "scripts":{
