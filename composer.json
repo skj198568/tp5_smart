@@ -1,19 +1,25 @@
 {
-  "name": "skj198568/tp5_smart",
-  "description": "tp5 smart 开发模式",
-  "type": "library",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "宋可敬",
-      "email": "597481334@qq.com"
-    }
-  ],
-  "require": {
-    "php": ">=7.0.0",
-    "skj198568/class_library": "1.0.*",
-    "workerman/workerman": "^3.5",
-    "php-ai/php-ml": "^0.6.2",
-    "facebook/webdriver": "^1.5"
-  }
+    "name": "skj198568/tp5_smart",
+    "description": "tp5 smart 开发模式",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "宋可敬",
+            "email": "597481334@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "skj198568/class_library": "1.0.*",
+        "workerman/workerman": "^3.5",
+        "php-ai/php-ml": "^0.6.2",
+        "facebook/webdriver": "^1.5"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/skj198568/class_library.git"
+        }
+    ]
 }
