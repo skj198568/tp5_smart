@@ -14,7 +14,12 @@
         "skj198568/class_library": "1.1.*",
         "workerman/workerman": "^3.5",
         "php-ai/php-ml": "^0.6.2",
-        "facebook/webdriver": "^1.5",
-        "topthink/think-migration": "^2.0"
-    }
+        "facebook/webdriver": "^1.5"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/skj198568/class_library.git"
+        }
+    ]
 }
