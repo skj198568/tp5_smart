@@ -1,7 +1,7 @@
 <!--布局begin-->
 <layout name="public/layout" replace="{__CONTENT__}"/>
 <!--布局end-->
-<div class="middle-box text-center loginscreen  animated fadeInDown">
+<div class="middle-box text-center loginscreen  animated fadeInDown" ms-keyup="$enterLogin()">
     <div>
         <div>
             <h1 class="logo-name"><span class="text-danger">M</span></h1>
@@ -42,6 +42,11 @@
                     });
                 }
             });
+        },
+        $enterLogin: function (event) {
+            if (event.keyCode === '13' || event.key.toLowerCase() === 'enter') {
+                login.$login();
+            }
         }
     });
 
