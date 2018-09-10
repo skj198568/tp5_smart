@@ -44,11 +44,25 @@ class TaskMap extends BaseModel {
     const F_CREATE_TIME = 'create_time';
 
     /**
-     * 更新时间
+     * 开始时间
      * Type: int(11)
      * Default: 0
      */
-    const F_UPDATE_TIME = 'update_time';
+    const F_START_TIME = 'start_time';
+
+    /**
+     * 结束时间
+     * Type: int(11)
+     * Default: 0
+     */
+    const F_END_TIME = 'end_time';
+
+    /**
+     * 备注
+     * Type: text
+     * Default: 
+     */
+    const F_REMARK = 'remark';
 
     /**
      * 字段校验，用于字段内容判断
@@ -57,7 +71,8 @@ class TaskMap extends BaseModel {
     public static $fields_verifies = [
         self::F_COMMAND => ["is_required",["length_max",255]], 
         self::F_CREATE_TIME => ["number",["length_max",11]], 
-        self::F_UPDATE_TIME => ["number",["length_max",11]], 
+        self::F_START_TIME => ["number",["length_max",11]], 
+        self::F_END_TIME => ["number",["length_max",11]], 
     ];
 
     /**
@@ -84,7 +99,8 @@ class TaskMap extends BaseModel {
      */
     protected static $fields_show_format = [
         self::F_CREATE_TIME => [["date('Y-m-d H:i:s', %s)","_show"]],
-        self::F_UPDATE_TIME => [["date('Y-m-d H:i:s', %s)","_show"]]
+        self::F_START_TIME => [["date('Y-m-d H:i:s', %s)","_show"]],
+        self::F_END_TIME => [["date('Y-m-d H:i:s', %s)","_show"]]
     ];
 
     /**
@@ -99,7 +115,9 @@ class TaskMap extends BaseModel {
     public static $fields_names = [
         self::F_COMMAND => '带有命名空间的任务调用地址',
         self::F_CREATE_TIME => '创建时间',
-        self::F_UPDATE_TIME => '更新时间'
+        self::F_START_TIME => '开始时间',
+        self::F_END_TIME => '结束时间',
+        self::F_REMARK => '备注'
     ];
 
     /**
@@ -108,7 +126,7 @@ class TaskMap extends BaseModel {
      * @return array
      */
     public static function getAllFields($exclude_fields = [self::F_ID]) {
-        $fields = [self::F_ID, self::F_COMMAND, self::F_CREATE_TIME, self::F_UPDATE_TIME];
+        $fields = [self::F_ID, self::F_COMMAND, self::F_CREATE_TIME, self::F_START_TIME, self::F_END_TIME, self::F_REMARK];
         return array_diff($fields, $exclude_fields);
     }
 
