@@ -9,6 +9,7 @@
 namespace app\index\model;
 
 use app\index\map\TaskMap;
+use think\Exception;
 
 /**
  * 后台任务 Model
@@ -34,7 +35,7 @@ class TaskModel extends TaskMap {
     public static function deal() {
         //处理数据
         $item = self::instance()->where([
-            self::F_UPDATE_TIME => 0
+            self::F_START_TIME => 0
         ])->order([self::F_ID => self::V_ORDER_ASC])->find();
         if (empty($item)) {
             return true;
@@ -43,16 +44,24 @@ class TaskModel extends TaskMap {
         self::instance()->where([
             self::F_ID => $item[self::F_ID]
         ])->setField([
-            self::F_UPDATE_TIME => -1
+            self::F_START_TIME => time()
         ]);
         //执行
-        eval($item[self::F_COMMAND]);
-        //设置执行的结束时间
-        self::instance()->where([
-            self::F_ID => $item[self::F_ID]
-        ])->setField([
-            self::F_UPDATE_TIME => time()
-        ]);
+        try {
+            eval($item[self::F_COMMAND]);
+            //设置执行的结束时间
+            self::instance()->where([
+                self::F_ID => $item[self::F_ID]
+            ])->setField([
+                self::F_END_TIME => time()
+            ]);
+        } catch (Exception $e) {
+            self::instance()->where([
+                self::F_ID => $item[self::F_ID]
+            ])->setField([
+                self::F_REMARK => $e->getMessage()
+            ]);
+        }
         return true;
     }
 
