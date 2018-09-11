@@ -71,6 +71,12 @@ class {$table_name}Map extends BaseModel {
      * 所有字段的注释
      */
     public static $fields_names = <empty name="fields_names">[]<else/>[<foreach name="fields_names" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_names_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+
+    /**
+     * 默认值
+     * @var array
+     */
+    protected static $fields_default_values = <empty name="fields_default_values">[]<else/>[<foreach name="fields_default_values" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_default_values_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 <present name="table_comment['partition']">
 
     /**

@@ -91,6 +91,12 @@ class BaseModel extends Query {
     protected static $fields_store_format = [];
 
     /**
+     * 默认值
+     * @var array
+     */
+    protected static $fields_default_values = [];
+
+    /**
      * 所有字段的注释
      */
     public static $fields_names = [];
@@ -156,6 +162,8 @@ class BaseModel extends Query {
      * @return int|string
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
+        //拼接默认值
+        $data = array_merge(static::$fields_default_values, $data);
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
         //自动完成字段
@@ -218,7 +226,10 @@ class BaseModel extends Query {
      */
     public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
-        foreach ($dataSet as $data) {
+        foreach ($dataSet as $k_data => $data) {
+            //拼接默认值
+            $data             = array_merge(static::$fields_default_values, $data);
+            $dataSet[$k_data] = $data;
             ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
         }
         //字段处理

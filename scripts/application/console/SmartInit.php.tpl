@@ -170,6 +170,8 @@ class SmartInit extends Command {
         $fields_verifies = [];
         //字段注释关系
         $fields_names = [];
+        //默认值
+        $fields_default_values = [];
         foreach ($table_info as $k => $each) {
             $all_fields[] = 'self::F_' . strtoupper($each['Field']);
             if ($each['Field'] == 'id') {
@@ -254,6 +256,10 @@ class SmartInit extends Command {
             if (isset($field_comment['store_format'])) {
                 $fields_store_format['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['store_format'], JSON_UNESCAPED_UNICODE);
             }
+            //设置默认值
+            if (in_array(strtolower($each['Type']), ['text', 'mediumtext', 'longtext'])) {
+                $fields_default_values['self::F_' . strtoupper($each['Field'])] = '';
+            }
         }
         //校验器
         $fields_verifies_string = '';
@@ -281,6 +287,8 @@ class SmartInit extends Command {
                 'fields_invisible'            => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
                 'fields_names'                => $fields_names,
                 'fields_names_keys'           => array_keys($fields_names),
+                'fields_default_values'       => $fields_default_values,
+                'fields_default_values_keys'  => array_keys($fields_default_values),
             ]);
         $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         $old_content = '';
@@ -440,7 +448,7 @@ class SmartInit extends Command {
         ];
         $ar_get_by_ids_json = [
             'status' => strtolower(sprintf('api/%s/getByIds/1', $table_name)),
-            'items'   => [$info]
+            'items'  => [$info]
         ];
         $ar_create_json     = [
             'status' => strtolower(sprintf('api/%s/create/1', $table_name)),
@@ -456,17 +464,17 @@ class SmartInit extends Command {
         ];
         $map_template_file  = __DIR__ . '/smart_init_templates/controller_base.tpl';
         $content            = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date'             => date('Y/m/d') . "\n",
-                'time'             => date('H:i:s') . "\n",
-                'table_name'       => $table_name_format,
-                'table_comment'    => $this->getTableComment($table_name),
-                'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_json'      => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_by_ids_json'      => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
-                'ar_create_json'   => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
-                'ar_update_json'   => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
-                'ar_delete_json'   => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
-                'create_api'       => $table_comment['create_api']
+                'date'               => date('Y/m/d') . "\n",
+                'time'               => date('H:i:s') . "\n",
+                'table_name'         => $table_name_format,
+                'table_comment'      => $this->getTableComment($table_name),
+                'ar_get_list_json'   => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_json'        => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_by_ids_json' => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
+                'ar_create_json'     => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
+                'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
+                'create_api'         => $table_comment['create_api']
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';

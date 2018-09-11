@@ -59,7 +59,12 @@ class TaskModel extends TaskMap {
             self::instance()->where([
                 self::F_ID => $item[self::F_ID]
             ])->setField([
-                self::F_REMARK => $e->getMessage()
+                self::F_REMARK => json_encode([
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'code'    => $e->getCode()
+                ], JSON_UNESCAPED_UNICODE)
             ]);
         }
         return true;
