@@ -47,10 +47,9 @@ class TaskModel extends TaskMap {
             self::F_START_TIME => time()
         ]);
         //执行
+        log_info('task-start-' . $item[self::F_ID]);
         try {
-            log_info('task-start-'.$item[self::F_ID]);
             eval($item[self::F_COMMAND]);
-            log_info('task-end-'.$item[self::F_ID]);
             //设置执行的结束时间
             self::instance()->where([
                 self::F_ID => $item[self::F_ID]
@@ -69,6 +68,8 @@ class TaskModel extends TaskMap {
                 ], JSON_UNESCAPED_UNICODE)
             ]);
         }
+        //结束
+        log_info('task-end-' . $item[self::F_ID]);
         return true;
     }
 
