@@ -170,6 +170,8 @@ class SmartInit extends Command {
         $fields_verifies = [];
         //字段注释关系
         $fields_names = [];
+        //默认值
+        $fields_default_values = [];
         foreach ($table_info as $k => $each) {
             $all_fields[] = 'self::F_' . strtoupper($each['Field']);
             if ($each['Field'] == 'id') {
@@ -254,6 +256,10 @@ class SmartInit extends Command {
             if (isset($field_comment['store_format'])) {
                 $fields_store_format['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['store_format'], JSON_UNESCAPED_UNICODE);
             }
+            //设置默认值
+            if (in_array(strtolower($each['Type']), ['text', 'mediumtext', 'longtext'])) {
+                $fields_default_values['self::F_' . strtoupper($each['Field'])] = '';
+            }
         }
         //校验器
         $fields_verifies_string = '';
@@ -281,7 +287,9 @@ class SmartInit extends Command {
                 'fields_invisible'            => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
                 'fields_names'                => $fields_names,
                 'fields_names_keys'           => array_keys($fields_names),
-            ], ['default_filter' => '']);
+                'fields_default_values'       => $fields_default_values,
+                'fields_default_values_keys'  => array_keys($fields_default_values),
+            ]);
         $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         $old_content = '';
         if (is_file($map_file)) {
