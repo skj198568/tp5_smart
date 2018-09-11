@@ -48,7 +48,9 @@ class TaskModel extends TaskMap {
         ]);
         //执行
         try {
+            log_info('task-start-'.$item[self::F_ID]);
             eval($item[self::F_COMMAND]);
+            log_info('task-end-'.$item[self::F_ID]);
             //设置执行的结束时间
             self::instance()->where([
                 self::F_ID => $item[self::F_ID]
