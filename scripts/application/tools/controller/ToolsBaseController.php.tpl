@@ -29,7 +29,8 @@ class ToolsBaseController extends Controller
     {
         parent::_initialize();
         if(!request()->isCli()){
-            return '只能命令行访问';
+            echo_info('只能命令行访问');
+            exit;
         }
         if (App::$debug) {
             log_info('$_REQUEST:', $_REQUEST);
