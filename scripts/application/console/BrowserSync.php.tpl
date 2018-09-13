@@ -227,8 +227,14 @@ class BrowserSync extends Command {
         }
         return sprintf('<script type="text/javascript">
     var ws = new WebSocket(\'ws://%s:%s\');
+    ws.onopen = function(){
+        console.log("connected for browser_sync");
+    };
     ws.onclose = function(){
         window.location.reload();
+    };
+    ws.onerror = function(event){
+        console.log(event.data);
     };
 </script>', $host, $port);
     }
@@ -242,10 +248,10 @@ class BrowserSync extends Command {
         //清除缓存
         clearstatcache();
         $last_scan_files = $this->scan_files;
-        $files_types = $input->getOption('file_types');
+        $files_types     = $input->getOption('file_types');
         //去除两端引号
         $files_types = explode(';', trim(trim(str_replace(['；', '"', "'"], [';', '', ''], $files_types)), ';'));
-        array_walk($files_types, function(&$each){
+        array_walk($files_types, function (&$each) {
             $each = trim($each);
         });
         $dirs      = $input->getOption('dirs');
