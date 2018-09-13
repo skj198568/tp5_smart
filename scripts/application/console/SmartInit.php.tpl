@@ -289,7 +289,7 @@ class SmartInit extends Command {
                 'fields_names_keys'           => array_keys($fields_names),
                 'fields_default_values'       => $fields_default_values,
                 'fields_default_values_keys'  => array_keys($fields_default_values),
-            ]);
+            ], ['default_filter' => '']);
         $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         $old_content = '';
         if (is_file($map_file)) {
