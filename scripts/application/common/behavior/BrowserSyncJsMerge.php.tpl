@@ -18,17 +18,23 @@ use think\App;
  * Class BrowserSyncJsMerge
  * @package app\common\behavior
  */
-class BrowserSyncJsMerge
-{
+class BrowserSyncJsMerge {
 
     /**
      * 执行
      * @param $content
      */
-    public function run(&$content){
-        if(App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(strtolower(request()->module()), ['api', 'migrate'])){
+    public function run(&$content) {
+        if (App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(strtolower(request()->module()), ['api', 'migrate'])) {
             //拼接socket监听js
-            $content .= BrowserSync::instance()->getJsContent();
+            $js_content = BrowserSync::instance()->getJsContent();
+            if (strpos($content, '<head>') !== false) {
+                //嵌入js
+                $content = str_replace('<head>', "<head>\n" . $js_content, $content);
+            } else {
+                //拼接
+                $content .= $js_content;
+            }
         }
     }
 }
