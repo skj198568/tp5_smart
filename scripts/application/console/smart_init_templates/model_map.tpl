@@ -65,7 +65,7 @@ class {$table_name}Map extends BaseModel {
      * 字段存储格式
      * @var array
      */
-    protected static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_store_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    public static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_store_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 所有字段的注释

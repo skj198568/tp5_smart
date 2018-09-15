@@ -88,7 +88,7 @@ class BaseModel extends Query {
      * 字段存储格式
      * @var array
      */
-    protected static $fields_store_format = [];
+    public static $fields_store_format = [];
 
     /**
      * 默认值
