@@ -167,7 +167,7 @@ class {$table_name}Map extends BaseModel {
 <present name="table_comment['partition']">
 
     /**
-     * 按id或id数组获取
+     * 按id获取
      * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param int $id
      * @param array $exclude_fields 不包含的字段
@@ -197,7 +197,7 @@ class {$table_name}Map extends BaseModel {
     <else/>
 
     /**
-     * 按id或id数组获取
+     * 按id获取
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
