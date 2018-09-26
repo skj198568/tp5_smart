@@ -169,7 +169,7 @@ class TaskMap extends BaseModel {
     }
 
     /**
-     * 按id或id数组获取
+     * 按id获取
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
