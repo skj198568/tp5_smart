@@ -74,10 +74,12 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
     if (strpos($desc, ',') !== false) {
         exit(sprintf('%s含有非法字符","，请改成中文"，"', $desc));
     }
-    //如果默认值为int类型，则过滤器则要添加intval
+    //如果默认值为int类型，则过滤器则要添加floatval
     if ($default !== null) {
         if (is_numeric($default)) {
-            $filter .= ',intval';
+            if ($filter == 'trim') {
+                $filter .= ',floatval';
+            }
         }
     }
     try {
