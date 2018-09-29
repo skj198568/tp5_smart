@@ -203,13 +203,27 @@ class SmartInit extends Command {
                 //新增格式化字段
                 $field_comment['show_format'][] = [$format, '_show'];
                 //处理静态变量
-                foreach ($field_comment['const_values'] as $const_value_array) {
-                    $const_fields .= sprintf("
+                if (isset($field_comment['const_values'])) {
+                    $map_relation = '';
+                    foreach ($field_comment['const_values'] as $const_value_array) {
+                        $const_fields .= sprintf("
     /**
      * %s
      */
-    const V_%s_%s = '%s';
+    const V_%s_%s = %s;
 ", $const_value_array[2], strtoupper($each['Field']), strtoupper($const_value_array[0]), $const_value_array[1]);
+                        $map_relation .= (empty($map_relation) ? '' : ",\n        ").sprintf($const_value_array[1] . " => '%s'", $const_value_array[2]);
+                    }
+                    //处理字段关系映射
+                    foreach ($field_comment['const_values'] as $const_value_array) {
+                    }
+                    $const_fields .= sprintf("
+    /**
+     * 映射关系
+     */
+    const R_%s = [
+        %s
+    ];\n", strtoupper($each['Field']), $map_relation);
                 }
             }
             //设置校验器，默认有长度限制
