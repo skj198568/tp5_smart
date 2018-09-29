@@ -77,7 +77,7 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
     //如果默认值为int类型，则过滤器则要添加floatval
     if ($default !== null) {
         if (is_numeric($default)) {
-            if ($filter == 'trim') {
+            if (strpos($filter, 'floatval') === false) {
                 $filter .= ',floatval';
             }
         }
