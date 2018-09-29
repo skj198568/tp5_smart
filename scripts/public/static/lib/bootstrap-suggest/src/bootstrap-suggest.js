@@ -5,7 +5,7 @@
  * @github  https://github.com/lzwme/bootstrap-suggest-plugin.git
  * @since   2014-10-09
  *===============================================================================
- * (c) Copyright 2014-2016 http://lzw.me All Rights Reserved.
+ * (c) Copyright 2014-2018 http://lzw.me All Rights Reserved.
  ********************************************************************************/
 (function (factory) {
     if (typeof define === "function" && define.amd) {
@@ -305,6 +305,28 @@
         adjustDropMenuPos($input, $dropdownMenu, options);
     }
     /**
+     * 显示下拉列表
+     */
+    function showDropMenu($input, options) {
+        var $dropdownMenu = $input.parent().find('ul:eq(0)');
+        if (!$dropdownMenu.is(':visible')) {
+            // $dropdownMenu.css('display', 'block');
+            $dropdownMenu.show();
+            $input.trigger('onShowDropdown', [options ? options.data.value : []]);
+        }
+    }
+    /**
+     * 隐藏下拉列表
+     */
+    function hideDropMenu($input, options) {
+        var $dropdownMenu = $input.parent().find('ul:eq(0)');
+        if ($dropdownMenu.is(':visible')) {
+            // $dropdownMenu.css('display', '');
+            $dropdownMenu.hide();
+            $input.trigger('onHideDropdown', [options ? options.data.value : []]);
+        }
+    }
+    /**
      * 下拉列表刷新
      * 作为 fnGetData 的 callback 函数调用
      */
@@ -320,7 +342,8 @@
             if (options.emptyTip) {
                 showTip(options.emptyTip, $input, $dropdownMenu, options);
             } else {
-                $dropdownMenu.empty().hide();
+                $dropdownMenu.empty();
+                hideDropMenu($input, options);
             }
             return $input;
         }
@@ -331,9 +354,8 @@
             JSON.stringify(options._lastData) === JSON.stringify(data) &&
             $dropdownMenu.find('tr').length === len
         ) {
-            $dropdownMenu.show();
+            showDropMenu($input, options);
             return adjustDropMenuPos($input, $dropdownMenu, options);
-            // return $input;
         }
         options._lastData = data;
 
@@ -389,7 +411,9 @@
         }
         html.push('</tbody></table>');
 
-        $dropdownMenu.html(html.join('')).show();
+        $dropdownMenu.html(html.join(''));
+        showDropMenu($input, options);
+        //.show();
 
         // scrollbar 存在时，延时到动画结束时调整 padding
         setTimeout(function() {
@@ -785,7 +809,7 @@
                         }
                     } else if (event.keyCode === options.keyEnter) {
                         tipsKeyword = getPointKeyword(currentList);
-                        $dropdownMenu.hide(); // .empty();
+                        hideDropMenu($input, options);
                     } else {
                         setOrGetDataId($input, '');
                     }
@@ -849,7 +873,7 @@
                     adjustDropMenuPos($input, $dropdownMenu, options);
                 }).on('blur', function() {
                     if (!isMouseenterMenu) { // 不是进入下拉列表状态，则隐藏列表
-                        $dropdownMenu.css('display', '');
+                        hideDropMenu($input, options);
                     }
                 }).on('click', function() {
                     // console.log('input click');
@@ -860,10 +884,9 @@
                         word === setOrGetAlt($input) &&
                         $dropdownMenu.find('table tr').length
                     ) {
-                        return $dropdownMenu.show();
+                        return showDropMenu($input, options);
                     }
 
-                    // if ($dropdownMenu.css('display') !== 'none') {
                     if ($dropdownMenu.is(':visible')) {
                         return;
                     }
@@ -883,23 +906,21 @@
 
                 // 下拉按钮点击时
                 $parent.find('.btn:eq(0)').attr('data-toggle', '').click(function() {
-                    var display = 'none';
-
-                    // if ($dropdownMenu.is(':visible')) {
-                    if ($dropdownMenu.css('display') === display) {
-                        display = 'block';
+                    if (!$dropdownMenu.is(':visible')) {
                         if (options.url) {
                             $input.click().focus();
                             if (!$dropdownMenu.find('tr').length) {
-                                display = 'none';
+                                return FALSE;
                             }
                         } else {
                             // 不以 keyword 作为过滤，展示所有的数据
                             refreshDropMenu($input, options.data, options);
                         }
+                        showDropMenu($input, options);
+                    } else {
+                        hideDropMenu($input, options);
                     }
 
-                    $dropdownMenu.css('display', display);
                     return FALSE;
                 });
 
@@ -924,7 +945,7 @@
                         setValue($input, keywords, options);
                         setOrGetAlt($input, keywords.key);
                         setBackground($input, options);
-                        $dropdownMenu.hide();
+                        hideDropMenu($input, options);
                     });
 
                 // 存在清空按钮
@@ -953,7 +974,7 @@
         },
         hide: function() {
             return this.each(function() {
-                $(this).parent().find('ul:eq(0)').css('display', '');
+                hideDropMenu($(this));
             });
         },
         disable: function() {
