@@ -53,17 +53,26 @@ class AreaMap extends BaseModel {
     /**
      * 省/直辖市
      */
-    const V_TYPE_PROVINCE = '1';
+    const V_TYPE_PROVINCE = 1;
 
     /**
      * 城市
      */
-    const V_TYPE_CITY = '2';
+    const V_TYPE_CITY = 2;
 
     /**
      * 区县
      */
-    const V_TYPE_AREA = '3';
+    const V_TYPE_AREA = 3;
+
+    /**
+     * 映射关系
+     */
+    const R_TYPE = [
+        1 => '省/直辖市',
+        2 => '城市',
+        3 => '区县'
+    ];
 
     /**
      * 字段校验，用于字段内容判断
