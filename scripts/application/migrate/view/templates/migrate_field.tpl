@@ -63,7 +63,7 @@ ClMigrateField::instance()
 <present name="field_info['verifies']">
     <foreach name="$field_info['verifies']" item="v" key="k">
         <if condition="is_array($v)">
-            <if condition="$v[0] eq 'password'">
+            <if condition="$v[0] eq 'is_password'">
                 ->verifyIsPassword('{$v[1]}', '{$v[2]}')
             </if>
             <if condition="$v[0] eq 'in_array'">
