@@ -13,7 +13,9 @@ use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
+use think\db\Connection;
 use think\db\Query;
+use think\Model;
 
 /**
  * 基础Model
@@ -106,6 +108,25 @@ class BaseModel extends Query {
      * @var array
      */
     public static $partition = ["platform_id", "1"];
+
+    /**
+     * 构造函数
+     * @access public
+     * @param Connection $connection 数据库对象实例
+     * @param Model $model 模型对象
+     */
+    public function __construct(Connection $connection = null, Model $model = null) {
+        parent::__construct($connection, $model);
+        //调用初始化函数
+        $this->initialize();
+    }
+
+    /**
+     * 初始化
+     */
+    public function initialize() {
+
+    }
 
     /**
      * 获取所有的字段
