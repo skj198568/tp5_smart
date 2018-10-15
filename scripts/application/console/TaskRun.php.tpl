@@ -68,14 +68,14 @@ class TaskRun extends Command {
         ClFile::dirCreate($pid_file);
         $task::$pidFile = $pid_file;
         //设置日志文件
-        $task::$logFile = RUNTIME_PATH . 'worker_man/task_run/log.txt';
+        $task::$logFile      = RUNTIME_PATH . 'worker_man/task_run/log.txt';
         $task->onWorkerStart = function ($task) use ($task_ini_file) {
             $settings = parse_ini_file($task_ini_file);
             foreach ($settings as $command => $cron_date) {
                 echo sprintf("[exec command]:%s\n", $command);
                 Timer::add(1, function () use ($command, $cron_date) {
                     if (ClDataCronTab::check(time(), $cron_date) === true) {
-                        pclose(popen(sprintf("cd %s && php public/index.php %s &", DOCUMENT_ROOT_PATH.'/../', $command), 'r'));
+                        pclose(popen(sprintf("cd %s && php public/index.php %s &", DOCUMENT_ROOT_PATH . '/../', $command), 'r'));
                     }
                 });
             }

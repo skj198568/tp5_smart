@@ -60,6 +60,9 @@ class SmartInit extends Command {
         $this->initController($input, $output);
         //分割
         $output->highlight('');
+        //修改目录权限为www
+        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
     }
 
     /**
@@ -212,7 +215,7 @@ class SmartInit extends Command {
      */
     const V_%s_%s = %s;
 ", $const_value_array[2], strtoupper($each['Field']), strtoupper($const_value_array[0]), $const_value_array[1]);
-                        $map_relation .= (empty($map_relation) ? '' : ",\n        ").sprintf($const_value_array[1] . " => '%s'", $const_value_array[2]);
+                        $map_relation .= (empty($map_relation) ? '' : ",\n        ") . sprintf($const_value_array[1] . " => '%s'", $const_value_array[2]);
                     }
                     //处理字段关系映射
                     foreach ($field_comment['const_values'] as $const_value_array) {

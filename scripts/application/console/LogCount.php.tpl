@@ -84,6 +84,9 @@ class LogCount extends Command {
         $this->dealSql($output, $files);
         //处理慢查询
         $this->dealSqlSlowQuery($input, $output, $files);
+        //修改目录权限为www
+        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
     }
 
     /**
