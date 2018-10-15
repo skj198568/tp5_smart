@@ -273,15 +273,17 @@ class AreaMap extends BaseModel {
 
     /**
      * 按ids获取
-     * @param array $ids
+     * @param $ids
+     * @param string $sort_field
+     * @param string $sort_type
      * @param array $exclude_fields
-     * @param int|null $duration
+     * @param int $duration
      * @return array|false|null|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getItemsByIds($ids, $exclude_fields = [], $duration = 3600) {
+    public static function getItemsByIds($ids, $sort_field = '', $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = 3600) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
@@ -293,11 +295,35 @@ class AreaMap extends BaseModel {
                     $items[] = $info;
                 }
             }
+            if (!empty($sort_field)) {
+                //排序
+                usort($items, function ($a, $b) use ($sort_field, $sort_type) {
+                    if ($a[$sort_field] > $b[$sort_field]) {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                });
+            }
             return $items;
         } else {
-            return static::instance()->where([
-                static::F_ID => ['in', $ids]
-            ])->field(static::getAllFields($exclude_fields))->select();
+            if (empty($sort_field)) {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            }
         }
     }
 

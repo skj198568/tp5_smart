@@ -398,7 +398,7 @@ class {$table_name}Map extends BaseModel {
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getItemsByIds(${$table_comment['partition'][0]}, $ids, $sort_field = self::F_ID, $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+    public static function getItemsByIds(${$table_comment['partition'][0]}, $ids, $sort_field = '', $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
@@ -410,28 +410,37 @@ class {$table_name}Map extends BaseModel {
                     $items[] = $info;
                 }
             }
-            //排序
-            usort($items, function ($a, $b) use ($sort_field, $sort_type) {
-                if ($a[$sort_field] > $b[$sort_field]) {
-                    if ($sort_type == self::V_ORDER_ASC) {
-                        return 1;
+            if (!empty($sort_field)) {
+                //排序
+                usort($items, function ($a, $b) use ($sort_field, $sort_type) {
+                    if ($a[$sort_field] > $b[$sort_field]) {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
                     } else {
-                        return -1;
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
                     }
-                } else {
-                    if ($sort_type == self::V_ORDER_ASC) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            });
+                });
+            }
             return $items;
         } else {
-            return static::instance(${$table_comment['partition'][0]})->where([
-                <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
-                </if>static::F_ID => ['in', $ids]
-            ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            if (empty($sort_field)) {
+                return static::instance(${$table_comment['partition'][0]})->where([
+                    <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                    </if>static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance(${$table_comment['partition'][0]})->where([
+                    <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                    </if>static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            }
         }
     }
     <else/>
@@ -448,7 +457,7 @@ class {$table_name}Map extends BaseModel {
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getItemsByIds($ids, $sort_field = self::F_ID, $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+    public static function getItemsByIds($ids, $sort_field = '', $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
@@ -460,27 +469,35 @@ class {$table_name}Map extends BaseModel {
                     $items[] = $info;
                 }
             }
-            //排序
-            usort($items, function ($a, $b) use ($sort_field, $sort_type) {
-                if ($a[$sort_field] > $b[$sort_field]) {
-                    if ($sort_type == self::V_ORDER_ASC) {
-                        return 1;
+            if (!empty($sort_field)) {
+                //排序
+                usort($items, function ($a, $b) use ($sort_field, $sort_type) {
+                    if ($a[$sort_field] > $b[$sort_field]) {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
                     } else {
-                        return -1;
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
                     }
-                } else {
-                    if ($sort_type == self::V_ORDER_ASC) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            });
+                });
+            }
             return $items;
         } else {
-            return static::instance()->where([
-                static::F_ID => ['in', $ids]
-            ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            if (empty($sort_field)) {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            }
         }
     }
 </present>
