@@ -51,9 +51,7 @@ class {$table_name}Map extends BaseModel {
      * 字段映射
      * @var array
      */
-    protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v">
-        <php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if>
-    </foreach><php>echo "\n    ";</php>]</empty>;
+    protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 字段格式化
