@@ -27,6 +27,9 @@ class TaskController extends ToolsBaseController {
             echo_info('只能命令行访问');
             exit;
         }
+        //取消日志相关兼容处理
+        Log::init(['level' => ['task_run'], 'allow_key' => ['task_run']]);
+        Log::key(time());
     }
 
     /**
@@ -37,10 +40,7 @@ class TaskController extends ToolsBaseController {
      * @throws \think\exception\DbException
      */
     public function deal() {
-        //取消日志相关兼容处理
-        Log::init(['level' => ['task_run'], 'allow_key' => ['task_run']]);
         $begin_time = time();
-        Log::key($begin_time);
         //处理任务
         TaskModel::deal();
         return (time() - $begin_time) . "s\n";
