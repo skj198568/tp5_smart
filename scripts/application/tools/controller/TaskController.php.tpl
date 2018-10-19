@@ -10,6 +10,7 @@
 namespace app\tools\controller;
 
 use app\index\model\TaskModel;
+use think\Log;
 
 /**
  * 任务
@@ -19,6 +20,16 @@ use app\index\model\TaskModel;
 class TaskController extends ToolsBaseController {
 
     /**
+     * 初始化函数
+     */
+    public function _initialize() {
+        if (!request()->isCli()) {
+            echo_info('只能命令行访问');
+            exit;
+        }
+    }
+
+    /**
      * 处理任务
      * @return int
      * @throws \think\db\exception\DataNotFoundException
@@ -26,7 +37,10 @@ class TaskController extends ToolsBaseController {
      * @throws \think\exception\DbException
      */
     public function deal() {
+        //取消日志相关兼容处理
+        Log::init(['level' => ['task_run'], 'allow_key' => ['task_run']]);
         $begin_time = time();
+        Log::key($begin_time);
         //处理任务
         TaskModel::deal();
         return (time() - $begin_time) . "s\n";
