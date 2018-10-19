@@ -120,7 +120,7 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'api/controller/TaskController.php') !== false) {
+    } else if (strpos($target_file, 'TaskController.php') !== false && strpos($target_file, 'api') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
