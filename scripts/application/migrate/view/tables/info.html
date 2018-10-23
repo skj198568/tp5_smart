@@ -167,7 +167,8 @@
                             <div class="col-md-3">
                                 <div ms-visible="!is_add && edit_field_name.length == 0">
                                     <label class="text-warning">After</label>
-                                    <select class="form-control" ms-duplex="after_field" ms-each="after_field_select_options">
+                                    <select class="form-control" ms-duplex="after_field"
+                                            ms-each="after_field_select_options">
                                         <option ms-attr-value="el">{{el}}</option>
                                     </select>
                                 </div>
@@ -183,7 +184,8 @@
                                         <!--内联表单begin-->
                                         <div class="form-inline">
                                             <div class="form-group">
-                                                <select class="form-control" ms-duplex="field_type" ms-each="field_type_values">
+                                                <select class="form-control" ms-duplex="field_type"
+                                                        ms-each="field_type_values">
                                                     <option ms-attr-value="el">{{el}}</option>
                                                 </select>
                                             </div>
@@ -329,7 +331,8 @@
                                 <!--内联表单begin-->
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <label ms-class="text-success: in_scope == 1" style="cursor:pointer;margin-right: 1em;"
+                                        <label ms-class="text-success: in_scope == 1"
+                                               style="cursor:pointer;margin-right: 1em;"
                                                ms-click="$checkInScope">
                                             <i class="fa fa-check-square-o" ms-visible="in_scope"></i>
                                             <i class="fa fa-square-o" ms-visible="!in_scope"></i>
@@ -364,7 +367,8 @@
                                     </div>
                                     <div class="form-group" ms-visible="min">
                                         <div class="input-group">
-                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最小值"
+                                            <input class="form-control" style="width: 50px;" type="text"
+                                                   placeholder="最小值"
                                                    ms-duplex="min_value">
                                         </div>
                                     </div>
@@ -385,7 +389,8 @@
                                     </div>
                                     <div class="form-group" ms-visible="max">
                                         <div class="input-group">
-                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                            <input class="form-control" style="width: 50px;" type="text"
+                                                   placeholder="最大值"
                                                    ms-duplex="max_value">
                                         </div>
                                     </div>
@@ -410,7 +415,8 @@
                                     </div>
                                     <div class="form-group" ms-visible="str_length_fixed">
                                         <div class="input-group">
-                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                            <input class="form-control" style="width: 50px;" type="text"
+                                                   placeholder="最大值"
                                                    ms-duplex="str_length_fixed_value">
                                         </div>
                                     </div>
@@ -434,7 +440,8 @@
                                     </div>
                                     <div class="form-group" ms-visible="str_length_min">
                                         <div class="input-group">
-                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                            <input class="form-control" style="width: 50px;" type="text"
+                                                   placeholder="最大值"
                                                    ms-duplex="str_length_min_value">
                                         </div>
                                     </div>
@@ -458,7 +465,8 @@
                                     </div>
                                     <div class="form-group" ms-visible="str_length_max">
                                         <div class="input-group">
-                                            <input class="form-control" style="width: 50px;" type="text" placeholder="最大值"
+                                            <input class="form-control" style="width: 50px;" type="text"
+                                                   placeholder="最大值"
                                                    ms-duplex="str_length_max_value">
                                         </div>
                                     </div>
@@ -486,7 +494,7 @@
                                            ms-duplex="const_values_json">
                                 </div>
                                 <p class="form-control-static">例：<span
-                                        class="text-danger">[["yes",1,"是"],["no",0,"否"]]</span></p>
+                                        class="text-danger">[["no",0,"否"],["yes",1,"是"]]</span></p>
                             </div>
                         </div>
                         <!--内联表单end-->
@@ -1004,7 +1012,7 @@
             table_info.store_format = 'string';
             table_info.password_salt = '';
             //清空编辑器的内容
-            if(editor_json !== null){
+            if (editor_json !== null) {
                 editor_json.setValue("");
             }
         },
@@ -1569,6 +1577,6 @@
         autoScrollEditorIntoView: false
     });
     //设置编辑器字体的大小
-    document.getElementById('id_div_editor').style.fontSize='16px';
+    document.getElementById('id_div_editor').style.fontSize = '16px';
 
 </script>
