@@ -76,7 +76,7 @@ class TaskRun extends Command {
                 echo sprintf("[exec command]:%s\n", $command);
                 Timer::add(1, function () use ($command, $cron_date) {
                     if (ClDataCronTab::check(time(), $cron_date) === true) {
-                        pclose(popen(sprintf("cd %s && php public/index.php %s &", DOCUMENT_ROOT_PATH.'/../', $command), 'r'));
+                        pclose(popen(sprintf("cd %s && php public/index.php %s &", DOCUMENT_ROOT_PATH . '/../', $command), 'r'));
                     }
                 });
             }

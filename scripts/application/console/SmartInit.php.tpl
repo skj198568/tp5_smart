@@ -60,6 +60,9 @@ class SmartInit extends Command {
         $this->initController($input, $output);
         //分割
         $output->highlight('');
+        //修改目录权限为www
+        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
     }
 
     /**
@@ -203,13 +206,27 @@ class SmartInit extends Command {
                 //新增格式化字段
                 $field_comment['show_format'][] = [$format, '_show'];
                 //处理静态变量
-                foreach ($field_comment['const_values'] as $const_value_array) {
-                    $const_fields .= sprintf("
+                if (isset($field_comment['const_values'])) {
+                    $map_relation = '';
+                    foreach ($field_comment['const_values'] as $const_value_array) {
+                        $const_fields .= sprintf("
     /**
      * %s
      */
-    const V_%s_%s = '%s';
+    const V_%s_%s = %s;
 ", $const_value_array[2], strtoupper($each['Field']), strtoupper($const_value_array[0]), $const_value_array[1]);
+                        $map_relation .= (empty($map_relation) ? '' : ",\n        ") . sprintf($const_value_array[1] . " => '%s'", $const_value_array[2]);
+                    }
+                    //处理字段关系映射
+                    foreach ($field_comment['const_values'] as $const_value_array) {
+                    }
+                    $const_fields .= sprintf("
+    /**
+     * 映射关系
+     */
+    const R_%s = [
+        %s
+    ];\n", strtoupper($each['Field']), $map_relation);
                 }
             }
             //设置校验器，默认有长度限制
@@ -448,7 +465,7 @@ class SmartInit extends Command {
         ];
         $ar_get_by_ids_json = [
             'status' => strtolower(sprintf('api/%s/getByIds/1', $table_name)),
-            'items'   => [$info]
+            'items'  => [$info]
         ];
         $ar_create_json     = [
             'status' => strtolower(sprintf('api/%s/create/1', $table_name)),
@@ -464,17 +481,17 @@ class SmartInit extends Command {
         ];
         $map_template_file  = __DIR__ . '/smart_init_templates/controller_base.tpl';
         $content            = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date'             => date('Y/m/d') . "\n",
-                'time'             => date('H:i:s') . "\n",
-                'table_name'       => $table_name_format,
-                'table_comment'    => $this->getTableComment($table_name),
-                'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_json'      => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_by_ids_json'      => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
-                'ar_create_json'   => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
-                'ar_update_json'   => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
-                'ar_delete_json'   => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
-                'create_api'       => $table_comment['create_api']
+                'date'               => date('Y/m/d') . "\n",
+                'time'               => date('H:i:s') . "\n",
+                'table_name'         => $table_name_format,
+                'table_comment'      => $this->getTableComment($table_name),
+                'ar_get_list_json'   => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_json'        => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_by_ids_json' => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
+                'ar_create_json'     => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
+                'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
+                'create_api'         => $table_comment['create_api']
             ], ['default_filter' => '']);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';

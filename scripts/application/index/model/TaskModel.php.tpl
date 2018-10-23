@@ -73,4 +73,32 @@ class TaskModel extends TaskMap {
         return true;
     }
 
+    /**
+     * 创建任务
+     * @param string $command 类似任务命令:app\index\model\AdminLoginLogModel::sendEmail();
+     * @param int $within_seconds_ignore_this_cmd 在多长时间内忽略该任务，比如某些不需要太精确的统计任务，可以设置为60秒，即60秒内只执行一次任务
+     * @return bool|int|string
+     */
+    public static function createTask($command, $within_seconds_ignore_this_cmd = 0) {
+        $is_insert = true;
+        if ($within_seconds_ignore_this_cmd > 0) {
+            $last_create_time = self::instance()->where([
+                self::F_COMMAND => $command
+            ])->order([self::F_ID => self::V_ORDER_DESC])->value(self::F_CREATE_TIME);
+            if (!is_numeric($last_create_time) || time() - $last_create_time > $within_seconds_ignore_this_cmd) {
+                $is_insert = true;
+            } else {
+                $is_insert = false;
+            }
+        }
+        if ($is_insert) {
+            //新增
+            return self::instance()->insert([
+                self::F_COMMAND => $command
+            ]);
+        } else {
+            return false;
+        }
+    }
+
 }

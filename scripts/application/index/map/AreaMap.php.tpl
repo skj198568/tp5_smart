@@ -53,17 +53,26 @@ class AreaMap extends BaseModel {
     /**
      * 省/直辖市
      */
-    const V_TYPE_PROVINCE = '1';
+    const V_TYPE_PROVINCE = 1;
 
     /**
      * 城市
      */
-    const V_TYPE_CITY = '2';
+    const V_TYPE_CITY = 2;
 
     /**
      * 区县
      */
-    const V_TYPE_AREA = '3';
+    const V_TYPE_AREA = 3;
+
+    /**
+     * 映射关系
+     */
+    const R_TYPE = [
+        1 => '省/直辖市',
+        2 => '城市',
+        3 => '区县'
+    ];
 
     /**
      * 字段校验，用于字段内容判断
@@ -105,7 +114,7 @@ class AreaMap extends BaseModel {
      * 字段存储格式
      * @var array
      */
-    protected static $fields_store_format = [];
+    public static $fields_store_format = [];
 
     /**
      * 所有字段的注释
@@ -163,7 +172,7 @@ class AreaMap extends BaseModel {
     }
 
     /**
-     * 按id或id数组获取
+     * 按id获取
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
@@ -264,15 +273,17 @@ class AreaMap extends BaseModel {
 
     /**
      * 按ids获取
-     * @param array $ids
+     * @param $ids
+     * @param string $sort_field
+     * @param string $sort_type
      * @param array $exclude_fields
-     * @param int|null $duration
+     * @param int $duration
      * @return array|false|null|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getItemsByIds($ids, $exclude_fields = [], $duration = 3600) {
+    public static function getItemsByIds($ids, $sort_field = '', $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = 3600) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
@@ -284,11 +295,35 @@ class AreaMap extends BaseModel {
                     $items[] = $info;
                 }
             }
+            if (!empty($sort_field)) {
+                //排序
+                usort($items, function ($a, $b) use ($sort_field, $sort_type) {
+                    if ($a[$sort_field] > $b[$sort_field]) {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                });
+            }
             return $items;
         } else {
-            return static::instance()->where([
-                static::F_ID => ['in', $ids]
-            ])->field(static::getAllFields($exclude_fields))->select();
+            if (empty($sort_field)) {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            }
         }
     }
 

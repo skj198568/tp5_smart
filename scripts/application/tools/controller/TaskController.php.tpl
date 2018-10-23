@@ -10,6 +10,7 @@
 namespace app\tools\controller;
 
 use app\index\model\TaskModel;
+use think\Log;
 
 /**
  * 任务
@@ -17,6 +18,19 @@ use app\index\model\TaskModel;
  * @package app\tools\controller
  */
 class TaskController extends ToolsBaseController {
+
+    /**
+     * 初始化函数
+     */
+    public function _initialize() {
+        if (!request()->isCli()) {
+            echo_info('只能命令行访问');
+            exit;
+        }
+        //取消日志相关兼容处理
+        Log::init(['level' => ['task_run'], 'allow_key' => ['task_run']]);
+        Log::key(time());
+    }
 
     /**
      * 处理任务

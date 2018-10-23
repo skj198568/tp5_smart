@@ -10,6 +10,7 @@
 namespace app\console;
 
 use ClassLibrary\ClFile;
+use ClassLibrary\ClMergeResource;
 use ClassLibrary\ClString;
 use think\console\Command;
 use think\console\Input;
@@ -86,6 +87,7 @@ class BrowserSync extends Command {
         $this->setName('browser_sync')
             ->addOption('--file_types', '-f', Option::VALUE_REQUIRED, '监听变化的文件后缀名，例如：".html;.js;.css"', '".html;.js;.css"')
             ->addOption('--dirs', '-d', Option::VALUE_REQUIRED, '监听web根目录下变化的文件夹，分号分割，例如：application;public', 'application;public')
+            ->addOption('--ignore_dirs', '-i', Option::VALUE_REQUIRED, '忽略监听的文件夹，例如：resource', 'resource')
             ->addOption('--port', '-p', Option::VALUE_REQUIRED, 'socket监听的端口，注意防火墙的设置', '8000')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
             ->setDescription('Monitor the server file, automatically refresh the browser when the file is modified[监听服务器文件，当文件修改时，自动同步刷新浏览器].');
@@ -150,6 +152,8 @@ class BrowserSync extends Command {
                 //记录端口号，用于生成js自动刷新代码
                 $this->port($this->socket_port);
                 if ($this->fileIsModify($input)) {
+                    //先清空页面缓存
+                    ClMergeResource::clearCache();
                     foreach ($worker->connections as $connection_each) {
                         $connection_each->close('sync');
                         usleep(1000000);
@@ -254,16 +258,18 @@ class BrowserSync extends Command {
         array_walk($files_types, function (&$each) {
             $each = trim($each);
         });
-        $dirs      = $input->getOption('dirs');
-        $root_path = dirname(dirname(__DIR__));
-        $dirs      = explode(';', trim(trim(str_replace('；', ';', $dirs)), ';'));
-        $files     = [];
+        $root_path   = dirname(dirname(__DIR__));
+        $dirs        = $input->getOption('dirs');
+        $dirs        = explode(';', trim(trim(str_replace('；', ';', $dirs)), ';'));
+        $ignore_dirs = $input->getOption('ignore_dirs');
+        $ignore_dirs = explode(';', trim(trim(str_replace('；', ';', $ignore_dirs)), ';'));
+        $files       = [];
         foreach ($dirs as $dir) {
             $dir = trim($dir);
             if (empty($dir) || !is_dir($root_path . '/' . $dir)) {
                 continue;
             }
-            $files = array_merge($files, ClFile::dirGetFiles($root_path . '/' . $dir, $files_types));
+            $files = array_merge($files, ClFile::dirGetFiles($root_path . '/' . $dir, $files_types, $ignore_dirs));
         }
         $scan_files = [];
         //文件内容改变，md5_file计算时间较长，以文件最后修改的时间为判断依据

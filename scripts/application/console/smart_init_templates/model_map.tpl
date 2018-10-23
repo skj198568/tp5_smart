@@ -51,9 +51,7 @@ class {$table_name}Map extends BaseModel {
      * 字段映射
      * @var array
      */
-    protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v">
-        <php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if>
-    </foreach><php>echo "\n    ";</php>]</empty>;
+    protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 字段格式化
@@ -65,7 +63,7 @@ class {$table_name}Map extends BaseModel {
      * 字段存储格式
      * @var array
      */
-    protected static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_store_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    public static $fields_store_format = <empty name="fields_store_format">[]<else/>[<foreach name="fields_store_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_store_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 所有字段的注释
@@ -167,7 +165,7 @@ class {$table_name}Map extends BaseModel {
 <present name="table_comment['partition']">
 
     /**
-     * 按id或id数组获取
+     * 按id获取
      * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param int $id
      * @param array $exclude_fields 不包含的字段
@@ -197,7 +195,7 @@ class {$table_name}Map extends BaseModel {
     <else/>
 
     /**
-     * 按id或id数组获取
+     * 按id获取
      * @param int $id
      * @param array $exclude_fields 不包含的字段
      * @param int|null $duration 缓存时间
@@ -389,6 +387,8 @@ class {$table_name}Map extends BaseModel {
      * 按ids获取
      * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @param array $ids
+     * @param string $sort_field
+     * @param string $sort_type
      * @param array $exclude_fields
      * @param int|null $duration
      * @return array
@@ -396,7 +396,7 @@ class {$table_name}Map extends BaseModel {
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getItemsByIds(${$table_comment['partition'][0]}, $ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+    public static function getItemsByIds(${$table_comment['partition'][0]}, $ids, $sort_field = '', $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
@@ -408,27 +408,54 @@ class {$table_name}Map extends BaseModel {
                     $items[] = $info;
                 }
             }
+            if (!empty($sort_field)) {
+                //排序
+                usort($items, function ($a, $b) use ($sort_field, $sort_type) {
+                    if ($a[$sort_field] > $b[$sort_field]) {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                });
+            }
             return $items;
         } else {
-            return static::instance(${$table_comment['partition'][0]})->where([
-                <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
-                </if>static::F_ID => ['in', $ids]
-            ])->field(static::getAllFields($exclude_fields))->select();
+            if (empty($sort_field)) {
+                return static::instance(${$table_comment['partition'][0]})->where([
+                    <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                    </if>static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance(${$table_comment['partition'][0]})->where([
+                    <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+                    </if>static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            }
         }
     }
     <else/>
 
     /**
      * 按ids获取
-     * @param array $ids
+     * @param $ids
+     * @param string $sort_field
+     * @param string $sort_type
      * @param array $exclude_fields
-     * @param int|null $duration
+     * @param int $duration
      * @return array|false|null|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getItemsByIds($ids, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+    public static function getItemsByIds($ids, $sort_field = '', $sort_type = self::V_ORDER_ASC, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (!is_array($ids) || empty($ids)) {
             return [];
         }
@@ -440,11 +467,35 @@ class {$table_name}Map extends BaseModel {
                     $items[] = $info;
                 }
             }
+            if (!empty($sort_field)) {
+                //排序
+                usort($items, function ($a, $b) use ($sort_field, $sort_type) {
+                    if ($a[$sort_field] > $b[$sort_field]) {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        if ($sort_type == self::V_ORDER_ASC) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                });
+            }
             return $items;
         } else {
-            return static::instance()->where([
-                static::F_ID => ['in', $ids]
-            ])->field(static::getAllFields($exclude_fields))->select();
+            if (empty($sort_field)) {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->select();
+            } else {
+                return static::instance()->where([
+                    static::F_ID => ['in', $ids]
+                ])->field(static::getAllFields($exclude_fields))->order([$sort_field => $sort_type])->select();
+            }
         }
     }
 </present>

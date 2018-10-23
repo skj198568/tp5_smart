@@ -47,6 +47,9 @@ class Mix extends Command {
                 ClPhpMix::encode($file);
             }
         }
+        //修改目录权限为www
+        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
     }
 
 }

@@ -88,7 +88,7 @@ class BaseModel extends Query {
      * 字段存储格式
      * @var array
      */
-    protected static $fields_store_format = [];
+    public static $fields_store_format = [];
 
     /**
      * 默认值
@@ -106,6 +106,25 @@ class BaseModel extends Query {
      * @var array
      */
     public static $partition = ["platform_id", "1"];
+
+    /**
+     * 构造函数
+     * @access public
+     * @param Connection $connection 数据库对象实例
+     * @param Model $model 模型对象
+     */
+    public function __construct(Connection $connection = null, Model $model = null) {
+        parent::__construct($connection, $model);
+        //调用初始化函数
+        $this->initialize();
+    }
+
+    /**
+     * 初始化
+     */
+    public function initialize() {
+
+    }
 
     /**
      * 获取所有的字段
@@ -493,6 +512,8 @@ class BaseModel extends Query {
                             foreach ((array)$each_format_item[0] as $each_format_item_each) {
                                 if ($each_format_item_each[0] == $item[$k_format_key]) {
                                     $item[$k_format_key . $each_format_item[1]] = $each_format_item_each[1];
+                                    //退出循环
+                                    break;
                                 }
                             }
                         }

@@ -163,6 +163,9 @@ class ApiDoc extends Command {
         ClFile::dirCreate($file_absolute_url);
         file_put_contents($file_absolute_url, $api_content);
         $output->highlight(sprintf('create %s ok.', $file_absolute_url));
+        //修改目录权限为www
+        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
     }
 
     /**
@@ -353,18 +356,18 @@ class ApiDoc extends Command {
 //            if(strpos($param, 'focus_type') === false){
 //                continue;
 //            }
-            $param   = ClString::spaceTrim($param);
-            $param   = trim($param);
-            $param   = ClString::spaceTrim($param);
-            if(strpos($param, 'ClFieldVerify') === false || strpos($param, 'fetchVerifies') === false){
+            $param = ClString::spaceTrim($param);
+            $param = trim($param);
+            $param = ClString::spaceTrim($param);
+            if (strpos($param, 'ClFieldVerify') === false || strpos($param, 'fetchVerifies') === false) {
                 $filters = [];
-            }else{
+            } else {
                 $filters = ClString::getBetween($param, 'ClFieldVerify', 'fetchVerifies()');
             }
-            $param       = str_replace($filters, '', $param);
-            if(strpos($param, ',,') === false){
+            $param = str_replace($filters, '', $param);
+            if (strpos($param, ',,') === false) {
                 $desc_index = 2;
-            }else{
+            } else {
                 $desc_index = 1;
             }
             $param       = str_replace([',,', '\''], [',', '"'], $param);
