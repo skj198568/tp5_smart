@@ -19,16 +19,14 @@ use think\Controller;
  * Class ToolsController
  * @package app\tools\controller
  */
-class ToolsBaseController extends Controller
-{
+class ToolsBaseController extends Controller {
 
     /**
      * 初始化函数
      */
-    public function initialize()
-    {
+    public function initialize() {
         parent::initialize();
-        if(!request()->isCli()){
+        if (!request()->isCli()) {
             echo_info('只能命令行访问');
             exit;
         }
@@ -45,20 +43,19 @@ class ToolsBaseController extends Controller
      * @param bool $is_log
      * @return \think\response\Json|\think\response\Jsonp
      */
-    protected function ar($code, $data = [], $example = '', $is_log = false)
-    {
+    protected function ar($code, $data = [], $example = '', $is_log = false) {
         $status = sprintf('%s/%s/%s/%s', request()->module(), request()->controller(), request()->action(), $code);
         //格式化
         $status = ClString::toArray($status);
-        foreach($status as $k_status => $v_status){
-            if(ClVerify::isAlphaCapital($v_status)){
-                $status[$k_status] = '_'.strtolower($v_status);
+        foreach ($status as $k_status => $v_status) {
+            if (ClVerify::isAlphaCapital($v_status)) {
+                $status[$k_status] = '_' . strtolower($v_status);
             }
         }
         //转换为字符串
         $status = implode('', $status);
         $status = str_replace('/_', '/', $status);
-        $data = is_array($data) ? $data : [$data];
+        $data   = is_array($data) ? $data : [$data];
         return json_return(array_merge([
             'status' => $status,
         ], $data), $is_log);

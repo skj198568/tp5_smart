@@ -10,7 +10,7 @@
 namespace app\tools\controller;
 
 use app\index\model\TaskModel;
-use think\Log;
+use think\facade\Log;
 
 /**
  * 任务
