@@ -37,7 +37,7 @@ class FileController extends ApiController {
         if ($png2jpg) {
             $result['file'] = ClImage::png2jpg($result['file']);
         }
-        return $this->ar(1, $result, '{"status":"api\/file\/uploadfile\/1","result":true,"msg":"上传成功","file":"\/upload\/2018\/03\/06\/104945_2748152867.xlsx"}');
+        return $this->ar(1, $result, '{"status":"api\/file\/uploadfile\/1","status_code":1,"result":true,"msg":"上传成功","file":"\/upload\/2018\/03\/06\/104945_2748152867.xlsx"}');
     }
 
     /**
@@ -61,7 +61,7 @@ class FileController extends ApiController {
             //替换为相对路径
             $img_url = str_replace(DOCUMENT_ROOT_PATH, '', $img_url);
         }
-        return $this->ar(1, ['url' => $img_url], '{"status":"api\/file\/img\/1","url":"\/static\/lib\/file_upload\/server\/php\/files\/265286_20180508231249.jpg"}');
+        return $this->ar(1, ['url' => $img_url], '{"status":"api\/file\/img\/1","status_code":1,"url":"\/static\/lib\/file_upload\/server\/php\/files\/265286_20180508231249.jpg"}');
     }
 
 }
