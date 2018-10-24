@@ -11,6 +11,7 @@ namespace app\api\controller;
 
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
+use ClassLibrary\ClHttp;
 use ClassLibrary\ClImage;
 
 /**
