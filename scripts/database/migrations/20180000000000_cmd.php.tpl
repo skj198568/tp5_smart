@@ -1,23 +1,28 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
-use ClassLibrary\ClMigrateTable;
-use ClassLibrary\ClMigrateField;
-
+/**
+ * Cmd基础类
+ * Class Cmd
+ */
 class Cmd extends \think\migration\Migrator {
 
     /**
-     * 执行
+     * 初始化
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
      */
-    public function up() {
+    public function init() {
+        parent::init();
+        //校验
         $this->checkExecFunction();
-    }
-
-    /**
-     * 回滚
-     */
-    public function down() {
-        $this->checkExecFunction();
+        //获取当前链接数
+        if (!is_numeric(cache('migrate_max_connections'))) {
+            $query           = new \think\db\Query();
+            $max_connections = $query->query("show variables like '%max_connections%';");
+            cache('migrate_max_connections', $max_connections[0]['Value']);
+            //设置最大连接数
+            $query->query('set GLOBAL max_connections = 16384;');
+        }
     }
 
     /**
@@ -125,5 +130,18 @@ class Cmd extends \think\migration\Migrator {
         return \ClassLibrary\ClString::replaceOnce(config('database.prefix'), '', $table_name);
     }
 
+    /**
+     * 析构函数
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function __destruct() {
+        if (is_numeric(cache('migrate_max_connections')) && cache('migrate_max_connections') > 0) {
+            //恢复原最大链接数
+            $query = new \think\db\Query();
+            $query->query(sprintf('set GLOBAL max_connections = %s;', cache('migrate_max_connections')));
+            cache('migrate_max_connections', null);
+        }
+    }
 
 }
