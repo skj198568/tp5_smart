@@ -10,7 +10,6 @@ class {$class_name} extends Cmd {
      * @throws \think\exception\PDOException
      */
     public function up() {
-        parent::up();
         //释放数据表信息，防止表结构修改导致的错误错误
         {$model_name}::tableInfoFree();
         //临时取消字段password存储格式，防止数据变动
