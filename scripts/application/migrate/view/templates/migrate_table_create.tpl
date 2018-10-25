@@ -8,7 +8,6 @@ use ClassLibrary\ClMigrateTable;
 class {$class_name} extends Cmd {
 
     public function up() {
-        parent::up();
         $table = '{$table_name}';
         if ($this->hasTable($table)) {
             return;
@@ -26,7 +25,6 @@ class {$class_name} extends Cmd {
     }
 
     public function down() {
-        parent::down();
         $table = '{$table_name}';
         if ($this->hasTable($table)) {
             $this->dropTable($table);
