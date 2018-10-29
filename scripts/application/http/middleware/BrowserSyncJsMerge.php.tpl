@@ -55,6 +55,10 @@ class BrowserSyncJsMerge {
         }
         //拼接socket监听js
         $js_content = BrowserSync::instance()->getJsContent();
+        //为空，则忽略
+        if (empty($js_content)) {
+            return;
+        }
         //已经拼接，则忽略
         if (strpos($content, $js_content) !== false) {
             return;
