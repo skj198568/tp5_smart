@@ -22,6 +22,18 @@ class MergeResource {
      * @param $content
      */
     public function run(&$content) {
+        //ajax模式
+        if (request()->isAjax()) {
+            return;
+        }
+        //cli模式
+        if (request()->isCli()) {
+            return;
+        }
+        //忽略api和migrate模块
+        if (in_array(strtolower(request()->module()), ['api', 'migrate'])) {
+            return;
+        }
         $content = ClMergeResource::merge($content);
     }
 

@@ -25,16 +25,34 @@ class BrowserSyncJsMerge {
      * @param $content
      */
     public function run(&$content) {
-        if (App::$debug && !request()->isAjax() && !request()->isCli() && !in_array(strtolower(request()->module()), ['api', 'migrate'])) {
-            //拼接socket监听js
-            $js_content = BrowserSync::instance()->getJsContent();
-            if (strpos($content, '<head>') !== false) {
-                //嵌入js
-                $content = str_replace('<head>', "<head>\n" . $js_content, $content);
-            } else {
-                //拼接
-                $content .= $js_content;
-            }
+        //包含不加载标识
+        if (strpos($content, 'exclude_sync_js_content')) {
+            return;
+        }
+        //忽略api,migrate两个模块
+        if (in_array(strtolower(request()->module()), ['api', 'migrate'])) {
+            return;
+        }
+        //非debug模式
+        if (!App::$debug) {
+            return;
+        }
+        //忽略ajax请求
+        if (request()->isAjax()) {
+            return;
+        }
+        //忽略cli请求
+        if (request()->isCli()) {
+            return;
+        }
+        //拼接socket监听js
+        $js_content = BrowserSync::instance()->getJsContent();
+        if (strpos($content, '<head>') !== false) {
+            //嵌入js
+            $content = str_replace('<head>', "<head>\n" . $js_content, $content);
+        } else {
+            //拼接
+            $content .= $js_content;
         }
     }
 }
