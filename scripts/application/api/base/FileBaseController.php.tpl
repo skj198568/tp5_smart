@@ -23,6 +23,17 @@ use ClassLibrary\ClImage;
 class FileBaseController extends ApiController {
 
     /**
+     * 跨域处理
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function _initialize() {
+        parent::_initialize();
+        header('Access-Control-Allow-Origin:*');
+    }
+
+    /**
      * 上传文件
      */
     public function uploadFile() {

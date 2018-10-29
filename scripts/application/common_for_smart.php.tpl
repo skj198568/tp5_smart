@@ -116,7 +116,7 @@ function json_return($data, $is_log = false) {
         //将请求地址加入返回数组中，用于区别请求内容
         log_info(json_encode($data, JSON_UNESCAPED_UNICODE), $data);
     }
-    $type = isset($_GET['callback']) ? 'JSONP' : 'JSON';
+    $type = (isset($_GET['callback']) || isset($_SERVER['HTTP_ORIGIN'])) ? 'JSONP' : 'JSON';
     if ($type == 'JSON') {
         return json($data);
     } else if ($type == 'JSONP') {
