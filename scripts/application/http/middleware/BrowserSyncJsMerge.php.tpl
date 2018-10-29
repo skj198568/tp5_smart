@@ -33,7 +33,7 @@ class BrowserSyncJsMerge {
     private function dealResponse(Response $response) {
         //获取内容
         $content = $response->getData();
-        //不包含标识
+        //包含不加载标识
         if (strpos($content, 'exclude_sync_js_content')) {
             return;
         }
