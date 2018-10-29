@@ -47,6 +47,10 @@ class BrowserSyncJsMerge {
         }
         //拼接socket监听js
         $js_content = BrowserSync::instance()->getJsContent();
+        //已经拼接，则忽略
+        if (strpos($content, $js_content) !== false) {
+            return;
+        }
         if (strpos($content, '<head>') !== false) {
             //嵌入js
             $content = str_replace('<head>', "<head>\n" . $js_content, $content);
