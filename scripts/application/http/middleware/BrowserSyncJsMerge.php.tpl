@@ -33,6 +33,10 @@ class BrowserSyncJsMerge {
     private function dealResponse(Response $response) {
         //获取内容
         $content = $response->getData();
+        //忽略ajax请求
+        if (request()->isAjax()) {
+            return;
+        }
         //包含不加载标识
         if (strpos($content, 'exclude_sync_js_content')) {
             return;
@@ -43,10 +47,6 @@ class BrowserSyncJsMerge {
         }
         //非debug模式
         if (!App::isDebug()) {
-            return;
-        }
-        //忽略ajax请求
-        if (request()->isAjax()) {
             return;
         }
         //忽略cli请求

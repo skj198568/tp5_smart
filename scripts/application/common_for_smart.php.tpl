@@ -10,6 +10,7 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+use think\facade\App;
 use think\facade\Log;
 
 /**
@@ -112,7 +113,7 @@ const PAGES_NUM = 15;
  */
 function json_return($data, $is_log = false) {
     //调试模式下，记录信息
-    if (\think\App::$debug || $is_log) {
+    if (App::isDebug() || $is_log) {
         //将请求地址加入返回数组中，用于区别请求内容
         log_info(json_encode($data, JSON_UNESCAPED_UNICODE), $data);
     }
