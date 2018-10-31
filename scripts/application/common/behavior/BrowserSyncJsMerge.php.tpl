@@ -25,24 +25,24 @@ class BrowserSyncJsMerge {
      * @param $content
      */
     public function run(&$content) {
-        //包含不加载标识
-        if (strpos($content, 'exclude_sync_js_content')) {
-            return;
-        }
-        //忽略api,migrate两个模块
-        if (in_array(strtolower(request()->module()), ['api', 'migrate'])) {
+        //忽略ajax请求
+        if (request()->isAjax()) {
             return;
         }
         //非debug模式
         if (!App::$debug) {
             return;
         }
-        //忽略ajax请求
-        if (request()->isAjax()) {
+        //忽略api,migrate两个模块
+        if (in_array(strtolower(request()->module()), ['api', 'migrate'])) {
             return;
         }
         //忽略cli请求
         if (request()->isCli()) {
+            return;
+        }
+        //包含不加载标识
+        if (strpos($content, 'exclude_sync_js_content')) {
             return;
         }
         //拼接socket监听js
