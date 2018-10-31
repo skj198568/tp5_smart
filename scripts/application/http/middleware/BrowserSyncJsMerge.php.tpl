@@ -31,18 +31,8 @@ class BrowserSyncJsMerge {
      * @param Response $response
      */
     private function dealResponse(Response $response) {
-        //获取内容
-        $content = $response->getData();
         //忽略ajax请求
         if (request()->isAjax()) {
-            return;
-        }
-        //包含不加载标识
-        if (strpos($content, 'exclude_sync_js_content')) {
-            return;
-        }
-        //忽略api,migrate两个模块
-        if (in_array(strtolower(request()->module()), ['api', 'migrate'])) {
             return;
         }
         //非debug模式
@@ -51,6 +41,16 @@ class BrowserSyncJsMerge {
         }
         //忽略cli请求
         if (request()->isCli()) {
+            return;
+        }
+        //忽略api,migrate两个模块
+        if (in_array(strtolower(request()->module()), ['api', 'migrate'])) {
+            return;
+        }
+        //获取内容
+        $content = $response->getData();
+        //包含不加载标识
+        if (strpos($content, 'exclude_sync_js_content')) {
             return;
         }
         //拼接socket监听js
