@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
-use think\Log;
+use think\facade\Log;
 
 /**
  * 写日志函数
@@ -21,7 +21,7 @@ function log_info() {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
         $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
-        Log::record($str, Log::LOG);
+        Log::record($str, \think\Log::DEBUG);
     }
 }
 
@@ -51,7 +51,7 @@ function le_info() {
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
         $str = '[' . $function . ']' . call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
-        Log::record($str, Log::LOG);
+        Log::record($str, \think\Log::DEBUG);
         //输出
         if (request()->isCli() || request()->isAjax()) {
             echo $str . "\n";
