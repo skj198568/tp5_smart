@@ -141,10 +141,10 @@ class Cmd extends \think\migration\Migrator {
             $query = new \think\db\Query();
             $query->query(sprintf('set GLOBAL max_connections = %s;', cache('migrate_max_connections')));
             cache('migrate_max_connections', null);
+            //修改目录权限为www
+            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+            exec($cmd);
         }
-        //修改目录权限为www
-        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
-        exec($cmd);
     }
 
 }
