@@ -275,22 +275,22 @@
                         <!--内联表单begin-->
                         <div class="form-inline">
                             <div class="form-group">
-                                <label ms-class="text-success: is_password == 1"
+                                <label ms-class="text-success: password == 1"
                                        style="cursor:pointer;margin-right: 1em;"
                                        ms-click="$checkPassword">
-                                    <i class="fa fa-check-square-o" ms-visible="is_password"></i>
-                                    <i class="fa fa-square-o" ms-visible="!is_password"></i>
-                                    is_password
+                                    <i class="fa fa-check-square-o" ms-visible="password"></i>
+                                    <i class="fa fa-square-o" ms-visible="!password"></i>
+                                    password
                                 </label>
                             </div>
-                            <div class="form-group" ms-visible="is_password">
+                            <div class="form-group" ms-visible="password">
                                 <div class="input-group">
                                     <div class="input-group-addon">min</div>
                                     <input class="form-control" type="text" style="width: 60px;"
                                            placeholder="Enter length" ms-duplex="password_min_length">
                                 </div>
                             </div>
-                            <div class="form-group" ms-visible="is_password">
+                            <div class="form-group" ms-visible="password">
                                 <div class="input-group">
                                     <div class="input-group-addon">max</div>
                                     <input class="form-control" type="text" style="width: 60px;"
@@ -942,7 +942,7 @@
         verifies_selected: [],
         common_settings: ['visible', 'is_sortable', 'is_searchable', 'is_read_only'],
         common_settings_selected: ['visible'],
-        is_password: 0,
+        password: 0,
         password_min_length: 6,
         password_max_length: 18,
         in_array: 0,
@@ -984,7 +984,7 @@
             table_info.verifies_selected.push('number');
             table_info.common_settings_selected.clear();
             table_info.common_settings_selected.push('visible');
-            table_info.is_password = 0;
+            table_info.password = 0;
             table_info.password_min_length = 6;
             table_info.password_max_length = 18;
             table_info.in_array = 0;
@@ -1066,7 +1066,7 @@
             }
         },
         $checkPassword: function () {
-            table_info.is_password = table_info.is_password == 1 ? 0 : 1;
+            table_info.password = table_info.password == 1 ? 0 : 1;
         },
         $checkInArray: function () {
             table_info.in_array = table_info.in_array == 1 ? 0 : 1;
@@ -1159,8 +1159,8 @@
             if (table_info.max) {
                 verifies.push(['max', table_info.max_value]);
             }
-            if (table_info.is_password) {
-                verifies.push(['is_password', table_info.password_min_length, table_info.password_max_length]);
+            if (table_info.password) {
+                verifies.push(['password', table_info.password_min_length, table_info.password_max_length]);
             }
             if (table_info.str_length_fixed) {
                 verifies.push(['length', table_info.str_length_fixed_value]);
@@ -1247,8 +1247,8 @@
                     $.each(v.verifies, function (k_verify, v_verify) {
                         if (jCommon.isArray(v_verify)) {
                             switch (v_verify[0]) {
-                                case 'is_password':
-                                    table_info.is_password = 1;
+                                case 'password':
+                                    table_info.password = 1;
                                     table_info.password_min_length = v_verify[1];
                                     table_info.password_max_length = v_verify[2];
                                     break;
@@ -1529,7 +1529,7 @@
             table_info.verifies.clear();
             table_info.verifies.pushArray(['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash']);
             table_info.store_format = 'string';
-            table_info.is_password = 0;
+            table_info.password = 0;
             table_info.str_length_fixed = 0;
             table_info.str_length_max = 0;
             table_info.str_length_min = 0;
