@@ -36,7 +36,8 @@ class ApiController extends BaseApiController {
      * @var array
      */
     protected $uncheck_request = [
-        'Index/index'
+        'Index/index',
+        'UrlShort/jump',
     ];
 
     /**
