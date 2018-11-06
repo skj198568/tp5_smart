@@ -93,5 +93,5 @@ class ApiController extends BaseApiController {
             return '<h1 style="text-align: center;font-size: 5em;">404</h1>';
         }
     }
-    
+
 }
