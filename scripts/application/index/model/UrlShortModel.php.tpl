@@ -63,14 +63,15 @@ class UrlShortModel extends UrlShortMap {
 
     /**
      * 获取短域名
-     * @param $url
-     * @param bool $with_domain
+     * @param string $url 源域名
+     * @param bool $with_domain 是否包含域名
+     * @param int $duration 短地址有效时间，比如3600秒，0为永不失效
      * @return string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getShortUrl($url, $with_domain = false) {
+    public static function getShortUrl($url, $with_domain = false, $duration = 0) {
         $current_domain = ClHttp::getServerDomain();
         $url            = trim($url);
         if (strpos($url, $current_domain) === 0) {
@@ -98,7 +99,8 @@ class UrlShortModel extends UrlShortMap {
             //新增
             self::instance()->insert([
                 self::F_SHORT_URL => $short_url,
-                self::F_TRUE_URL  => $url
+                self::F_TRUE_URL  => $url,
+                self::F_END_TIME  => $duration == 0 ? $duration : time() + $duration
             ]);
         } else {
             //url不一致，忽略原先生成的url，直接覆盖
@@ -106,7 +108,8 @@ class UrlShortModel extends UrlShortMap {
                 self::instance()->where([
                     self::F_ID => $info[self::F_ID]
                 ])->setField([
-                    self::F_TRUE_URL => $url
+                    self::F_TRUE_URL => $url,
+                    self::F_END_TIME => $duration == 0 ? $duration : time() + $duration
                 ]);
             }
         }

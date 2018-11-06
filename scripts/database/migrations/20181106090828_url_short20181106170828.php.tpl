@@ -29,6 +29,12 @@ class UrlShort20181106170828 extends Cmd {
                 ClMigrateField::instance()
                     ->fetch('真实url')
             ])
+            ->addColumn('end_time', 'integer', ['default' => 0, 'comment' =>
+                ClMigrateField::instance()
+                    ->showFormat("date('Y-m-d H:i:s', %s)", '_show')
+                    ->verifyNumber()
+                    ->fetch('超时时间，如果为0，则永不超时')
+            ])
             ->addColumn('create_time', 'integer', ['default' => 0, 'comment' =>
                 ClMigrateField::instance()
                     ->showFormat("date('Y-m-d H:i:s', %s)", '_show')

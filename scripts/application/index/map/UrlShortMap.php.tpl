@@ -44,6 +44,13 @@ class UrlShortMap extends BaseModel {
     const F_TRUE_URL = 'true_url';
 
     /**
+     * 超时时间，如果为0，则永不超时
+     * Type: int(11)
+     * Default: 0
+     */
+    const F_END_TIME = 'end_time';
+
+    /**
      * 创建时间
      * Type: int(11)
      * Default: 0
@@ -57,6 +64,7 @@ class UrlShortMap extends BaseModel {
     public static $fields_verifies = [
         self::F_SHORT_URL => [["length_max",255]], 
         self::F_TRUE_URL => [["length_max",255]], 
+        self::F_END_TIME => ["number",["length_max",11]], 
         self::F_CREATE_TIME => ["number",["length_max",11]], 
     ];
 
@@ -83,6 +91,7 @@ class UrlShortMap extends BaseModel {
      * @var array
      */
     protected static $fields_show_format = [
+        self::F_END_TIME => [["date('Y-m-d H:i:s', %s)","_show"]],
         self::F_CREATE_TIME => [["date('Y-m-d H:i:s', %s)","_show"]]
     ];
 
@@ -98,6 +107,7 @@ class UrlShortMap extends BaseModel {
     public static $fields_names = [
         self::F_SHORT_URL => '短连接',
         self::F_TRUE_URL => '真实url',
+        self::F_END_TIME => '超时时间，如果为0，则永不超时',
         self::F_CREATE_TIME => '创建时间'
     ];
 
@@ -113,7 +123,7 @@ class UrlShortMap extends BaseModel {
      * @return array
      */
     public static function getAllFields($exclude_fields = [self::F_ID]) {
-        $fields = [self::F_ID, self::F_SHORT_URL, self::F_TRUE_URL, self::F_CREATE_TIME];
+        $fields = [self::F_ID, self::F_SHORT_URL, self::F_TRUE_URL, self::F_END_TIME, self::F_CREATE_TIME];
         return array_diff($fields, $exclude_fields);
     }
 

@@ -32,7 +32,7 @@ class UrlShortBaseApiController extends ApiController {
             $return['items'] = UrlShortModel::forShow($return['items']);
             //返回
             return $return;
-        }), '{"status":"api\/url_short\/getlist\/1","status_code":1,"limit":10,"offset":0,"total":10,"items":[{"id":"主键id","short_url":"短连接","true_url":"真实url","create_time":"创建时间"}]}');
+        }), '{"status":"api\/url_short\/getlist\/1","status_code":1,"limit":10,"offset":0,"total":10,"items":[{"id":"主键id","short_url":"短连接","true_url":"真实url","end_time":"超时时间，如果为0，则永不超时","create_time":"创建时间"}]}');
     }
     
     /**
@@ -48,7 +48,7 @@ class UrlShortBaseApiController extends ApiController {
         $info = UrlShortModel::getById($id);
         //拼接额外字段 & 格式化相关字段
         $info = UrlShortModel::forShow($info);
-        return $this->ar(1, ['info' => $info], '{"status":"api\/url_short\/get\/1","status_code":1,"info":{"id":"主键id","short_url":"短连接","true_url":"真实url","create_time":"创建时间"}}');
+        return $this->ar(1, ['info' => $info], '{"status":"api\/url_short\/get\/1","status_code":1,"info":{"id":"主键id","short_url":"短连接","true_url":"真实url","end_time":"超时时间，如果为0，则永不超时","create_time":"创建时间"}}');
     }
 
     /**
@@ -64,7 +64,7 @@ class UrlShortBaseApiController extends ApiController {
         $items = UrlShortModel::getItemsByIds($ids);
         //拼接额外字段 & 格式化相关字段
         $items = UrlShortModel::forShow($items);
-        return $this->ar(1, ['items' => $items], '{"status":"api\/url_short\/getbyids\/1","status_code":1,"items":[{"id":"主键id","short_url":"短连接","true_url":"真实url","create_time":"创建时间"}]}');
+        return $this->ar(1, ['items' => $items], '{"status":"api\/url_short\/getbyids\/1","status_code":1,"items":[{"id":"主键id","short_url":"短连接","true_url":"真实url","end_time":"超时时间，如果为0，则永不超时","create_time":"创建时间"}]}');
     }
 
     /**
@@ -82,7 +82,7 @@ class UrlShortBaseApiController extends ApiController {
         $info = UrlShortModel::getById(UrlShortModel::instance()->getLastInsID());
         //拼接额外字段 & 格式化相关字段
         $info = UrlShortModel::forShow($info);
-        return $this->ar(1, ['info' => $info], '{"status":"api\/url_short\/create\/1","status_code":1,"info":{"id":"主键id","short_url":"短连接","true_url":"真实url","create_time":"创建时间"}}');
+        return $this->ar(1, ['info' => $info], '{"status":"api\/url_short\/create\/1","status_code":1,"info":{"id":"主键id","short_url":"短连接","true_url":"真实url","end_time":"超时时间，如果为0，则永不超时","create_time":"创建时间"}}');
     }
 
 }

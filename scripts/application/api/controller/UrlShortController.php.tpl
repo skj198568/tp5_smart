@@ -34,9 +34,12 @@ class UrlShortController extends UrlShortBaseApiController {
         //默认跳转地址
         $jump_url = ClHttp::getServerDomain() . '/';
         if (!empty($info)) {
-            $jump_url = $info[UrlShortModel::F_TRUE_URL];
-            if (strpos($info[UrlShortModel::F_TRUE_URL], '/') === 0) {
-                $jump_url = ClHttp::getServerDomain() . $info[UrlShortModel::F_TRUE_URL];
+            //判断超时时间
+            if (empty($info[UrlShortModel::F_END_TIME]) || $info[UrlShortModel::F_END_TIME] > time()) {
+                $jump_url = $info[UrlShortModel::F_TRUE_URL];
+                if (strpos($info[UrlShortModel::F_TRUE_URL], '/') === 0) {
+                    $jump_url = ClHttp::getServerDomain() . $info[UrlShortModel::F_TRUE_URL];
+                }
             }
         }
         //跳转地址
