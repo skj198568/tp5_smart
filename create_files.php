@@ -209,7 +209,7 @@ $file = $document_root_dir . '/application/route.php';
 if (is_file($file)) {
     $file_content = file_get_contents($file);
     if (strpos($file_content, 'su/:short_url') === false) {
-        $file_content = str_replace('];', "\n    'su/:short_url' => '/api/url_short/jump/short_url/:short_url',\n];");
+        $file_content = str_replace('];', "\n    'su/:short_url' => '/api/url_short/jump/short_url/:short_url',\n];", $file_content);
         //回写
         file_put_contents($file, $file_content);
     }
