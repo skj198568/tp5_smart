@@ -36,8 +36,6 @@ class ApiController extends BaseApiController {
      * @var array
      */
     protected $uncheck_request = [
-        'Index/index',
-        'UrlShort/jump',
     ];
 
     /**
@@ -46,6 +44,8 @@ class ApiController extends BaseApiController {
     public function _initialize() {
         parent::_initialize();
         $token = '';
+        //合并
+        $this->uncheck_request = array_merge($this->default_uncheck_request, $this->uncheck_request);
         if (!ClArray::inArrayIgnoreCase(request()->controller() . '/' . request()->action(), $this->uncheck_request)) {
             $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token');
         }

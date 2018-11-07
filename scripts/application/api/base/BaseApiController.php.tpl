@@ -24,6 +24,15 @@ use think\Controller;
 class BaseApiController extends Controller {
 
     /**
+     * 不校验的请求
+     * @var array
+     */
+    protected $default_uncheck_request = [
+        'Index/index',
+        'UrlShort/jump',
+    ];
+
+    /**
      * 初始化函数
      */
     public function _initialize() {
@@ -69,6 +78,7 @@ class BaseApiController extends Controller {
      * @param int $limit 每页显示数
      * @param null|int $duration 缓存时间
      * @return array
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
