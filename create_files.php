@@ -209,7 +209,17 @@ $file = $document_root_dir . '/application/route.php';
 if (is_file($file)) {
     $file_content = file_get_contents($file);
     if (strpos($file_content, 'su/:short_url') === false) {
-        $file_content = str_replace('];', "\n    'su/:short_url' => '/api/url_short/jump/short_url/:short_url',\n];", $file_content);
+        $file_content = '';
+        //按行处理
+        $f_read = fopen($file, 'r');
+        while (!feof($f_read)) {
+            $line_content = fgets($f_read);
+            if (strpos($line_content, 'return') === 0) {
+                $line_content .= "    'su/:short_url' => '/api/url_short/jump/short_url/:short_url',\n";
+            }
+            $file_content .= $line_content;
+        }
+        fclose($f_read);
         //回写
         file_put_contents($file, $file_content);
     }
