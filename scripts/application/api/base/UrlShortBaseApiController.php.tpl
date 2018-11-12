@@ -20,6 +20,7 @@ class UrlShortBaseApiController extends ApiController {
 
     /**
      * 列表
+     * @throws \think\Exception
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
