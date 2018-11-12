@@ -7,6 +7,12 @@
 class Cmd extends \think\migration\Migrator {
 
     /**
+     * 是否修改目录拥有者
+     * @var bool
+     */
+    protected static $dir_own_is_changed = false;
+
+    /**
      * 初始化
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
@@ -15,13 +21,15 @@ class Cmd extends \think\migration\Migrator {
         parent::init();
         //校验
         $this->checkExecFunction();
-        //获取当前链接数
-        if (!is_numeric(cache('migrate_max_connections'))) {
-            $query           = new \think\db\Query();
-            $max_connections = $query->query("show variables like '%max_connections%';");
-            cache('migrate_max_connections', $max_connections[0]['Value']);
-            //设置最大连接数
-            $query->query('set GLOBAL max_connections = 16384;');
+        if (strpos(config('database.hostname'), 'aliyuncs.com') === false) {
+            //获取当前链接数
+            if (!is_numeric(cache('migrate_max_connections'))) {
+                $query           = new \think\db\Query();
+                $max_connections = $query->query("show variables like '%max_connections%';");
+                cache('migrate_max_connections', $max_connections[0]['Value']);
+                //设置最大连接数
+                $query->query('set GLOBAL max_connections = 16384;');
+            }
         }
     }
 
@@ -43,6 +51,8 @@ class Cmd extends \think\migration\Migrator {
         $cmd = sprintf('cd %s/../../ && php -f public/index.php %s', __DIR__, $module_controller_action);
         //执行
         exec($cmd);
+        //修改目录权限
+        $this->changeDirOwn();
     }
 
     /**
@@ -131,6 +141,15 @@ class Cmd extends \think\migration\Migrator {
     }
 
     /**
+     * 修改目录权限
+     */
+    protected function changeDirOwn() {
+        //修改目录权限为www
+        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
+    }
+
+    /**
      * 析构函数
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
@@ -141,9 +160,12 @@ class Cmd extends \think\migration\Migrator {
             $query = new \think\db\Query();
             $query->query(sprintf('set GLOBAL max_connections = %s;', cache('migrate_max_connections')));
             cache('migrate_max_connections', null);
-            //修改目录权限为www
-            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
-            exec($cmd);
+        }
+        //修改目录权限
+        if (!self::$dir_own_is_changed) {
+            $this->changeDirOwn();
+            //修改状态
+            self::$dir_own_is_changed = true;
         }
     }
 
