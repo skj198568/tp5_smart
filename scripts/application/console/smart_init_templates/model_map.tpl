@@ -103,6 +103,7 @@ class {$table_name}Map extends BaseModel {
      */
     public static function instance(${$table_comment['partition'][0]}<if condition="!isset($table_comment['partition'][1])"> = 0</if>, $id = 0) {
         if ($id >= 0) {
+            $id = json_encode([${$table_comment['partition'][0]}, $id], JSON_UNESCAPED_UNICODE);
             if (!isset(static::$instances_array[$id])) {
                 static::$instances_array[$id] = new static();
                 //设置分表
