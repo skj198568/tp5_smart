@@ -119,6 +119,9 @@ class LogCount extends Command {
                 }
                 //.html .htm处理
                 $line = str_replace(['.html', '.htm'], ['', ''], $line);
+                if ($line{0} != '/') {
+                    $line = ClString::getBetween($line, '/', '');
+                }
                 //获取请求module/controller/action
                 $line = ClString::replaceOnce('/', '', $line);
                 $line = trim($line);
@@ -220,24 +223,31 @@ class LogCount extends Command {
         if ($input->hasOption('slow_microsecond')) {
             $slow_microsecond = intval($input->getOption('slow_microsecond'));
         } else {
-            $slow_microsecond = 30;
+            $slow_microsecond = 10;
         }
         $sql               = [];
         $sql_runtime_array = [];
         foreach ($files as $file) {
             $content = file_get_contents($file);
             $content = explode("\n", $content);
+            $pre_log = '';
             foreach ($content as $line) {
-                if (strpos($line, '[ SQL ]') === false) {
+                $line = trim($line);
+                $line = strtolower($line);
+                $line = $pre_log . ' ' . $line;
+                if (strpos($line, '[ sql ]') === false) {
                     continue;
                 }
-                $line = strtolower($line);
                 if (strpos($line, 'select') === false) {
                     continue;
                 }
                 $sql_runtime = ClString::getBetween($line, 'runtime:', 's', false);
                 if (!is_numeric($sql_runtime)) {
+                    $pre_log = $line;
                     continue;
+                }
+                if ($pre_log != '') {
+                    $pre_log = '';
                 }
                 //转换成毫秒
                 $sql_runtime = floatval($sql_runtime * 1000);
