@@ -166,5 +166,22 @@ class {$table_name}BaseApiController extends ApiController {
         </present>return $this->ar(1, ['id' => $id], '{$ar_delete_json}');
     }
 </if>
+<foreach name="relations" item="each_relation">
+
+    /**
+     * 获取字段定义关系 {$each_relation['function_desc']}
+     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function getFieldRelation{$each_relation['class_name']}() {
+        $items = [];
+        foreach ({$table_name}Model::R_{:strtoupper($each_relation['field_name'])} as $value => $text) {
+            $items[] = [
+                'value' => $value,
+                'text'  => $text
+            ];
+        }
+        return $this->ar(1, ['items' => $items], '{$each_relation["json_return"]}');
+    }
+</foreach>
 
 }

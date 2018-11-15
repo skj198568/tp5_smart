@@ -68,4 +68,18 @@ class AreaBaseApiController extends ApiController {
         return $this->ar(1, ['items' => $items], '{"status":"api\/area\/getbyids\/1","status_code":1,"items":[{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}]}');
     }
 
+    /**
+     * 获取字段定义关系 类型，1/省、直辖市，2/城市，3/区县     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function getFieldRelationType() {
+        $items = [];
+        foreach (AreaModel::R_TYPE as $value => $text) {
+            $items[] = [
+                'value' => $value,
+                'text'  => $text
+            ];
+        }
+        return $this->ar(1, ['items' => $items], '{"status":"api\/group_import\/getrelationtype\/1","status_code":1,"items":[{"value":"1","text":"省\/直辖市"},{"value":"2","text":"城市"},{"value":"3","text":"区县"}]}');
+    }
+
 }

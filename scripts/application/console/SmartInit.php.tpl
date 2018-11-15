@@ -421,6 +421,8 @@ class SmartInit extends Command {
         }
         $table_name_format = $this->tableNameFormat($table_name);
         $info              = [];
+        //字段映射关系
+        $relations = [];
         foreach ($table_info as $k => $each) {
             if (empty($each['Comment'])) {
                 $comment = [];
@@ -438,12 +440,37 @@ class SmartInit extends Command {
             //静态变量
             $const_str = '';
             if (isset($comment['const_values'])) {
+                $json_return = [];
                 foreach ($comment['const_values'] as $each_const_value) {
-                    $const_str .= sprintf(' %s/%s;', $each_const_value[1], $each_const_value[2]);
+                    $const_str     .= sprintf(' %s/%s;', $each_const_value[1], $each_const_value[2]);
+                    $json_return[] = [
+                        'value' => $each_const_value[1],
+                        'text'  => $each_const_value[2],
+                    ];
                 }
                 if (!empty($const_str)) {
                     $info[$each['Field']] .= sprintf(':%s', $const_str);
                 }
+                $class_name = $each['Field'];
+                if (strpos($class_name, '_') !== false) {
+                    $class_name = explode('_', $class_name);
+                    array_walk($class_name, function (&$each) {
+                        $each = ucfirst($each);
+                    });
+                    $class_name = implode('', $class_name);
+                } else {
+                    $class_name = ucfirst($class_name);
+                }
+                $relations[] = [
+                    'function_desc' => empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'],
+                    'class_name'    => $class_name,
+                    'field_name'    => $each['Field'],
+                    'json_return'   => json_encode([
+                        "status"      => "api/group_import/getrelation" . strtolower($class_name) . "/1",
+                        "status_code" => 1,
+                        "items"       => $json_return
+                    ], JSON_UNESCAPED_UNICODE)
+                ];
             }
             //额外字段
             if (isset($comment['show_map_fields'])) {
@@ -497,7 +524,8 @@ class SmartInit extends Command {
                 'ar_create_json'     => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
                 'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
-                'create_api'         => $table_comment['create_api']
+                'create_api'         => $table_comment['create_api'],
+                'relations'          => $relations
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
