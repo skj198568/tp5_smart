@@ -12,12 +12,10 @@ class {$class_name} extends Cmd {
     public function up() {
         //释放数据表信息，防止表结构修改导致的错误错误
         {$model_name}::tableInfoFree();
-        //临时取消字段password存储格式，防止数据变动
-        foreach ({$model_name}::$fields_store_format as $k => $v) {
-            if (is_array($v) && $v[0] == 'password') {
-                unset({$model_name}::$fields_store_format[$k]);
-            }
-        }
+        //临时取消存储格式，防止数据变动
+        {$model_name}::$fields_store_format = [];
+        //临时取消校验
+        {$model_name}::$fields_verifies = [];
         //清空
         {$model_name}::instance()->execute('TRUNCATE TABLE `{$table_name_with_prefix}`');
         //db存储文件
