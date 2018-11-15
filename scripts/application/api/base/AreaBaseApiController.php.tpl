@@ -69,7 +69,7 @@ class AreaBaseApiController extends ApiController {
     }
 
     /**
-     * 获取字段定义关系
+     * 获取字段type定义关系
      * @return \think\response\Json|\think\response\Jsonp
      */
     public function getFieldRelationType() {
