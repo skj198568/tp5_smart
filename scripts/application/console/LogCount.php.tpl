@@ -236,6 +236,9 @@ class LogCount extends Command {
                     continue;
                 }
                 $sql_runtime = ClString::getBetween($line, 'runtime:', 's', false);
+                if (!is_numeric($sql_runtime)) {
+                    continue;
+                }
                 //转换成毫秒
                 $sql_runtime = floatval($sql_runtime * 1000);
                 if ($sql_runtime < $slow_microsecond) {
