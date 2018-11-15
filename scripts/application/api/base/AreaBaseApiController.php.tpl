@@ -69,7 +69,8 @@ class AreaBaseApiController extends ApiController {
     }
 
     /**
-     * 获取字段定义关系 类型，1/省、直辖市，2/城市，3/区县     * @return \think\response\Json|\think\response\Jsonp
+     * 获取字段定义关系
+     * @return \think\response\Json|\think\response\Jsonp
      */
     public function getFieldRelationType() {
         $items = [];
@@ -79,7 +80,7 @@ class AreaBaseApiController extends ApiController {
                 'text'  => $text
             ];
         }
-        return $this->ar(1, ['items' => $items], '{"status":"api\/group_import\/getrelationtype\/1","status_code":1,"items":[{"value":"1","text":"省\/直辖市"},{"value":"2","text":"城市"},{"value":"3","text":"区县"}]}');
+        return $this->ar(1, ['items' => $items], '{"status":"api\/group_import\/getfieldrelationtype\/1","status_code":1,"items":[{"value":"1","text":"省\/直辖市"},{"value":"2","text":"城市"},{"value":"3","text":"区县"}]}');
     }
 
 }

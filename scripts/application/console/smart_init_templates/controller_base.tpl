@@ -169,7 +169,7 @@ class {$table_name}BaseApiController extends ApiController {
 <foreach name="relations" item="each_relation">
 
     /**
-     * 获取字段{$each_relation['function_desc']}定义关系
+     * 获取字段定义关系
      * @return \think\response\Json|\think\response\Jsonp
      */
     public function getFieldRelation{$each_relation['class_name']}() {
