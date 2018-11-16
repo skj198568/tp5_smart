@@ -222,9 +222,9 @@ class SmartInit extends Command {
                     }
                     $const_fields .= sprintf("
     /**
-     * 映射关系
+     * 字段配置
      */
-    const R_%s = [
+    const C_%s = [
         %s
     ];\n", strtoupper($each['Field']), $map_relation);
                 }
@@ -421,8 +421,8 @@ class SmartInit extends Command {
         }
         $table_name_format = $this->tableNameFormat($table_name);
         $info              = [];
-        //字段映射关系
-        $relations = [];
+        //字段配置
+        $fields_config = [];
         foreach ($table_info as $k => $each) {
             if (empty($each['Comment'])) {
                 $comment = [];
@@ -461,12 +461,12 @@ class SmartInit extends Command {
                 } else {
                     $class_name = ucfirst($class_name);
                 }
-                $relations[] = [
+                $fields_config[] = [
                     'function_desc' => empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'],
                     'class_name'    => $class_name,
                     'field_name'    => $each['Field'],
                     'json_return'   => json_encode([
-                        "status"      => "api/group_import/getfieldrelation" . strtolower($class_name) . "/1",
+                        "status"      => "api/group_import/getfieldconfig" . strtolower($class_name) . "/1",
                         "status_code" => 1,
                         "items"       => $json_return
                     ], JSON_UNESCAPED_UNICODE)
@@ -525,7 +525,7 @@ class SmartInit extends Command {
                 'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
                 'create_api'         => $table_comment['create_api'],
-                'relations'          => $relations
+                'fields_config'          => $fields_config
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';

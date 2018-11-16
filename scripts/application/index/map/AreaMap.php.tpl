@@ -66,9 +66,9 @@ class AreaMap extends BaseModel {
     const V_TYPE_AREA = 3;
 
     /**
-     * 映射关系
+     * 字段配置
      */
-    const R_TYPE = [
+    const C_TYPE = [
         1 => '省/直辖市',
         2 => '城市',
         3 => '区县'
