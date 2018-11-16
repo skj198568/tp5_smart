@@ -466,7 +466,7 @@ class SmartInit extends Command {
                     'class_name'    => $class_name,
                     'field_name'    => $each['Field'],
                     'json_return'   => json_encode([
-                        "status"      => "api/group_import/getfieldconfig" . strtolower($class_name) . "/1",
+                        "status"      => 'api/'.$table_name.'/getfieldconfig' . strtolower($class_name) . "/1",
                         "status_code" => 1,
                         "items"       => $json_return
                     ], JSON_UNESCAPED_UNICODE)

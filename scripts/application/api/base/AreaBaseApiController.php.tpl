@@ -80,7 +80,7 @@ class AreaBaseApiController extends ApiController {
                 'text'  => $text
             ];
         }
-        return $this->ar(1, ['items' => $items], '{"status":"api\/group_import\/getfieldconfigtype\/1","status_code":1,"items":[{"value":"1","text":"省\/直辖市"},{"value":"2","text":"城市"},{"value":"3","text":"区县"}]}');
+        return $this->ar(1, ['items' => $items], '{"status":"api\/area\/getfieldconfigtype\/1","status_code":1,"items":[{"value":"1","text":"省\/直辖市"},{"value":"2","text":"城市"},{"value":"3","text":"区县"}]}');
     }
 
 }
