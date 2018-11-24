@@ -151,8 +151,6 @@ class BrowserSync extends Command {
                 //记录端口号，用于生成js自动刷新代码
                 $this->port($this->socket_port);
                 if ($this->fileIsModify($input)) {
-                    //先清空页面缓存
-                    ClMergeResource::clearCache();
                     foreach ($worker->connections as $connection_each) {
                         $connection_each->close('sync');
                         usleep(1000000);
