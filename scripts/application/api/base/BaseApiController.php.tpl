@@ -30,6 +30,8 @@ class BaseApiController extends Controller {
     protected $default_uncheck_request = [
         'Index/index',
         'UrlShort/jump',
+        'File/uploadFile',
+        'File/img',
     ];
 
     /**

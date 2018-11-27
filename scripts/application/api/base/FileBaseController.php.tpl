@@ -24,9 +24,6 @@ class FileBaseController extends ApiController {
 
     /**
      * 跨域处理
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function _initialize() {
         parent::_initialize();
