@@ -19,13 +19,6 @@ use ClassLibrary\ClString;
 class UrlShortModel extends UrlShortMap {
 
     /**
-     * 初始化
-     */
-    public function initialize() {
-        parent::initialize();
-    }
-
-    /**
      * 缓存清除触发器
      * @param $item
      */
