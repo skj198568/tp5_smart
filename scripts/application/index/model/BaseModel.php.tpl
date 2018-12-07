@@ -397,7 +397,7 @@ class BaseModel extends Query {
                             }
                             $model = implode('', $table_name);
                         } else {
-                            $model = ucfirst(ClString::getBetween($table_name, '', '.', false));
+                            $model = ucfirst($table_name);
                         }
                         //拼接Model
                         $model .= 'Model';

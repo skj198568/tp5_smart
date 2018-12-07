@@ -604,7 +604,10 @@ class ApiDoc extends Command {
      * @return string
      */
     private function getWithNameSpace($class_file_absolute_url, $class_name) {
-        $class_name    = ClString::getBetween(trim($class_name), '', '::', false);
+        $class_name_temp = ClString::getBetween(trim($class_name), '', '::', false);
+        if (!empty($class_name_temp)) {
+            $class_name = $class_name_temp;
+        }
         $class_content = file_get_contents($class_file_absolute_url);
         $class_content = explode("\n", $class_content);
         $namespace     = '';
