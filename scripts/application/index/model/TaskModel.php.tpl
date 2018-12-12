@@ -27,18 +27,23 @@ class TaskModel extends TaskMap {
 
     /**
      * 处理任务
+     * @param int $id 执行的id
      * @return bool
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function deal() {
+    public static function deal($id = 0) {
         //处理数据
-        $item = self::instance()->where([
-            self::F_START_TIME => 0
-        ])->order([self::F_ID => self::V_ORDER_ASC])->find();
-        if (empty($item)) {
-            return true;
+        if ($id == 0) {
+            $item = self::instance()->where([
+                self::F_START_TIME => 0
+            ])->order([self::F_ID => self::V_ORDER_ASC])->find();
+            if (empty($item)) {
+                return true;
+            }
+        } else {
+            $item = self::getById($id);
         }
         //设置正在执行
         self::instance()->where([
@@ -57,16 +62,21 @@ class TaskModel extends TaskMap {
                 self::F_END_TIME => time()
             ]);
         } catch (Exception $e) {
+            $error_msg = json_encode([
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'code'    => $e->getCode()
+            ], JSON_UNESCAPED_UNICODE);
             self::instance()->where([
                 self::F_ID => $item[self::F_ID]
             ])->setField([
-                self::F_REMARK => json_encode([
-                    'message' => $e->getMessage(),
-                    'file'    => $e->getFile(),
-                    'line'    => $e->getLine(),
-                    'code'    => $e->getCode()
-                ], JSON_UNESCAPED_UNICODE)
+                self::F_REMARK => $error_msg
             ]);
+            log_info('task-error', $error_msg);
+            if ($id > 0) {
+                echo_info('task-error', $error_msg);
+            }
         }
         //结束
         log_info('task-end-' . $item[self::F_ID]);

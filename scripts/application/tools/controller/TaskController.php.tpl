@@ -10,6 +10,7 @@
 namespace app\tools\controller;
 
 use app\index\model\TaskModel;
+use ClassLibrary\ClFieldVerify;
 use think\Log;
 
 /**
@@ -40,9 +41,10 @@ class TaskController extends ToolsBaseController {
      * @throws \think\exception\DbException
      */
     public function deal() {
+        $id         = get_param('id', ClFieldVerify::instance()->fetchVerifies(), '任务主键id', 0);
         $begin_time = time();
         //处理任务
-        TaskModel::deal();
+        TaskModel::deal($id);
         return (time() - $begin_time) . "s\n";
     }
 
