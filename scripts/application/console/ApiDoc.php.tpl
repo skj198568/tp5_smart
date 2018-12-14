@@ -54,7 +54,7 @@ class ApiDoc extends Command {
 //        echo_info('$files:', $files);
         foreach ($files as $each_file) {
             $output->info($each_file);
-//            if(strpos($each_file, 'Area') === false){
+//            if (strpos($each_file, '/GroupC') === false) {
 //                continue;
 //            }
             //获取所有函数，包括所有继承的父类
@@ -99,12 +99,11 @@ class ApiDoc extends Command {
 //                    continue;
 //                }
 //                echo_info($k);
-//                if($k !== 'isFocus'){
+//                if ($k !== 'update') {
 //                    continue;
 //                }
-                $desc   = $this->getDescByFunctionContent($each_function);
-                $params = $this->getParamsByFunctionContent($each_file_temp, $each_function);
-//                echo_info($params);
+                $desc              = $this->getDescByFunctionContent($each_function);
+                $params            = $this->getParamsByFunctionContent($each_file_temp, $each_function);
                 $ar_items          = $this->getAjaxReturnByFunctionContent($each_function);
                 $ajax_return_items = [];
                 foreach ($ar_items as $status => $content) {
@@ -113,6 +112,7 @@ class ApiDoc extends Command {
                 $api[sprintf('/api/%s/%s', $this->formatRequestControllerName($this->getClassName($each_file)), $this->getFunctionName($each_function))] = [sprintf('%s / %s', $class_desc, $desc), $params, $ajax_return_items];
             }
         }
+//        echo_info($api);
         $api_items         = '';
         $api_item_template = __DIR__ . '/api_doc_templates/api_item.html';
         $id                = 0;
@@ -175,7 +175,7 @@ class ApiDoc extends Command {
      */
     private function getClassDesc($file_absolute_url) {
         $file_content = file_get_contents($file_absolute_url);
-        $file_content = ClString::getBetween($file_content, 'namespace', 'class ', false);
+        $file_content = ClString::getBetween($file_content, 'namespace', 'class ', true);
         $file_content = ClString::getBetween($file_content, '/**', 'class ', false);
         $file_content = explode('*', $file_content);
         $class_desc   = '';
@@ -348,17 +348,18 @@ class ApiDoc extends Command {
      * @return array
      */
     private function getParamsByFunctionContent($class_file_absolute_url, $function_content) {
-//        echo_info($function_content);
         $return_array = [];
         //获取get_param方式参数
         $params = ClString::parseToArray($function_content, 'get_param', ');', false);
+//        echo_info($params);
         foreach ($params as $param) {
-//            if(strpos($param, 'focus_type') === false){
+//            if (strpos($param, 'not_allow_subject_ids') === false) {
 //                continue;
 //            }
             $param = ClString::spaceTrim($param);
             $param = trim($param);
             $param = ClString::spaceTrim($param);
+//            echo_info($param);
             if (strpos($param, 'ClFieldVerify') === false || strpos($param, 'fetchVerifies') === false) {
                 $filters = [];
             } else {
@@ -376,6 +377,7 @@ class ApiDoc extends Command {
             $param       = trim($param, ',');
             $param_temp  = [];
             $param_array = explode('","', trim($param, '"'));
+//            echo_info($param_array);
             foreach ($param_array as $each) {
                 if (strpos($each, ',') !== false) {
                     foreach (explode(',', $each) as $each_param) {
@@ -387,7 +389,10 @@ class ApiDoc extends Command {
             }
 //            echo_info($param_temp);
             //参数名
-            $name = ClString::getBetween($param_temp[0], '', '"', false);
+            $name = $param_temp[0];
+            if (strpos($name, '"') !== false) {
+                $name = ClString::getBetween($name, '', '"', false);
+            }
             if (strpos($name, "'") === 0) {
                 //参数定义
                 $name = trim($name, "'");
@@ -400,7 +405,9 @@ class ApiDoc extends Command {
             if (strpos($name, '/') !== false) {
                 $name = ClString::getBetween($name, '', '/', false);
             }
-//            echo_info($name, $filters);
+//            if ($name == 'not_allow_subject_ids') {
+//                echo_info($name, $filters);
+//            }
             //过滤器
             if (!empty($filters)) {
                 $sub_filters = ClString::getBetween($filters, 'instance', 'fetchVerifies', false);
@@ -432,6 +439,9 @@ class ApiDoc extends Command {
                 }
                 //去除带参数的校验器
                 $filters = explode('->', $filters);
+//                if ($name == 'not_allow_subject_ids') {
+//                    echo_info($name, $filters);
+//                }
                 foreach ($filters as $k_each_filter => $v_each_filter) {
                     if (strpos($v_each_filter, '$') !== false) {
                         unset($filters[$k_each_filter]);
@@ -442,6 +452,9 @@ class ApiDoc extends Command {
                 eval($filters);
                 //转换为数组
                 $filters = (array)$filters;
+//                if ($name == 'not_allow_subject_ids') {
+//                    echo_info($name, $filters);
+//                }
             } else {
                 $filters = [];
             }
@@ -499,7 +512,9 @@ class ApiDoc extends Command {
 //                echo_info(sprintf('$params=%s;', $params_functions));
                 eval(sprintf('$params=%s;', $params_functions));
                 $fields_verifies = sprintf('%s::$fields_verifies', $class_name_with_namespace);
+//                echo_info($fields_verifies);
                 eval(sprintf('$fields_verifies=%s;', $fields_verifies));
+//                echo_info($params);
                 foreach ($class_const_content as $each_const_param) {
                     foreach ($params as $each_param) {
                         if (strpos($each_const_param, sprintf("'%s'", $each_param)) !== false) {
@@ -514,7 +529,7 @@ class ApiDoc extends Command {
                             $remark         = implode('; ', $remark);
                             $return_array[] = [
                                 'name'    => $each_param,
-                                'filters' => isset($fields_verifies[$each_param]) ? ClFieldVerify::getNamesStringByVerifies($fields_verifies[$each_param]) : '',
+                                'filters' => isset($fields_verifies[$each_param]) ? ClFieldVerify::getNamesStringByVerifies($fields_verifies[$each_param]) : '无',
                                 'remark'  => $remark
                             ];
                         }
