@@ -217,6 +217,13 @@ class BaseModel extends Query {
                                 }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                 break;
+                            case 'base64':
+                                if (empty($data[$k_field])) {
+                                    $data[$k_field] = '';
+                                } else {
+                                    $data[$k_field] = base64_encode($data[$k_field]);
+                                }
+                                break;
                         }
                     }
                 }
@@ -285,6 +292,13 @@ class BaseModel extends Query {
                                     }
                                     $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
                                     break;
+                                case 'base64':
+                                    if (empty($data[$k_field])) {
+                                        $data[$k_field] = '';
+                                    } else {
+                                        $data[$k_field] = base64_encode($data[$k_field]);
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -346,6 +360,13 @@ class BaseModel extends Query {
                                     }
                                 }
                                 $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
+                                break;
+                            case 'base64':
+                                if (empty($data[$k_field])) {
+                                    $data[$k_field] = '';
+                                } else {
+                                    $data[$k_field] = base64_encode($data[$k_field]);
+                                }
                                 break;
                         }
                     }
@@ -601,6 +622,16 @@ class BaseModel extends Query {
                                             }
                                         }
                                         break;
+                                    case 'base64':
+                                        if (empty($data[$k_field])) {
+                                            $data[$k_field] = '';
+                                        } else {
+                                            $data[$k_field] = base64_decode($data[$k_field]);
+                                            if ($data[$k_field] == false) {
+                                                $data[$k_field] = '';
+                                            }
+                                        }
+                                        break;
                                 }
                             }
                         }
@@ -640,6 +671,16 @@ class BaseModel extends Query {
                                     }
                                 }
                                 break;
+                            case 'base64':
+                                if (empty($data[$k_field])) {
+                                    $data[$k_field] = '';
+                                } else {
+                                    $data[$k_field] = base64_decode($data[$k_field]);
+                                    if ($data[$k_field] == false) {
+                                        $data[$k_field] = '';
+                                    }
+                                }
+                                break;
                         }
                     }
                 }
@@ -670,6 +711,16 @@ class BaseModel extends Query {
                             }
                         }
                         break;
+                    case 'base64':
+                        if (empty($value)) {
+                            $value = '';
+                        } else {
+                            $value = base64_decode($value);
+                            if ($value == false) {
+                                $value = '';
+                            }
+                        }
+                        break;
                 }
             }
         }
@@ -695,6 +746,16 @@ class BaseModel extends Query {
                                 $data[$key] = json_decode($value, true);
                                 if (is_null($data[$key])) {
                                     $data[$key] = [];
+                                }
+                            }
+                            break;
+                        case 'base64':
+                            if (empty($data[$key])) {
+                                $data[$key] = '';
+                            } else {
+                                $data[$key] = base64_decode($data[$key]);
+                                if ($data[$key] == false) {
+                                    $data[$key] = '';
                                 }
                             }
                             break;

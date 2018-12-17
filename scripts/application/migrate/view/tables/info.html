@@ -219,6 +219,7 @@
                                                 <option value="string">string</option>
                                                 <option value="json">json</option>
                                                 <option value="password">password</option>
+                                                <option value="base64">base64</option>
                                             </select>
                                         </div>
                                         <div class="form-group" ms-visible="store_format == 'password'">
@@ -1141,11 +1142,10 @@
                 param.show_format = table_info.show_format_str;
             }
             var verifies = table_info.verifies_selected.$model;
-            if (table_info.store_format == 'json') {
-                param.store_format = 'json';
-            }
             if (table_info.store_format == 'password') {
                 param.store_format = ['password', table_info.password_salt];
+            } else {
+                param.store_format = table_info.store_format;
             }
             if (table_info.in_array) {
                 verifies.push(['in_array', table_info.in_array_value]);

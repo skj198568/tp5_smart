@@ -54,6 +54,9 @@ ClMigrateField::instance()
     <if condition="$field_info['store_format'] eq 'json'">
         ->storageFormatJson()
     </if>
+    <if condition="$field_info['store_format'] eq 'base64'">
+        ->storageFormatBase64()
+    </if>
     <if condition="is_array($field_info['store_format'])">
         <if condition="$field_info['store_format'][0] eq 'password'">
             ->storageFormatPassword('{$field_info['store_format'][1]}')
