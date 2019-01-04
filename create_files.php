@@ -62,7 +62,7 @@ foreach ($files as $file) {
                 }
             }
         }
-    } else if (strpos($target_file, 'command.php') !== false) {
+    } else if (strpos($target_file, 'command.php') === 0) {
         $file_content = file_get_contents($target_file);
         //处理换行
         if (strpos($file_content, '[]') !== false) {
