@@ -53,10 +53,10 @@ class ApiDoc extends Command {
         $api      = [];
 //        echo_info('$files:', $files);
         foreach ($files as $each_file) {
-            $output->info($each_file);
-//            if (strpos($each_file, '/GroupC') === false) {
+//            if (strpos($each_file, '/PlatformC') === false) {
 //                continue;
 //            }
+            $output->info($each_file);
             //获取所有函数，包括所有继承的父类
             $functions = $this->getAllFunctions($each_file);
 //            echo_info('$functions:', $functions);
@@ -586,7 +586,11 @@ class ApiDoc extends Command {
         $father_class_name   = '';
         foreach ($class_content_array as $line) {
             if (strpos($line, 'class ') !== false && strpos($line, ' extends ') !== false) {
-                $father_class_name = trim(ClString::getBetween($line, 'extends ', '{', false));
+                if (strpos($line, '{')) {
+                    $father_class_name = trim(ClString::getBetween($line, 'extends ', '{', false));
+                } else {
+                    $father_class_name = trim(ClString::getBetween($line, 'extends ', '', false));
+                }
                 break;
             }
         }
