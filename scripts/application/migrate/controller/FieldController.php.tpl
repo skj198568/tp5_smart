@@ -302,8 +302,7 @@ class FieldController extends MigrateBaseController {
      * @throws \think\exception\PDOException
      */
     private function getAllFields($table_name) {
-        $query = new Query();
-        return $query->query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
+        return $this->query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
     }
 
     /**

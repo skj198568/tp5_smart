@@ -133,6 +133,7 @@
                             btn.push('<button class="btn btn-info btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
                             btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                             btn.push('<button class="btn btn-warning btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
+                            btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIndex(\'' + value + '\')"><i class="fa fa-key"></i> 索引</button>');
                             return btn.join(' ');
                         }
                     }
@@ -229,6 +230,9 @@
                     });
                 }
             });
+        },
+        $dealIndex: function (table_name) {
+            window.location.href = '/migrate/tables/table_index/table_name/' + table_name + '.html';
         }
     });
 

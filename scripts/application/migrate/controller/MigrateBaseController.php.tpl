@@ -41,6 +41,12 @@ class MigrateBaseController extends Controller {
     ];
 
     /**
+     * 查询对象实例
+     * @var Query
+     */
+    var $query_instance = null;
+
+    /**
      * 初始化函数
      */
     public function _initialize() {
@@ -82,6 +88,7 @@ class MigrateBaseController extends Controller {
         $this->assign('controller_name', request()->controller());
         $this->assign('action_name', request()->action());
         $this->setMenu();
+        $this->query_instance = new Query();
     }
 
     /**
@@ -390,6 +397,17 @@ class MigrateBaseController extends Controller {
         //清除缓存
         $key = $this->getKey($table_name);
         cache($key, null);
+    }
+
+    /**
+     * 查询
+     * @param $sql
+     * @return mixed
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    protected function query($sql) {
+        return $this->query_instance->query($sql);
     }
 
 }

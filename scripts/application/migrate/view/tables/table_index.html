@@ -1,0 +1,346 @@
+<!--布局begin-->
+<layout name="public/layout" replace="{__CONTENT__}"/>
+<!--布局end-->
+<!--面包屑路径导航begin-->
+<ol class="breadcrumb" style="margin-bottom: 1em;">
+    <li><a href="{:url('tables/index')}">首页</a></li>
+    <li class="active">索引</li>
+    <li class="active">{{table_name}}</li>
+</ol>
+<!--面包屑路径导航end-->
+<hr>
+<!--jQuery bootstrap table tools内联表单begin-->
+<div id="id_tools_div" class="form-inline">
+    <button type="button" class="btn btn-success" ms-click="$add"><i class="fa fa-plus"></i> 新增</button>
+</div>
+<!--jQuery bootstrap table tools内联表单end-->
+<table id="id_table"></table>
+<!--新增模态框begin-->
+<div class="modal fade" id="id_modal_add" tabindex="-1" role="dialog" aria-labelledby="id_modal_add_title"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="id_modal_add_title">新增</h4>
+            </div>
+            <div class="modal-body">
+                <!--基本表单begin-->
+                <div>
+                    <div class="form-group">
+                        <label>选择字段</label>
+                        <div ms-each="fields">
+                            <label style="cursor: pointer;margin-right: 2em;" ms-click="$check(el.field_name)">
+                                <i class="fa fa-check-square-o" ms-visible="$isChecked(el.field_name)"></i>
+                                <i class="fa fa-square-o" ms-visible="!$isChecked(el.field_name)"></i>
+                                <span ms-class-1="text-danger:!$isChecked(el.field_name)"
+                                      ms-class="text-success:$isChecked(el.field_name)">{{el.field_name}}-{{el.field_desc}}</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>索引类型</label>
+                        <select class="form-control" ms-duplex="index_type" ms-each="index_type_config">
+                            <option ms-attr-value="el.value">{{el.name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <!--基本表单end-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ms-click="$doAdd()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--新增模态框end-->
+<script type="text/javascript">
+
+    var index = avalon.define({
+        $id: 'avalon_controller',
+        $init: function () {
+            index.table_name = jCommon.hrefGetParams('table_name');
+            index.$initTable();
+            index.$getFields();
+            index.$getMysqlVersion();
+            index.$getTableEngine();
+        },
+        table_name: '',
+        fields: [],
+        $getFields: function () {
+            $.get('/migrate/field/getList', {
+                table_name: index.table_name
+            }, function (r) {
+                index.fields = r.items;
+            });
+        },
+        //选中的字段
+        fields_checked: [],
+        $isChecked: function (field_name) {
+            return index.fields_checked.contains(field_name);
+        },
+        $check: function (field_name) {
+            if (index.$isChecked(field_name)) {
+                return index.fields_checked.remove(field_name);
+            } else {
+                return index.fields_checked.ensure(field_name);
+            }
+        },
+        //索引类型
+        index_type: 'INDEX',
+        //索引类型配置
+        index_type_config: [
+            {
+                value: 'INDEX',
+                name: 'index'
+            },
+            {
+                value: 'FULLTEXT',
+                name: 'fulltext'
+            }
+        ],
+        //数据
+        $items: [],
+        //bool类型source
+        bool_items: [
+            {value: 0, text: '否', class_name: 'text-danger'},
+            {value: 1, text: '是', class_name: 'text-success'}
+        ],
+        mysql_version: 0,
+        $getMysqlVersion: function () {
+            $.get('/migrate/common/getMysqlVersion', {}, function (r) {
+                index.mysql_version = parseFloat(r.version);
+            });
+        },
+        engine: '',
+        $getTableEngine: function () {
+            $.get('/migrate/table/getEngine', {
+                table_name: index.table_name
+            }, function (r) {
+                index.engine = r.engine;
+            });
+        },
+        //初始化
+        $initTable: function () {
+            $('#id_table').bootstrapTable({
+                uniqueId: 'id',
+                url: '{:url("migrate/table/getIndexList")}',
+                cache: false,
+                sortOrder: 'desc',
+                pageSize: 10,
+                pageList: [10, 25, 50, 'All'],
+                queryParams: function (params) {
+                    params.table_name = index.table_name;
+                    if (!jCommon.empty(index.condition)) {
+                        params.condition = index.condition;
+                    }
+                    return params;
+                },
+                responseHandler: function (r) {
+                    index.$items = r.items;
+                    return {
+                        'rows': r.items,
+                        'total': r.total,
+                        'page': r.offset / r.limit + 1
+                    };
+                },
+                idField: 'id',
+                toolbar: '#id_tools_div',
+                pagination: true,
+                sidePagination: "server",
+                showColumns: true,
+                showRefresh: true,
+                columns: [
+                    // {
+                    //     checkbox: true
+                    // },
+                    {
+                        field: 'id',
+                        title: 'ID'
+                    },
+                    {
+                        field: 'index',
+                        title: '索引名称'
+                    },
+                    {
+                        field: 'fields',
+                        title: '索引字段'
+                    },
+                    {
+                        field: 'index_type',
+                        title: '索引类型'
+                    },
+                    {
+                        field: 'index',
+                        title: '操作',
+                        formatter: function (value, row, index) {
+                            var btn = [];
+                            btn.push('<button class="btn btn-danger btn-xs" onclick="index.$remove(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
+                            return btn.join(',');
+                        }
+                    }
+                ]
+            });
+        },
+        //检索条件
+        condition: '',
+        //检索
+        $search: function () {
+            $('#id_table').bootstrapTable('refresh', {
+                query: {
+                    offset: 0
+                }
+            });
+        },
+        //刷新
+        $refresh: function () {
+            $('#id_table').bootstrapTable('refresh', {});
+        },
+        //获取所有数据
+        $getData: function () {
+            return $('#id_table').bootstrapTable('getData', false);
+        },
+        //按id获取
+        $getById: function (id) {
+            return $('#id_table').bootstrapTable('getRowByUniqueId', id);
+        },
+        //按id获取值
+        $getValueById: function (id, field) {
+            var info = index.$getById(id);
+            if (info.hasOwnProperty(field)) {
+                return info[field];
+            } else {
+                return null;
+            }
+        },
+        //按id删除
+        $delById: function (id) {
+            return $('#id_table').bootstrapTable('removeByUniqueId', id);
+        },
+        //按id获取索引
+        $getIndexById: function (id) {
+            return $('#id_table').find('tr[data-uniqueid="' + id + '"]').attr('data-index');
+        },
+        //新增
+        $add: function () {
+            index.fields_checked = [];
+            index.index_type = 'INDEX';
+            //设置配置类型
+            if (index.engine == 'InnoDB') {
+                if (index.mysql_version < 5.6) {
+                    //取消fulltext
+                    index.index_type_config = [
+                        {
+                            value: 'INDEX',
+                            name: 'index'
+                        }
+                    ];
+                }
+            }
+            $('#id_modal_add').modal('show');
+        },
+        //处理新增
+        $doAdd: function () {
+            //字段数量不可为空
+            if (index.fields_checked.length == 0) {
+                layer.msg('请选择索引的字段', function () {
+
+                });
+                return false;
+            }
+            //fulltext只能是一个字段
+            if (index.index_type == 'FULLTEXT') {
+                if (index.fields_checked.length > 1) {
+                    layer.msg('FULLTEXT索引只支持单字段', function () {
+
+                    });
+                    return false;
+                }
+            }
+            $.post('/migrate/table/createIndex', {
+                table_name: index.table_name,
+                index_type: index.index_type,
+                fields: index.fields_checked.$model
+            }, function (r) {
+                $('#id_modal_add').modal('hide');
+                //提醒消息
+                layer.msg('新增成功:' + r.file, function () {
+
+                });
+                index.$refresh();
+            });
+        },
+        //处理删除
+        $doDel: function (id) {
+            var name = index.$getValueById(id, 'name');
+            //询问框
+            var index = layer.confirm('确认删除“<span class="text-danger">' + name + '</span>”？', {
+                title: '删除',
+                btn: ['取消', '确认'] //按钮
+            }, function () {
+                layer.close(index);
+            }, function () {
+                $.post('/api//delete', {id: id}, function (r) {
+                    //删除数据
+                    $('#id_table').bootstrapTable('remove', {field: 'id', values: [id]});
+                    //提醒消息
+                    layer.msg('删除成功', function () {
+
+                    });
+                });
+            });
+        },
+        /**
+         * 更新单行数据
+         * @param id
+         * @param row 行内容为空时，则从服务器获取数据
+         */
+        $updateRow: function (id, row) {
+            var line_index = index.$getIndexById(id);
+            if (jCommon.empty(row)) {
+                $.get('/migrate/table/getIndex', {id: id}, function (r) {
+                    //更新
+                    $('#id_table').bootstrapTable('updateRow', {index: line_index, row: r.info});
+                });
+            } else {
+                //更新
+                $('#id_table').bootstrapTable('updateRow', {index: line_index, row: row});
+            }
+        },
+        $remove: function (field_index) {
+            var fields = [];
+            var index_type = 'INDEX';
+            $.each(index.$items, function (k, v) {
+                if (v.index == field_index) {
+                    fields = v.fields;
+                    index_type = v.index_type;
+                    return false;
+                }
+            });
+            var layer_index = layer.confirm('确认删除索引“<span style="color: red;">' + field_index + '</span>”？', {
+                btn: ['否', '是'] //按钮
+            }, function () {
+                layer.close(layer_index);
+            }, function () {
+                $.get('/migrate/table/deleteIndex', {
+                    table_name: index.table_name,
+                    fields: fields,
+                    index_type: index_type
+                }, function (r) {
+                    layer.close(layer_index);
+                    layer.msg('删除索引成功:' + r.file, function () {
+
+                    });
+                    index.$refresh();
+                });
+            });
+        }
+    });
+
+    avalon.ready(function () {
+        index.$init();
+    });
+
+</script>

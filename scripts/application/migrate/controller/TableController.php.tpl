@@ -28,8 +28,7 @@ class TableController extends MigrateBaseController {
      * @throws \think\exception\PDOException
      */
     public function getList() {
-        $query         = new Query();
-        $tables_select = $query->query("SHOW TABLES");
+        $tables_select = $this->query("SHOW TABLES");
         $tables        = [];
         foreach ($tables_select as $k => $table) {
             $table = array_pop($table);
@@ -100,8 +99,7 @@ class TableController extends MigrateBaseController {
         $this->assign('api_functions', $api_functions);
         $key       = $this->getKey([$table_name]);
         $fields    = cache($key);
-        $query     = new Query();
-        $old_table = $query->query("SHOW TABLES LIKE '%$table_name'");
+        $old_table = $this->query("SHOW TABLES LIKE '%$table_name'");
         $file_path = $this->getMigrateFilePath($class_name);
         if (empty($old_table)) {
             //create
@@ -215,6 +213,7 @@ class TableController extends MigrateBaseController {
     /**
      * 备份数据
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -225,9 +224,8 @@ class TableController extends MigrateBaseController {
         $class_name = $this->getClassName([$table_name, 'data']);
         $table_name = $this->getTableNameWithPrefix($table_name);
         $this->assign('table_name_with_prefix', $table_name);
-        $query = new Query();
-        $query->setTable($table_name);
-        $all_count = $query->count();
+        $this->query_instance->setTable($table_name);
+        $all_count = $this->query_instance->count();
         if (empty($all_count)) {
             return $this->ar(2, ['message' => '数据为空，不可备份']);
         }
@@ -240,7 +238,7 @@ class TableController extends MigrateBaseController {
         $db_handle = fopen($db_file, 'w+');
         $is_write  = false;
         for ($page = 1; $page <= $all_page; $page++) {
-            $items = $query->page($page)->limit($limit)->select();
+            $items = $this->query_instance->page($page)->limit($limit)->select();
             foreach ($items as $each_item) {
                 fputs($db_handle, ($is_write ? "\n" : '') . json_encode($each_item, JSON_UNESCAPED_UNICODE));
                 $is_write = true;
@@ -253,6 +251,101 @@ class TableController extends MigrateBaseController {
         $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
+        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+    }
+
+    /**
+     * 获取索引列表
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function getIndexList() {
+        $table_name  = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $sql         = sprintf('show index from %s WHERE Key_name <> "PRIMARY"', $this->getTableNameWithPrefix($table_name));
+        $items       = $this->query($sql);
+        $index_items = [];
+        $item_index  = 0;
+        foreach ($items as $each) {
+            if (isset($index_items[$each['Key_name']])) {
+                $index_items[$each['Key_name']]['fields'][] = $each['Column_name'];
+            } else {
+                $item_index++;
+                $index_items[$each['Key_name']] = [
+                    'id'         => $item_index,
+                    'index'      => $each['Key_name'],
+                    'fields'     => [$each['Column_name']],
+                    'index_type' => $each['Index_type'] == 'FULLTEXT' ? 'FULLTEXT' : 'INDEX'
+                ];
+            }
+        }
+        $return = [
+            'limit'  => PAGES_NUM,
+            'offset' => 0,
+            'total'  => count($index_items),
+            'items'  => array_values($index_items)
+        ];
+        return $this->ar(1, $return);
+    }
+
+    /**
+     * 删除索引
+     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function deleteIndex() {
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $this->assign('table_name', $table_name);
+        $fields = get_param('fields', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '索引字段');
+        $this->assign('fields', json_encode($fields, JSON_UNESCAPED_UNICODE));
+        $index_type = get_param('index_type', ClFieldVerify::instance()->verifyInArray(['INDEX', 'UNIQUE', 'FULLTEXT'])->fetchVerifies(), '索引类型');
+        $this->assign('index_type', $index_type);
+        $class_name = $this->getClassName(array_merge([$table_name, 'delete', 'index'], $fields));
+        $this->assign('class_name', $class_name);
+        $this->assign('index_name', $this->getModelName(implode('_', array_merge(['index'], $fields)), false));
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_index_delete.tpl'));
+        $file_path     = $this->getMigrateFilePath($class_name);
+        //写入文件
+        file_put_contents($file_path, "<?php\n" . $table_content);
+        //执行
+        $this->run($table_name);
+        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+    }
+
+    /**
+     * 获取表引擎
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function getEngine() {
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $table_name = $this->getTableNameWithPrefix($table_name);
+        $result     = $this->query(sprintf('SHOW CREATE TABLE %s;', $table_name));
+        $result     = $result[0]['Create Table'];
+        $result     = ClString::getBetween($result, 'ENGINE=', ' ', false);
+        return $this->ar(1, ['engine' => $result]);
+    }
+
+    /**
+     * 删除索引
+     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function createIndex() {
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $this->assign('table_name', $table_name);
+        $fields = get_param('fields', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '索引字段');
+        $this->assign('fields', json_encode($fields, JSON_UNESCAPED_UNICODE));
+        $class_name = $this->getClassName(array_merge([$table_name, 'create', 'index'], $fields));
+        $this->assign('class_name', $class_name);
+        $this->assign('index_name', $this->getModelName(implode('_', array_merge(['index'], $fields)), false));
+        $index_type = get_param('index_type', ClFieldVerify::instance()->verifyInArray(['INDEX', 'UNIQUE', 'FULLTEXT'])->fetchVerifies(), '索引类型');
+        $this->assign('index_type', $index_type);
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_index_create.tpl'));
+        $file_path     = $this->getMigrateFilePath($class_name);
+        //写入文件
+        file_put_contents($file_path, "<?php\n" . $table_content);
+        //执行
+        $this->run($table_name);
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
     }
 
