@@ -516,15 +516,19 @@ class BaseModel extends Query {
                             //如果为空，则取消格式化
                             $item[$k_format_key . $each_format_item[1]] = '';
                         } else {
-                            $format_string = sprintf('%s;', sprintf($each_format_item[0], $item[$k_format_key]));
-                            $function      = ClString::getBetween($format_string, '', '(', false);
-                            $params        = ClString::getBetween($format_string, '(', ')', false);
-                            if (strpos($params, ',') !== false) {
-                                $params = explode(',', $params);
+                            if (empty($item[$k_format_key])) {
+                                $item[$k_format_key . $each_format_item[1]] = '';
                             } else {
-                                $params = [$params];
+                                $format_string = sprintf('%s;', sprintf($each_format_item[0], $item[$k_format_key]));
+                                $function      = ClString::getBetween($format_string, '', '(', false);
+                                $params        = ClString::getBetween($format_string, '(', ')', false);
+                                if (strpos($params, ',') !== false) {
+                                    $params = explode(',', $params);
+                                } else {
+                                    $params = [$params];
+                                }
+                                $item[$k_format_key . $each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
                             }
-                            $item[$k_format_key . $each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
                         }
                     } else {
                         //数组式格式化
