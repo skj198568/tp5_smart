@@ -149,7 +149,7 @@ class SmartInit extends Command {
      * @return bool
      * @throws \think\Exception
      */
-    protected function dealModelMap($table_name, Output $output) {
+    private function dealModelMap($table_name, Output $output) {
         $table_info = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
         if (empty($table_info)) {
             $output->highlight(sprintf('table name:%s is not exist.', $table_name));
@@ -334,7 +334,7 @@ class SmartInit extends Command {
      * @return bool
      * @throws \think\Exception
      */
-    protected function dealModel($table_name, Output $output) {
+    private function dealModel($table_name, Output $output) {
         $model_name_file = APP_PATH . 'index/model/' . $this->tableNameFormat($table_name) . 'Model.php';
         if (is_file($model_name_file)) {
             return false;
@@ -466,7 +466,7 @@ class SmartInit extends Command {
                     'class_name'    => $class_name,
                     'field_name'    => $each['Field'],
                     'json_return'   => json_encode([
-                        "status"      => 'api/'.$table_name.'/getfieldconfig' . strtolower($class_name) . "/1",
+                        "status"      => 'api/' . $table_name . '/getfieldconfig' . strtolower($class_name) . "/1",
                         "status_code" => 1,
                         "items"       => $json_return
                     ], JSON_UNESCAPED_UNICODE)
@@ -476,6 +476,12 @@ class SmartInit extends Command {
             if (isset($comment['show_map_fields'])) {
                 foreach ($comment['show_map_fields'] as $each_field) {
                     $info[$each_field[1]] = $each_field[2];
+                }
+            }
+            //拼接格式化字段
+            if (isset($comment['show_format'])) {
+                foreach ($comment['show_format'] as $each_field) {
+                    $info[$each['Field'] . $each_field[1]] = $comment['name'];
                 }
             }
         }
@@ -525,7 +531,7 @@ class SmartInit extends Command {
                 'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
                 'create_api'         => $table_comment['create_api'],
-                'fields_config'          => $fields_config
+                'fields_config'      => $fields_config
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
