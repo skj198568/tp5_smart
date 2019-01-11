@@ -17,12 +17,4 @@ use app\api\base\{$table_name}BaseApiController;
  */
 class {$table_name}Controller extends {$table_name}BaseApiController {
     
-    /**
-     * where条件
-     * @return array
-     */
-    protected function getListWhere() {
-        return [];
-    }
-
 }
