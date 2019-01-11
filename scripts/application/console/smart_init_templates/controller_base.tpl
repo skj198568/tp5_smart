@@ -19,6 +19,22 @@ class {$table_name}BaseApiController extends ApiController {
 <if condition="!empty($create_api) && in_array('get', $create_api)">
 
     /**
+     * where条件
+     * @return array
+     */
+    protected function getListWhere() {
+        return [];
+    }
+
+    /**
+     * 获取返回例子
+     * @return string
+     */
+    protected function getListReturnExample() {
+        return '{$ar_get_list_json}';
+    }
+
+    /**
      * 列表
      * @throws \think\Exception
      * @return \think\response\Json|\think\response\Jsonp
@@ -37,7 +53,7 @@ class {$table_name}BaseApiController extends ApiController {
             $return['items'] = {$table_name}Model::forShow($return['items']);
             //返回
             return $return;
-        }), '{$ar_get_list_json}');
+        }), static::getListReturnExample());
     }
         <else/>$where = [];
         return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($return) {
@@ -45,9 +61,17 @@ class {$table_name}BaseApiController extends ApiController {
             $return['items'] = {$table_name}Model::forShow($return['items']);
             //返回
             return $return;
-        }), '{$ar_get_list_json}');
+        }), static::getListReturnExample());
     }
     </present>
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function getReturnExample() {
+        return '{$ar_get_json}';
+    }
 
     /**
      * 单个信息
@@ -65,7 +89,15 @@ class {$table_name}BaseApiController extends ApiController {
         $info = {$table_name}Model::getById($id);
         </present>//拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
-        return $this->ar(1, ['info' => $info], '{$ar_get_json}');
+        return $this->ar(1, ['info' => $info], static::getReturnExample());
+    }
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function getByIdsReturnExample() {
+        return '{$ar_get_by_ids_json}';
     }
 
     /**
@@ -84,10 +116,18 @@ class {$table_name}BaseApiController extends ApiController {
         $items = {$table_name}Model::getItemsByIds($ids);
         </present>//拼接额外字段 & 格式化相关字段
         $items = {$table_name}Model::forShow($items);
-        return $this->ar(1, ['items' => $items], '{$ar_get_by_ids_json}');
+        return $this->ar(1, ['items' => $items], static::getByIdsReturnExample());
     }
 </if>
 <if condition="!empty($create_api) && in_array('create', $create_api)">
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function createReturnExample() {
+        return '{$ar_create_json}';
+    }
 
     /**
      * 创建
@@ -109,10 +149,18 @@ class {$table_name}BaseApiController extends ApiController {
         $info = {$table_name}Model::getById({$table_name}Model::instance()->getLastInsID());
         </present>//拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
-        return $this->ar(1, ['info' => $info], '{$ar_create_json}');
+        return $this->ar(1, ['info' => $info], static::createReturnExample());
     }
 </if>
 <if condition="!empty($create_api) && in_array('update', $create_api)">
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function updateReturnExample() {
+        return '{$ar_update_json}';
+    }
 
     /**
      * 更新
@@ -140,10 +188,18 @@ class {$table_name}BaseApiController extends ApiController {
         $info = {$table_name}Model::getById($id);
         </present>//拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
-        return $this->ar(1, ['info' => $info], '{$ar_update_json}');
+        return $this->ar(1, ['info' => $info], static::updateReturnExample());
     }
 </if>
 <if condition="!empty($create_api) && in_array('delete', $create_api)">
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function deleteReturnExample() {
+        return '{$ar_delete_json}';
+    }
 
     /**
      * 删除
@@ -163,7 +219,7 @@ class {$table_name}BaseApiController extends ApiController {
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => is_array($id) ? ['in', $id] : $id
         ])->delete();
-        </present>return $this->ar(1, ['id' => $id], '{$ar_delete_json}');
+        </present>return $this->ar(1, ['id' => $id], static::deleteReturnExample());
     }
 </if>
 <foreach name="fields_config" item="each_config">

@@ -16,5 +16,13 @@ use app\api\base\{$table_name}BaseApiController;
  * @package app\api\controller
  */
 class {$table_name}Controller extends {$table_name}BaseApiController {
+    
+    /**
+     * where条件
+     * @return array
+     */
+    protected function getListWhere() {
+        return [];
+    }
 
 }

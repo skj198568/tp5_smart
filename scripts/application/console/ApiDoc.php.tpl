@@ -53,7 +53,7 @@ class ApiDoc extends Command {
         $api      = [];
 //        echo_info('$files:', $files);
         foreach ($files as $each_file) {
-//            if (strpos($each_file, '/PlatformC') === false) {
+//            if (strpos($each_file, '/GroupC') === false) {
 //                continue;
 //            }
             $output->info($each_file);
@@ -82,7 +82,6 @@ class ApiDoc extends Command {
 //            echo_info('$class_desc:', $class_desc);
             foreach ($functions as $k => $each_function) {
                 list($each_file_temp, $each_function) = $each_function;
-//                echo_info($each_file_temp, $each_function);
                 //忽略的函数
                 $ignore = false;
                 foreach (['public function _empty'] as $each_ignore_function) {
@@ -98,13 +97,14 @@ class ApiDoc extends Command {
 //                if(strpos($each_file_temp, 'UserFocusController') === false){
 //                    continue;
 //                }
-//                echo_info($k);
-//                if ($k !== 'update') {
+//                if ($k !== 'getList') {
 //                    continue;
 //                }
+//                echo_info($k);
+//                echo_info($each_file_temp, $each_function);
                 $desc              = $this->getDescByFunctionContent($each_function);
                 $params            = $this->getParamsByFunctionContent($each_file_temp, $each_function);
-                $ar_items          = $this->getAjaxReturnByFunctionContent($each_function);
+                $ar_items          = $this->getAjaxReturnByFunctionContent($each_function, $each_file);
                 $ajax_return_items = [];
                 foreach ($ar_items as $status => $content) {
                     $ajax_return_items[sprintf('api-%s-%s', $this->getClassName($each_file), $status)] = $content;
@@ -220,6 +220,9 @@ class ApiDoc extends Command {
 //        }
         if (empty($file_absolute_url)) {
             return [];
+        }
+        if (empty($function_types)) {
+            $function_types = ['public', 'protected', 'private'];
         }
         $content = file_get_contents($file_absolute_url);
 //        echo_info('$content:', $content);
@@ -647,24 +650,36 @@ class ApiDoc extends Command {
     /**
      * 获取返回值
      * @param $function_content
+     * @param $file_absolute_url
      * @return array
      */
-    private function getAjaxReturnByFunctionContent($function_content) {
-        $ar_functions = ClString::parseToArray($function_content, '->ar', "}'");
-        $ar_return    = [];
+    private function getAjaxReturnByFunctionContent($function_content, $file_absolute_url) {
+        $ar_functions  = ClString::parseToArray($function_content, '->ar', "}'");
+        $ar_return     = [];
+        $function_name = $this->getFunctionName($function_content);
         foreach ($ar_functions as $each) {
-            $function_name = $this->getFunctionName($function_content);
-            $each          = ClString::spaceTrim($each);
-            $each          = rtrim($each, ';');
-            $each          = rtrim($each, ')');
-            $each          = str_replace(["'{", "}'"], ['"{', '}"'], $each);
-            $json_str      = '';
+            $each     = ClString::spaceTrim($each);
+            $each     = rtrim($each, ';');
+            $each     = rtrim($each, ')');
+            $each     = str_replace(["'{", "}'"], ['"{', '}"'], $each);
+            $json_str = '';
             if (strpos($each, '"{') !== false) {
                 $json_str = ClString::getBetween($each, '"{', '}"');
                 $json_str = trim($json_str, '"');
                 $json_str = ClString::jsonFormat($json_str, true);
             }
             $ar_return[sprintf('%s-%s', $function_name, ClString::getBetween($each, '(', ',', false))] = $json_str;
+        }
+        //拼接扩展返回
+        $ar_functions = ClString::parseToArray($function_content, 'static::', 'ReturnExample');
+        foreach ($ar_functions as $each) {
+            $each_function_name                                        = ClString::getBetween($each, '::', '', false);
+            $function_content                                          = $this->getAllFunctions($file_absolute_url, $each_function_name, []);
+            $function_content                                          = ClString::getBetween($function_content, "'{", "}'");
+            $function_content                                          = trim($function_content, "'");
+            $status_code                                               = json_decode($function_content, true);
+            $status_code                                               = $status_code['status_code'];
+            $ar_return[sprintf('%s-%s', $function_name, $status_code)] = $json_str = ClString::jsonFormat($function_content, true);
         }
         return $ar_return;
     }
