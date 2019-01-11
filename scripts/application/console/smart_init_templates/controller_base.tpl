@@ -48,7 +48,7 @@ class {$table_name}BaseApiController extends ApiController {
             {$table_name}Model::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]}<php>echo "\n";</php>
         ];
         <else/>$where = [];
-        </if>return $this->ar(1, $this->paging({$table_name}Model::instance(${$table_comment['partition'][0]}), $where, function ($return) {
+        </if>return $this->ar(1, $this->paging({$table_name}Model::instance(${$table_comment['partition'][0]}), array_merge($where, static::getListWhere()), function ($return) {
             //拼接额外字段 & 格式化相关字段
             $return['items'] = {$table_name}Model::forShow($return['items']);
             //返回
@@ -56,7 +56,7 @@ class {$table_name}BaseApiController extends ApiController {
         }), static::getListReturnExample());
     }
         <else/>$where = [];
-        return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($return) {
+        return $this->ar(1, $this->paging({$table_name}Model::instance(), array_merge($where, static::getListWhere()), function ($return) {
             //拼接额外字段 & 格式化相关字段
             $return['items'] = {$table_name}Model::forShow($return['items']);
             //返回
