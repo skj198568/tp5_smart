@@ -108,6 +108,11 @@
             _opt.complete = function (XMLHttpRequest, textStatus) {
                 ajax_complete_call_back(XMLHttpRequest, textStatus);
             };
+            //设置post参数方式，解决空数组不提交问题
+            if (_opt.type == 'post') {
+                _opt.contentType = "application/json;charset=utf-8";
+                _opt.data = JSON.stringify(_opt.data);
+            }
             return _ajax(_opt);
         };
     })(jQuery);
