@@ -19,6 +19,14 @@ use ClassLibrary\ClArray;
 class AreaBaseApiController extends ApiController {
 
     /**
+     * 获取返回例子
+     * @return string
+     */
+    protected function getListReturnExample() {
+        return '{"status":"api\/area\/getlist\/1","status_code":1,"limit":10,"offset":0,"total":10,"items":[{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}]}';
+    }
+
+    /**
      * 列表
      * @throws \think\Exception
      * @return \think\response\Json|\think\response\Jsonp
@@ -33,9 +41,17 @@ class AreaBaseApiController extends ApiController {
             $return['items'] = AreaModel::forShow($return['items']);
             //返回
             return $return;
-        }), '{"status":"api\/area\/getlist\/1","status_code":1,"limit":10,"offset":0,"total":10,"items":[{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}]}');
+        }), static::getListReturnExample());
     }
     
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function getReturnExample() {
+        return '{"status":"api\/area\/get\/1","status_code":1,"info":{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}}';
+    }
+
     /**
      * 单个信息
      * @return \think\response\Json|\think\response\Jsonp
@@ -49,7 +65,15 @@ class AreaBaseApiController extends ApiController {
         $info = AreaModel::getById($id);
         //拼接额外字段 & 格式化相关字段
         $info = AreaModel::forShow($info);
-        return $this->ar(1, ['info' => $info], '{"status":"api\/area\/get\/1","status_code":1,"info":{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}}');
+        return $this->ar(1, ['info' => $info], static::getReturnExample());
+    }
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function getByIdsReturnExample() {
+        return '{"status":"api\/area\/getbyids\/1","status_code":1,"items":[{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}]}';
     }
 
     /**
@@ -65,7 +89,7 @@ class AreaBaseApiController extends ApiController {
         $items = AreaModel::getItemsByIds($ids);
         //拼接额外字段 & 格式化相关字段
         $items = AreaModel::forShow($items);
-        return $this->ar(1, ['items' => $items], '{"status":"api\/area\/getbyids\/1","status_code":1,"items":[{"id":"主键id","name":"名称","f_id":"父类id","type":"类型，1\/省、直辖市，2\/城市，3\/区县: 1\/省\/直辖市; 2\/城市; 3\/区县;"}]}');
+        return $this->ar(1, ['items' => $items], static::getByIdsReturnExample());
     }
 
     /**
