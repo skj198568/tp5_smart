@@ -19,7 +19,7 @@ class {$table_name}BaseApiController extends ApiController {
 <if condition="!empty($create_api) && in_array('get', $create_api)">
 
     /**
-     * 获取返回例子
+     * 返回例子
      * @return string
      */
     protected function getListReturnExample() {
