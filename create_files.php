@@ -90,19 +90,13 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'FileController') !== false) {
+    } else if (strpos($target_file, 'api/controller/') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'ErrorController') !== false) {
-        if (!is_file($target_file)) {
-            //覆盖文件
-            echo 'copy file: ' . $target_file . PHP_EOL;
-            copy($file, $target_file);
-        }
-    } else if (strpos($target_file, 'IndexBaseController') !== false) {
+    }  else if (strpos($target_file, 'IndexBaseController') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
@@ -114,19 +108,13 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'Apps.php') !== false) {
+    }  else if (strpos($target_file, 'Apps.php') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'TaskController.php') !== false && strpos($target_file, 'api') !== false) {
-        if (!is_file($target_file)) {
-            //覆盖文件
-            echo 'copy file: ' . $target_file . PHP_EOL;
-            copy($file, $target_file);
-        }
-    } else if (strpos($target_file, 'users.ini') !== false) {
+    }  else if (strpos($target_file, 'users.ini') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;

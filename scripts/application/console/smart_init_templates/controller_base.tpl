@@ -9,6 +9,7 @@ use app\api\controller\ApiController;
 use app\index\model\{$table_name}Model;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClArray;
+{$use_content}
 
 /**
  * {$table_comment['name']} Base
@@ -19,7 +20,7 @@ class {$table_name}BaseApiController extends ApiController {
 <if condition="!empty($create_api) && in_array('get', $create_api)">
 
     /**
-     * 返回例子
+     * 获取返回例子
      * @return string
      */
     protected function getListReturnExample() {
@@ -231,5 +232,6 @@ class {$table_name}BaseApiController extends ApiController {
         return $this->ar(1, ['items' => $items], '{$each_config["json_return"]}');
     }
 </foreach>
+{$functions_content}
 
 }
