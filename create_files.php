@@ -25,7 +25,7 @@ foreach ($files as $file) {
     //如果目标文件不存在，则新建
     \ClassLibrary\ClFile::dirCreate($target_file);
     //不可直接覆盖的文件特殊处理
-    if ((strpos($target_file, 'BaseApiController') === false && strpos($target_file, 'ApiController') !== false) || strpos($target_file, 'task_run.ini') !== false) {
+    if (strpos($target_file, 'task_run.ini') !== false) {
         if (!is_file($target_file)) {
             //如果文件不存在，则覆盖文件，存在则忽略
             echo 'copy file: ' . $target_file . PHP_EOL;
@@ -90,13 +90,14 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'api/controller/') !== false) {
+    } else if (strpos($target_file, str_replace('/', DIRECTORY_SEPARATOR, 'api/controller/')) !== false) {
+        // api/controller目录下文件均不覆盖
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    }  else if (strpos($target_file, 'IndexBaseController') !== false) {
+    } else if (strpos($target_file, 'IndexBaseController') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
@@ -108,13 +109,13 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    }  else if (strpos($target_file, 'Apps.php') !== false) {
+    } else if (strpos($target_file, 'Apps.php') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    }  else if (strpos($target_file, 'users.ini') !== false) {
+    } else if (strpos($target_file, 'users.ini') !== false) {
         if (!is_file($target_file)) {
             //覆盖文件
             echo 'copy file: ' . $target_file . PHP_EOL;
