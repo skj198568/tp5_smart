@@ -118,6 +118,7 @@ class UrlShortBaseApiController extends ApiController {
         $info = UrlShortModel::forShow($info);
         return $this->ar(1, ['info' => $info], static::createReturnExample());
     }
+
     /**
      * 跳转地址
      * @throws \think\db\exception\DataNotFoundException

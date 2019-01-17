@@ -519,7 +519,17 @@ class SmartInit extends Command {
             'id'          => '主键id'
         ];
         $map_template_file  = __DIR__ . '/smart_init_templates/controller_base.tpl';
-        $content            = "<?php\n" . $this->view->fetch($map_template_file, [
+        $use_content_file = __DIR__ . '/smart_init_templates/base_controller_extra/' . $table_name . '_use.tpl';
+        $use_content      = '';
+        if (is_file($use_content_file)) {
+            $use_content = file_get_contents($use_content_file);
+        }
+        $functions_content_file = __DIR__ . '/smart_init_templates/base_controller_extra/' . $table_name . '_functions.tpl';
+        $functions_content      = '';
+        if (is_file($functions_content_file)) {
+            $functions_content = file_get_contents($functions_content_file);
+        }
+        $content = "<?php\n" . $this->view->fetch($map_template_file, [
                 'date'               => date('Y/m/d') . "\n",
                 'time'               => date('H:i:s') . "\n",
                 'table_name'         => $table_name_format,
@@ -531,7 +541,9 @@ class SmartInit extends Command {
                 'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
                 'create_api'         => $table_comment['create_api'],
-                'fields_config'      => $fields_config
+                'fields_config'      => $fields_config,
+                'use_content'        => $use_content,
+                'functions_content'  => $functions_content
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
