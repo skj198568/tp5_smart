@@ -1,4 +1,3 @@
-
     /**
      * 跳转地址
      * @throws \think\db\exception\DataNotFoundException

@@ -7,7 +7,7 @@ namespace app\index\map;
 
 use app\index\model\BaseModel;
 use ClassLibrary\ClArray;
-use ClassLibrary\ClCache;
+use ClassLibrary\ClCache;{$use_content}
 
 /**
  * {$table_comment['name']} Map
@@ -149,7 +149,7 @@ class {$table_name}Map extends BaseModel {
     protected function cacheRemoveTrigger($item) {
         if (is_numeric({$table_comment['is_cache']}) && isset($item['{$table_comment['partition'][0]}']) && isset($item[static::F_ID])) {
             static::getByIdRc($item['{$table_comment['partition'][0]}'], $item[static::F_ID]);
-        }
+        }{$cache_remove_trigger_content}
     }
     <else/>
 
@@ -160,7 +160,7 @@ class {$table_name}Map extends BaseModel {
     protected function cacheRemoveTrigger($item) {
         if (is_numeric({$table_comment['is_cache']}) && isset($item[static::F_ID])) {
             static::getByIdRc($item[static::F_ID]);
-        }
+        }{$cache_remove_trigger_content}
     }
 </present>
 <present name="table_comment['partition']">
@@ -540,6 +540,6 @@ class {$table_name}Map extends BaseModel {
             $this->tableCopy($source_table_name, $this->table);
         }
     }
-</present>
+</present>{$functions_content}
 
 }

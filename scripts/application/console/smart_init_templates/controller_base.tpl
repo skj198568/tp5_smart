@@ -8,8 +8,7 @@ namespace app\api\base;
 use app\api\controller\ApiController;
 use app\index\model\{$table_name}Model;
 use ClassLibrary\ClFieldVerify;
-use ClassLibrary\ClArray;
-{$use_content}
+use ClassLibrary\ClArray;{$use_content}
 
 /**
  * {$table_comment['name']} Base
@@ -233,5 +232,4 @@ class {$table_name}BaseApiController extends ApiController {
     }
 </foreach>
 {$functions_content}
-
 }

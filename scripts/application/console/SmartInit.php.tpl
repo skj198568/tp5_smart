@@ -285,27 +285,45 @@ class SmartInit extends Command {
             $fields_verifies_string .= sprintf('
         %s => %s, ', $field, json_encode($verify_array, JSON_UNESCAPED_UNICODE));
         }
+        $use_file    = __DIR__ . '/smart_init_templates/model_map_extra/' . $table_name . '_use.tpl';
+        $use_content = "\n";
+        if (is_file($use_file)) {
+            $use_content = "\n" . file_get_contents($use_file) . "\n";
+        }
+        $functions_file    = __DIR__ . '/smart_init_templates/model_map_extra/' . $table_name . '_functions.tpl';
+        $functions_content = '';
+        if (is_file($functions_file)) {
+            $functions_content = "\n" . file_get_contents($functions_file) . "\n";
+        }
+        $cache_remove_trigger_file    = __DIR__ . '/smart_init_templates/model_map_extra/' . $table_name . '_cache_remove_trigger.tpl';
+        $cache_remove_trigger_content = "\n";
+        if (is_file($cache_remove_trigger_file)) {
+            $cache_remove_trigger_content = "\n" . file_get_contents($cache_remove_trigger_file) . "\n";
+        }
         $content     = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date'                        => date('Y/m/d') . "\n",
-                'time'                        => date('H:i:s') . "\n",
-                'table_comment'               => $this->getTableComment($table_name),
-                'table_name'                  => $this->tableNameFormat($table_name),
-                'table_name_with_prefix'      => $this->getTableNameWithPrefix($table_name),
-                'const_fields'                => $const_fields,
-                'fields_verifies'             => empty($fields_verifies_string) ? '' : trim($fields_verifies_string, ',') . "\n    ",
-                'fields_read_only'            => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
-                'all_fields_str'              => implode(', ', $all_fields),
-                'fields_show_map_fields'      => $fields_show_map_fields,
-                'fields_show_map_fields_keys' => array_keys($fields_show_map_fields),
-                'fields_show_format'          => $fields_show_format,
-                'fields_show_format_keys'     => array_keys($fields_show_format),
-                'fields_store_format'         => $fields_store_format,
-                'fields_store_format_keys'    => array_keys($fields_store_format),
-                'fields_invisible'            => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
-                'fields_names'                => $fields_names,
-                'fields_names_keys'           => array_keys($fields_names),
-                'fields_default_values'       => $fields_default_values,
-                'fields_default_values_keys'  => array_keys($fields_default_values),
+                'date'                         => date('Y/m/d') . "\n",
+                'time'                         => date('H:i:s') . "\n",
+                'table_comment'                => $this->getTableComment($table_name),
+                'table_name'                   => $this->tableNameFormat($table_name),
+                'table_name_with_prefix'       => $this->getTableNameWithPrefix($table_name),
+                'const_fields'                 => $const_fields,
+                'fields_verifies'              => empty($fields_verifies_string) ? '' : trim($fields_verifies_string, ',') . "\n    ",
+                'fields_read_only'             => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
+                'all_fields_str'               => implode(', ', $all_fields),
+                'fields_show_map_fields'       => $fields_show_map_fields,
+                'fields_show_map_fields_keys'  => array_keys($fields_show_map_fields),
+                'fields_show_format'           => $fields_show_format,
+                'fields_show_format_keys'      => array_keys($fields_show_format),
+                'fields_store_format'          => $fields_store_format,
+                'fields_store_format_keys'     => array_keys($fields_store_format),
+                'fields_invisible'             => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
+                'fields_names'                 => $fields_names,
+                'fields_names_keys'            => array_keys($fields_names),
+                'fields_default_values'        => $fields_default_values,
+                'fields_default_values_keys'   => array_keys($fields_default_values),
+                'use_content'                  => $use_content,
+                'functions_content'            => $functions_content,
+                'cache_remove_trigger_content' => $cache_remove_trigger_content
             ]);
         $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         $old_content = '';
@@ -519,15 +537,15 @@ class SmartInit extends Command {
             'id'          => '主键id'
         ];
         $map_template_file  = __DIR__ . '/smart_init_templates/controller_base.tpl';
-        $use_content_file = __DIR__ . '/smart_init_templates/base_controller_extra/' . $table_name . '_use.tpl';
-        $use_content      = '';
+        $use_content_file   = __DIR__ . '/smart_init_templates/controller_base_extra/' . $table_name . '_use.tpl';
+        $use_content        = "\n";
         if (is_file($use_content_file)) {
-            $use_content = file_get_contents($use_content_file);
+            $use_content = "\n" . file_get_contents($use_content_file);
         }
-        $functions_content_file = __DIR__ . '/smart_init_templates/base_controller_extra/' . $table_name . '_functions.tpl';
-        $functions_content      = '';
+        $functions_content_file = __DIR__ . '/smart_init_templates/controller_base_extra/' . $table_name . '_functions.tpl';
+        $functions_content      = "\n";
         if (is_file($functions_content_file)) {
-            $functions_content = file_get_contents($functions_content_file);
+            $functions_content = "\n" . file_get_contents($functions_content_file) . "\n\n";
         }
         $content = "<?php\n" . $this->view->fetch($map_template_file, [
                 'date'               => date('Y/m/d') . "\n",

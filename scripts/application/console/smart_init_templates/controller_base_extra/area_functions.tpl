@@ -1,4 +1,3 @@
-
     /**
      * 按名字获取
      * @return \think\response\Json|\think\response\Jsonp
