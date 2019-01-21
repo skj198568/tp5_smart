@@ -27,7 +27,7 @@ class {$table_name}Map extends BaseModel {
      * @var string
      */
     protected $table = '{$table_name_with_prefix}';
-    {$const_fields}
+{$const_fields}
 
     /**
      * 字段校验，用于字段内容判断
@@ -131,11 +131,11 @@ class {$table_name}Map extends BaseModel {
                 static::$instances_array[$id] = new static();
             }
             return static::$instances_array[$id];
-        }else if($id == -1) {
+        } else if ($id == -1) {
             return count(static::$instances_array);
-        }else if($id == -2) {
+        } else if ($id == -2) {
             return static::instance(count(static::$instances_array));
-        }else{
+        } else {
             return null;
         }
     }

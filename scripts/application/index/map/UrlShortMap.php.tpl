@@ -30,7 +30,7 @@ class UrlShortMap extends BaseModel {
      * @var string
      */
     protected $table = 't_url_short';
-    
+
     /**
      * 短连接
      * Type: varchar(255)
@@ -140,11 +140,11 @@ class UrlShortMap extends BaseModel {
                 static::$instances_array[$id] = new static();
             }
             return static::$instances_array[$id];
-        }else if($id == -1) {
+        } else if ($id == -1) {
             return count(static::$instances_array);
-        }else if($id == -2) {
+        } else if ($id == -2) {
             return static::instance(count(static::$instances_array));
-        }else{
+        } else {
             return null;
         }
     }

@@ -29,7 +29,7 @@ class TaskMap extends BaseModel {
      * @var string
      */
     protected $table = 't_task';
-    
+
     /**
      * 带有命名空间的任务调用地址
      * Type: varchar(255)
@@ -150,11 +150,11 @@ class TaskMap extends BaseModel {
                 static::$instances_array[$id] = new static();
             }
             return static::$instances_array[$id];
-        }else if($id == -1) {
+        } else if ($id == -1) {
             return count(static::$instances_array);
-        }else if($id == -2) {
+        } else if ($id == -2) {
             return static::instance(count(static::$instances_array));
-        }else{
+        } else {
             return null;
         }
     }
