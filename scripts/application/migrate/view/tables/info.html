@@ -1288,15 +1288,15 @@
                         table_info.const_values = 1;
                         table_info.const_values_json = v.const_values;
                     }
-                    console.log(table_info.const_values,
-                        table_info.const_values_json);
                     if (v.hasOwnProperty('show_map_fields') && !jCommon.empty(v.show_map_fields)) {
                         table_info.show_map_fields = 1;
                         table_info.show_map_fields_json = v.show_map_fields;
                     }
                     if (v.hasOwnProperty('show_format') && !jCommon.empty(v.show_format)) {
                         table_info.show_format = 1;
-                        table_info.show_format_str = v.show_format;
+                        //只显示内容部分
+                        var show_format = JSON.parse(v.show_format);
+                        table_info.show_format_str = show_format[0][0];
                     }
                     if (v.hasOwnProperty('store_format') && !jCommon.empty(v.store_format)) {
                         if (jCommon.isArray(v.store_format)) {
@@ -1305,7 +1305,6 @@
                         } else {
                             table_info.store_format = v.store_format;
                         }
-                        console.log('aaa', table_info.store_format);
                     } else {
                         table_info.store_format = 'string';
                     }
