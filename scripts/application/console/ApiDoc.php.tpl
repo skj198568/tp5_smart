@@ -12,6 +12,7 @@ namespace app\console;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
+use ClassLibrary\ClSystem;
 use ClassLibrary\ClVerify;
 use think\Config;
 use think\console\Command;
@@ -45,6 +46,10 @@ class ApiDoc extends Command {
      * @throws \think\Exception
      */
     protected function execute(Input $input, Output $output) {
+        if (ClSystem::isWin()) {
+            $output->error('请在Linux环境下执行');
+            return;
+        }
         //设置view
         $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
         //处理base
@@ -502,8 +507,8 @@ class ApiDoc extends Command {
                 if (!is_file($class_const_file_absolute_url)) {
                     continue;
                 }
-                $class_const_content = file_get_contents($class_const_file_absolute_url);
-                $class_const_content = ClString::parseToArray($class_const_content, '/**', ';');
+                $class_const_file_absolute_url_content = file_get_contents($class_const_file_absolute_url);
+                $class_const_content                   = ClString::parseToArray($class_const_file_absolute_url_content, '/**', ';');
                 foreach ($class_const_content as $k => $v) {
                     if (strpos($v, 'const F_') === false) {
                         unset($class_const_content[$k]);
@@ -529,7 +534,25 @@ class ApiDoc extends Command {
                                 $each_const_param_line = trim($each_const_param_line);
                                 $remark[]              = $each_const_param_line;
                             }
-                            $remark         = implode('; ', $remark);
+                            //丰富remark信息
+                            if (strpos($class_const_file_absolute_url_content, 'const C_' . strtoupper($each_param)) !== false) {
+                                $field_config  = sprintf('%s::C_' . strtoupper($each_param), $class_name_with_namespace);
+                                $remark_append = [];
+                                eval(sprintf('$field_config=%s;', $field_config));
+                                foreach ($field_config as $each_field_key => $each_field_config) {
+                                    $remark_append[] = $each_field_key . '/' . $each_field_config;
+                                }
+                                $remark[] = 'Config: ' . implode('、', $remark_append);
+                            }
+                            //美化
+                            foreach ($remark as $k_remark => $v_remark) {
+                                if (strpos($v_remark, ':') !== false) {
+                                    $v_remark_pre = ClString::getBetween($v_remark, ':', '', false);
+                                    $v_remark     = str_replace($v_remark_pre, '<span style="color: red;">' . $v_remark_pre . '</span>', $v_remark);
+                                }
+                                $remark[$k_remark] = $v_remark;
+                            }
+                            $remark         = implode('<span style="color: blue;">; </span>', $remark);
                             $return_array[] = [
                                 'name'    => $each_param,
                                 'filters' => isset($fields_verifies[$each_param]) ? ClFieldVerify::getNamesStringByVerifies($fields_verifies[$each_param]) : '无',
