@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: SmartInit
- * Date: 2018/05/05
- * Time: 19:58:34
+ * Date: 2019/01/23
+ * Time: 17:29:27
  */
 
 namespace app\index\model;
@@ -11,7 +11,10 @@ namespace app\index\model;
 use app\index\map\AreaMap;
 
 /**
- * 地址信息 Model
+ * 地址信息
+ * 如果有需要，请重写父类接口，不可直接修改父类函数，会被自动覆盖掉。
+ * Class AreaModel
+ * @package app\index\model
  */
 class AreaModel extends AreaMap {
 
