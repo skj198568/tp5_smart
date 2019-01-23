@@ -369,7 +369,7 @@ class SmartInit extends Command {
                 //写入文件
                 file_put_contents($model_name_file, $model_content);
                 //输出
-                $output->highlight('Modify Model Name:' . $model_name_file);
+                $output->highlight('[Model]:modify model name ' . $model_name_file);
             }
             return false;
         }
@@ -627,7 +627,7 @@ class SmartInit extends Command {
                 //写入文件
                 file_put_contents($api_controller_file, $controller_content);
                 //输出
-                $output->highlight('Modify Controller Name:' . $api_controller_file);
+                $output->highlight('[Api]:modify controller name ' . $api_controller_file);
             }
             return false;
         }
