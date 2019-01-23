@@ -1,46 +1,63 @@
 <if condition="$item_index%2 eq 0">
-    <div style="padding: 1em;">
+    <div>
         <else/>
-        <div style="padding:1em;background-color: #F5FFFA;">
+        <div style="background-color: #F5FFFA;">
 </if>
-<a name="{$a_name}"></a>
-<p><span class="text-danger">{$id}. </span>{$api_desc}</p>
-<p class="text-danger" style="border: 1px #CCCCCC dashed;padding: 0.5em;">
-    {$url}
+<a id="id_a_anchor_{$id}" name="{$a_name}" data-id="{$id}"></a>
+<p>
+    <a href="javascript: void(0);" id="id_a_{$id}" onclick="javascript:openOrCloseApi('{$id}')"
+       onmouseover="javascript: mouseOver('{$id}')"
+       onmouseout="javascript: mouseOut('{$id}')"
+       style="cursor: pointer;border-bottom: 1px #FFFFFF dashed;text-decoration : none" title="请点击">
+        <span class="text-danger">{$id}. </span>{$api_desc}
+        <span id="id_span_api_url_{$id}" style="color: red;margin-left: 1em;">({$url})</span>
+    </a>
 </p>
-<notempty name="params">
-    <!--表格begin-->
-    <table class="table table-hover table-bordered table-condensed"
-           style="margin-top: 1em;table-layout: fixed;">
-        <thead>
-        <tr>
-            <th style="width: 20%;">名称</th>
-            <th style="width: 30%;">校验条件</th>
-            <th style="width: 50%;">描述</th>
-        </tr>
-        </thead>
-        <tbody>
-        <foreach name="params" item="vo">
+<div id="id_div_{$id}" style="display: none;padding-left: 1em;padding-right: 1em;">
+    请求地址：
+    <p class="text-danger" style="border: 1px #CCCCCC dashed;padding: 0.5em;">
+        {$url}
+    </p>
+    <notempty name="params">
+        请求参数：
+        <!--表格begin-->
+        <table class="table table-hover table-bordered table-condensed"
+               style="table-layout: fixed;">
+            <thead>
             <tr>
-                <td style="width: 20%;">{$vo['name']}</td>
-                <td style="width: 30%;word-wrap:break-word;word-break:break-all;"><span class="text-danger">{$vo['filters']}</span>
-                </td>
-                <td style="width: 50%;word-wrap:break-word;word-break:break-all;"><span class="text-info">{$vo['remark']}</span>
-                </td>
+                <th style="width: 20%;">名称</th>
+                <th style="width: 30%;">校验条件</th>
+                <th style="width: 50%;">描述</th>
             </tr>
-        </foreach>
-        </tbody>
-    </table>
-    <!--表格end-->
-</notempty>
-<empty name="ar_returns">
-    <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
-        无
+            </thead>
+            <tbody>
+            <foreach name="params" item="vo">
+                <tr>
+                    <td style="width: 20%;">{$vo['name']}</td>
+                    <td style="width: 30%;word-wrap:break-word;word-break:break-all;"><span class="text-danger">{$vo['filters']}</span>
+                    </td>
+                    <td style="width: 50%;word-wrap:break-word;word-break:break-all;"><span class="text-info">{$vo['remark']}</span>
+                    </td>
+                </tr>
+            </foreach>
+            </tbody>
+        </table>
+        <!--表格end-->
+    </notempty>
+    输出内容：
+    <empty name="ar_returns">
+        <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
+            无
+        </p>
+    </empty>
+    <foreach name="ar_returns" item="vo">
+        <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
+            {:empty($vo) ? '无' : $vo}
+        </p>
+    </foreach>
+    文档地址：
+    <p class="text-danger" style="border: 1px #CCCCCC dashed;padding: 0.5em;color: #00b7ee;">
+        <span class="class_span_api_request_url"></span>#{$a_name}
     </p>
-</empty>
-<foreach name="ar_returns" item="vo">
-    <p style="border: 1px #CCCCCC dashed;padding: 0.5em;">
-        {:empty($vo) ? '无' : $vo}
-    </p>
-</foreach>
+</div>
 </div>

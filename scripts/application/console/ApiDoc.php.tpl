@@ -122,8 +122,10 @@ class ApiDoc extends Command {
         $api_item_template = __DIR__ . '/api_doc_templates/api_item.html';
         $id                = 0;
 //        echo_info($api);
-        $item_index = 0;
-        $menu       = [];
+        $item_index    = 0;
+        $menu          = [];
+        $color         = 'black';
+        $last_api_desc = '';
         foreach ($api as $request_url => $each_content) {
             $id++;
             foreach ($each_content[1] as $param_key => $param_item) {
@@ -131,11 +133,23 @@ class ApiDoc extends Command {
                     $each_content[1][$param_key]['filters'] = str_replace(';', '<span style="color: blue;">; </span>', $param_item['filters']);
                 }
             }
+            //美化api_desc
+            $api_desc                 = $each_content[0];
+            $api_desc_controller_name = ClString::getBetween($api_desc, '', '/', false);
+            if (!empty($last_api_desc)) {
+                if ($api_desc_controller_name != ClString::getBetween($last_api_desc, '', '/', false)) {
+                    $color = ($color == 'black') ? 'blue' : 'black';
+                }
+            }
+            //赋值给上一个接口
+            $last_api_desc = $api_desc;
+            //替换
+            $api_desc  = str_replace($api_desc_controller_name, sprintf('<span style="color:%s;">%s</span>', $color, $api_desc_controller_name), $api_desc);
             $a_name    = 'name' . str_replace('/', '_', $request_url);
             $api_items .= $this->view->fetch($api_item_template, [
-                'id'         => $id,
-                'api_desc'   => $each_content[0] . "\n",
-                'url'        => str_replace('/', '<span style="color: blue;">/</span>', $request_url) . "\n",
+                'id'         => ClString::append($id, 0, 3),
+                'api_desc'   => $api_desc,
+                'url'        => str_replace('/', '<span style="color: blue;">/</span>', $request_url),
                 'params'     => $each_content[1],
                 'ar_returns' => $each_content[2],
                 'a_name'     => $a_name,

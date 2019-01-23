@@ -9,39 +9,78 @@
     <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdn.staticfile.org/scrollup/2.4.1/jquery.scrollUp.min.js"></script>
     <style type="text/css">
-        *{
-            font-family: Consolas, "Century Gothic",  "Liberation Mono", Courier, Verdana;
+        * {
+            font-family: Consolas, "Century Gothic", "Liberation Mono", Courier, Verdana;
         }
     </style>
 </head>
 <body class="container-fluid">
 <div class="row">
-    <div class="col-md-8 col-md-offset-1" style="padding-bottom: 2em;">
+    <div class="col-md-10 col-md-offset-1" style="padding-bottom: 2em;">
         <h2 style="text-align: center;margin: 1em;">
             Api（共 <span class="text-danger">{$api_count}</span> 个）
         </h2>
         <hr>
         {$api_items}
     </div>
-    <div class="col-md-3" style="padding-top: 1em;">
-        <!--垂直排列按钮组begin-->
-        <div class="btn-group-vertical bs-docs-sidebar hidden-print hidden-xs hidden-sm affix">
-            <foreach name="menu" item="v" key="k">
-                <div class="btn-group {:$k > 20 ? 'dropup' : ''}">
-                    <button id="id_{$v['controller']}" type="button" class="btn {:$k%2 == 0 ? 'btn-success' : 'btn-default'} dropdown-toggle btn-xs" data-toggle="dropdown" style="text-align: left;">
-                        {$k+1}. {$v['name']}
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="id_{$v['controller']}">
-                        <foreach name="v['sons']" item="v_son" key="k_son">
-                            <li><a href="#{$v_son['href']}">{$v_son['id']}. {$v_son['name']}</a></li>
-                        </foreach>
-                    </ul>
-                </div>
-            </foreach>
-        </div>
-        <!--垂直排列按钮组end-->
-    </div>
 </div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //拼接访问地址
+        var url = window.location.origin + window.location.pathname + $('.class_span_api_request_url').html();
+        $('.class_span_api_request_url').html(url);
+        //处理显示
+        if (window.location.hash.length > 0) {
+            var hash = window.location.hash.substring(1);
+            var id = $("a[name='" + hash + "']").attr('data-id');
+            openOrCloseApi(id);
+        }
+    });
+
+    //已经打开的ids
+    var opened_ids = [];
+
+    /**
+     * 打开或关闭
+     * @param id
+     */
+    function openOrCloseApi(id) {
+        if (opened_ids.indexOf(id) > -1) {
+            //收起
+            $('#id_div_' + id).hide();
+            var _ids = [];
+            $.each(opened_ids, function (k, v) {
+                if (v != id) {
+                    _ids.push(v);
+                }
+            });
+            opened_ids = _ids;
+        } else {
+            //展开
+            $('#id_div_' + id).show();
+            opened_ids.push(id);
+        }
+    }
+
+    /**
+     * 鼠标over
+     * @param id
+     */
+    function mouseOver(id) {
+        $('#id_span_api_url_' + id).css('color', 'blue');
+        $('#id_a_' + id).css('border-bottom', '1px #AAAAAA dashed');
+    }
+
+    /**
+     * 鼠标out
+     * @param id
+     */
+    function mouseOut(id) {
+        $('#id_span_api_url_' + id).css('color', 'red');
+        $('#id_a_' + id).css('border-bottom', '1px #FFFFFF dashed');
+    }
+
+</script>
 </body>
 </html>
