@@ -42,13 +42,13 @@ class ApiDoc extends Command {
      * 执行
      * @param Input $input
      * @param Output $output
-     * @return int|null|void
+     * @return bool|int|null
      * @throws \think\Exception
      */
     protected function execute(Input $input, Output $output) {
         if (ClSystem::isWin()) {
             $output->error('请在Linux环境下执行');
-            return;
+            return false;
         }
         //设置view
         $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));

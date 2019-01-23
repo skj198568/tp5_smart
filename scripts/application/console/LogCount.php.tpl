@@ -11,6 +11,7 @@ namespace app\console;
 
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
+use ClassLibrary\ClSystem;
 use think\Config;
 use think\console\Command;
 use think\console\Input;
@@ -48,6 +49,10 @@ class LogCount extends Command {
      * @throws \think\Exception
      */
     protected function execute(Input $input, Output $output) {
+        if (ClSystem::isWin()) {
+            $output->error('请在Linux环境下执行');
+            return false;
+        }
         if ($input->hasOption('start_day')) {
             $start_day = intval($input->getOption('start_day'));
         } else {

@@ -12,6 +12,7 @@ namespace app\console;
 
 use ClassLibrary\ClDataCronTab;
 use ClassLibrary\ClFile;
+use ClassLibrary\ClSystem;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
@@ -39,9 +40,13 @@ class TaskRun extends Command {
      * 执行
      * @param Input $input
      * @param Output $output
-     * @return bool
+     * @return bool|int|null
      */
     protected function execute(Input $input, Output $output) {
+        if (ClSystem::isWin()) {
+            $output->error('请在Linux环境下执行');
+            return false;
+        }
         $task_ini_file = __DIR__ . '/task_run.ini';
         if (!is_file($task_ini_file)) {
             file_put_contents($task_ini_file, ';执行命令=类似crontab的执行时间定义，支持到秒一级任务定义 */秒 */分 */时 */日 */月 */周

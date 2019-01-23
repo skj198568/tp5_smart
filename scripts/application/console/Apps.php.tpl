@@ -12,6 +12,7 @@ namespace app\console;
 
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
+use ClassLibrary\ClSystem;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
@@ -87,9 +88,13 @@ class Apps extends Command {
      * 执行
      * @param Input $input
      * @param Output $output
-     * @return bool
+     * @return bool|int|null
      */
     protected function execute(Input $input, Output $output) {
+        if (ClSystem::isWin()) {
+            $output->error('请在Linux环境下执行');
+            return false;
+        }
         set_time_limit(0);
         //创建文件夹
         ClFile::dirCreate($this->getPortSrc());

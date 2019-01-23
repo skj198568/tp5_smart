@@ -13,6 +13,7 @@ use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClMysql;
 use ClassLibrary\ClString;
+use ClassLibrary\ClSystem;
 use think\Config;
 use think\console\Command;
 use think\console\Input;
@@ -42,10 +43,14 @@ class SmartInit extends Command {
      * 执行
      * @param Input $input
      * @param Output $output
-     * @return int|null|void
+     * @return bool|int|null
      * @throws \think\Exception
      */
     protected function execute(Input $input, Output $output) {
+        if (ClSystem::isWin()) {
+            $output->error('请在Linux环境下执行');
+            return false;
+        }
         //设置view
         $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
         //设置Mysql
