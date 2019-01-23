@@ -355,14 +355,32 @@ class SmartInit extends Command {
     private function dealModel($table_name, Output $output) {
         $model_name_file = APP_PATH . 'index/model/' . $this->tableNameFormat($table_name) . 'Model.php';
         if (is_file($model_name_file)) {
+            //仅更改Model名称
+            $model_content = file_get_contents($model_name_file);
+            $class_desc    = ClString::getBetween($model_content, '/**', ' extends ', false);
+            $class_desc    = explode("\n", $class_desc);
+            //第一行即Model注释
+            $desc           = $class_desc[0];
+            $table_comment  = $this->getTableComment($table_name);
+            $new_model_desc = '* ' . $table_comment['name'];
+            if ($desc != $new_model_desc) {
+                //替换Model name
+                $model_content = str_replace($desc, $new_model_desc, $model_content);
+                //写入文件
+                file_put_contents($model_name_file, $model_content);
+                //输出
+                $output->highlight('Modify Model Name:' . $model_name_file);
+            }
             return false;
         }
-        $template_file = __DIR__ . '/smart_init_templates/model.tpl';
-        $content       = "<?php\n" . $this->view->fetch($template_file, [
+        $template_file         = __DIR__ . '/smart_init_templates/model.tpl';
+        $table_comment         = $this->getTableComment($table_name);
+        $table_comment['name'] .= "\n";
+        $content               = "<?php\n" . $this->view->fetch($template_file, [
                 'date'          => date('Y/m/d') . "\n",
                 'time'          => date('H:i:s') . "\n",
                 'table_name'    => $this->tableNameFormat($table_name),
-                'table_comment' => $this->getTableComment($table_name)
+                'table_comment' => $table_comment
             ]);
         if (!empty($content)) {
             //写入
@@ -595,6 +613,22 @@ class SmartInit extends Command {
     private function dealController($table_name, Output $output) {
         $api_controller_file = APP_PATH . 'api/controller/' . $this->tableNameFormat($table_name) . 'Controller.php';
         if (is_file($api_controller_file)) {
+            //仅更改名称
+            $controller_content = file_get_contents($api_controller_file);
+            $class_desc         = ClString::getBetween($controller_content, '/**', ' extends ', false);
+            $class_desc = explode("\n", $class_desc);
+            //第一行即注释
+            $desc = $class_desc[0];
+            $table_comment  = $this->getTableComment($table_name);
+            $new_desc = '* ' . $table_comment['name'];
+            if ($desc != $new_desc) {
+                //替换Model name
+                $controller_content = str_replace($desc, $new_desc, $controller_content);
+                //写入文件
+                file_put_contents($api_controller_file, $controller_content);
+                //输出
+                $output->highlight('Modify Controller Name:' . $api_controller_file);
+            }
             return false;
         }
         $map_template_file     = __DIR__ . '/smart_init_templates/controller.tpl';
