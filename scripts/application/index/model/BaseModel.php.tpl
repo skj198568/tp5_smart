@@ -208,6 +208,8 @@ class BaseModel extends Query {
                 }
             }
         }
+        //校验参数
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, $operate_type, $this->is_divide_table ? null : static::instance());
         return $data;
     }
 
@@ -258,9 +260,7 @@ class BaseModel extends Query {
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //预处理数据
-        $data = static::preprocessDataBeforeExecute($data, 'insert');
-        //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
+        $data   = static::preprocessDataBeforeExecute($data, 'insert');
         $result = parent::insert($data, $replace, $getLastInsID, $sequence);
         //执行
         if (!ClArray::isLinearArray($data)) {
@@ -289,8 +289,6 @@ class BaseModel extends Query {
         foreach ($dataSet as $k_data => $data) {
             //预处理数据
             $data = static::preprocessDataBeforeExecute($data, 'insert');
-            //校验数据
-            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
             //替换数据
             $dataSet[$k_data] = $data;
         }
@@ -317,8 +315,6 @@ class BaseModel extends Query {
      * @throws \think\exception\PDOException
      */
     public function update(array $data = []) {
-        //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', $this->is_divide_table ? null : static::instance());
         //预处理数据
         $data = static::preprocessDataBeforeExecute($data, 'update');
         return parent::update($data);
