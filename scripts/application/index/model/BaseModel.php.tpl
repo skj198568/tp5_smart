@@ -138,6 +138,32 @@ class BaseModel extends Query {
     }
 
     /**
+     * 在操作数据库之前预处理数据
+     * @param array $data
+     * @param string $operate_type 操作类型insert/update
+     * @return array
+     */
+    protected function preprocessDataBeforeOperateDb($data, $operate_type) {
+        $data = array_merge(self::$fields_default_values, $data);
+        if ($operate_type == 'insert') {
+            //自动完成字段
+            if (in_array('create_time', static::getAllFields())) {
+                if (!isset($data['create_time']) || empty($data['create_time'])) {
+                    $data['create_time'] = time();
+                }
+            }
+        } else if ($operate_type == 'update') {
+            //自动完成字段
+            if (in_array('update_time', static::getAllFields())) {
+                if (!isset($data['update_time']) || empty($data['update_time'])) {
+                    $data['update_time'] = time();
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
      * 重写execute方法，用于清除缓存
      * @param string $sql
      * @param array $bind
@@ -183,16 +209,10 @@ class BaseModel extends Query {
      * @return int|string
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
-        //拼接默认值
-        $data = array_merge(static::$fields_default_values, $data);
+        //预处理数据
+        $data = static::preprocessDataBeforeOperateDb($data, 'insert');
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
-        //自动完成字段
-        if (in_array('create_time', static::getAllFields())) {
-            if (!isset($data['create_time']) || empty($data['create_time'])) {
-                $data['create_time'] = time();
-            }
-        }
         //存储格式处理
         if (!empty(static::$fields_store_format)) {
             foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
@@ -255,19 +275,13 @@ class BaseModel extends Query {
     public function insertAll(array $dataSet, $replace = false, $limit = null) {
         //校验参数
         foreach ($dataSet as $k_data => $data) {
-            //拼接默认值
-            $data             = array_merge(static::$fields_default_values, $data);
-            $dataSet[$k_data] = $data;
+            //预处理数据
+            $data = static::preprocessDataBeforeOperateDb($data, 'insert');
             ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
+            $dataSet[$k_data] = $data;
         }
         //字段处理
         foreach ($dataSet as $k_data => $data) {
-            //自动完成字段
-            if (in_array('create_time', static::getAllFields())) {
-                if (!isset($data['create_time']) || empty($data['create_time'])) {
-                    $data['create_time'] = time();
-                }
-            }
             //存储格式处理
             if (!empty(static::$fields_store_format)) {
                 foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
@@ -331,12 +345,8 @@ class BaseModel extends Query {
     public function update(array $data = []) {
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', $this->is_divide_table ? null : static::instance());
-        //自动完成字段
-        if (in_array('update_time', static::getAllFields())) {
-            if (!isset($data['update_time']) || empty($data['update_time'])) {
-                $data['update_time'] = time();
-            }
-        }
+        //预处理数据
+        $data = static::preprocessDataBeforeOperateDb($data, 'update');
         //存储格式处理
         if (!empty(static::$fields_store_format)) {
             foreach (static::$fields_store_format as $k_field => $each_field_store_format) {

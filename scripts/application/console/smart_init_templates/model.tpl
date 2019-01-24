@@ -25,6 +25,17 @@ class {$table_name}Model extends {$table_name}Map {
     }
 
     /**
+     * 在操作数据库之前预处理数据
+     * @param array $data
+     * @param string $operate_type 操作类型insert/update
+     * @return array
+     */
+    protected function preprocessDataBeforeOperateDb($data, $operate_type) {
+        $data = parent::preprocessDataBeforeOperateDb($data, $operate_type);
+        return $data;
+    }
+
+    /**
      * 缓存清除触发器
      * @param $item
      */
