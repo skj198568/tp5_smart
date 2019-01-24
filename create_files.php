@@ -103,7 +103,7 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, str_replace('/', DIRECTORY_SEPARATOR, 'index/model/')) !== false) {
+    } else if (strpos($target_file, str_replace('/', DIRECTORY_SEPARATOR, 'index/model/')) !== false && strpos($target_file, 'BaseModel') === false) {
         if (!is_file($target_file)) {
             //复制文件
             echo 'copy file: ' . $target_file . PHP_EOL;
