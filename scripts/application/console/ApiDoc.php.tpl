@@ -218,7 +218,7 @@ class ApiDoc extends Command {
     private function getClassDesc($file_absolute_url) {
         $file_content = file_get_contents($file_absolute_url);
         $file_content = ClString::getBetween($file_content, 'namespace', 'class ', true);
-        $file_content = ClString::getBetween($file_content, '/**', 'class ', false);
+        $file_content = ClString::getBetween($file_content, '/**', 'class', false);
         $file_content = explode('*', $file_content);
         $class_desc   = '';
         foreach ($file_content as $line) {
@@ -351,18 +351,8 @@ class ApiDoc extends Command {
             }
         }
         $content = file_get_contents($file_absolute_url);
-        //倒序获取函数备注
-        $lines_reverse = array_reverse(explode("\n", $content));
-        //翻转
-        $lines_reverse = implode("\n", $lines_reverse);
-        $function_desc = ClString::getBetween($lines_reverse, $function_name_line, '/**', false);
-        if (strpos($function_desc, ' function ') !== false) {
-            $function_desc = '';
-        } else if (!empty($function_desc)) {
-            $function_desc .= '/**';
-            $function_desc = implode("\n", array_reverse(explode("\n", $function_desc)));
-        }
-        return $function_desc;
+        $desc    = ClString::getBetween($content, '/**', $function_name_line);
+        return str_replace($function_name_line, '', $desc);
     }
 
     /**
