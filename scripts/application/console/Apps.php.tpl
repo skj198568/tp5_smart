@@ -17,6 +17,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\Exception;
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 
@@ -95,6 +96,27 @@ class Apps extends Command {
             $output->error('请在Linux环境下执行');
             return false;
         }
+        try {
+            return $this->doExecute($input, $output);
+        } catch (Exception $exception) {
+            echo_info([
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+                'code'    => $exception->getCode(),
+                'data'    => $exception->getData()
+            ]);
+        }
+        return true;
+    }
+
+    /**
+     * 处理
+     * @param Input $input
+     * @param Output $output
+     * @return bool
+     */
+    private function doExecute(Input $input, Output $output) {
         set_time_limit(0);
         //创建文件夹
         ClFile::dirCreate($this->getPortSrc());

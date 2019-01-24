@@ -17,6 +17,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\Exception;
 use Workerman\Lib\Timer;
 use Workerman\Worker;
 
@@ -47,6 +48,27 @@ class TaskRun extends Command {
             $output->error('请在Linux环境下执行');
             return false;
         }
+        try {
+            return $this->doExecute($input, $output);
+        } catch (Exception $exception) {
+            echo_info([
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+                'code'    => $exception->getCode(),
+                'data'    => $exception->getData()
+            ]);
+        }
+        return true;
+    }
+
+    /**
+     * 处理
+     * @param Input $input
+     * @param Output $output
+     * @return bool
+     */
+    private function doExecute(Input $input, Output $output) {
         $task_ini_file = __DIR__ . '/task_run.ini';
         if (!is_file($task_ini_file)) {
             file_put_contents($task_ini_file, ';执行命令=类似crontab的执行时间定义，支持到秒一级任务定义 */秒 */分 */时 */日 */月 */周

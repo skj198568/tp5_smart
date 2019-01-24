@@ -18,6 +18,7 @@ use think\Config;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
+use think\Exception;
 use think\exception\ThrowableError;
 use think\View;
 
@@ -43,13 +44,34 @@ class ApiDoc extends Command {
      * @param Input $input
      * @param Output $output
      * @return bool|int|null
-     * @throws \think\Exception
      */
     protected function execute(Input $input, Output $output) {
         if (ClSystem::isWin()) {
             $output->error('请在Linux环境下执行');
             return false;
         }
+        try {
+            return $this->doExecute($input, $output);
+        } catch (Exception $exception) {
+            echo_info([
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+                'code'    => $exception->getCode(),
+                'data'    => $exception->getData()
+            ]);
+        }
+        return true;
+    }
+
+    /**
+     * 处理
+     * @param Input $input
+     * @param Output $output
+     * @return bool
+     * @throws Exception
+     */
+    private function doExecute(Input $input, Output $output) {
         //设置view
         $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
         //处理base
@@ -185,6 +207,7 @@ class ApiDoc extends Command {
         //修改目录权限为www
         $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
+        return true;
     }
 
     /**

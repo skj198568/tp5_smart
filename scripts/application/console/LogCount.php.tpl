@@ -17,6 +17,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\Exception;
 use think\View;
 
 /**
@@ -45,14 +46,35 @@ class LogCount extends Command {
      * 执行
      * @param Input $input
      * @param Output $output
-     * @return int|null|void
-     * @throws \think\Exception
+     * @return bool|int|null
      */
     protected function execute(Input $input, Output $output) {
         if (ClSystem::isWin()) {
             $output->error('请在Linux环境下执行');
             return false;
         }
+        try {
+            return $this->doExecute($input, $output);
+        } catch (Exception $exception) {
+            echo_info([
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+                'code'    => $exception->getCode(),
+                'data'    => $exception->getData()
+            ]);
+        }
+        return true;
+    }
+
+    /**
+     * 执行
+     * @param Input $input
+     * @param Output $output
+     * @return bool
+     * @throws Exception
+     */
+    private function doExecute(Input $input, Output $output) {
         if ($input->hasOption('start_day')) {
             $start_day = intval($input->getOption('start_day'));
         } else {
@@ -92,6 +114,7 @@ class LogCount extends Command {
         //修改目录权限为www
         $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
+        return true;
     }
 
     /**
