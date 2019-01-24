@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: SmartInit
  * Date: 2019/01/24
- * Time: 16:32:23
+ * Time: 17:10:44
  */
 
 namespace app\index\model;
@@ -31,8 +31,18 @@ class UrlShortModel extends UrlShortMap {
      * @param string $operate_type 操作类型insert/update
      * @return array
      */
-    protected function preprocessDataBeforeOperateDb($data, $operate_type) {
-        $data = parent::preprocessDataBeforeOperateDb($data, $operate_type);
+    protected function preprocessDataBeforeExecute($data, $operate_type) {
+        $data = parent::preprocessDataBeforeExecute($data, $operate_type);
+        return $data;
+    }
+
+    /**
+     * 查询之后预处理数据
+     * @param array $data
+     * @return array
+     */
+    protected function preprocessDataAfterQuery($data) {
+        $data = parent::preprocessDataAfterQuery($data);
         return $data;
     }
 

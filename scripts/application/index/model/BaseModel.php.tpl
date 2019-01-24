@@ -143,7 +143,11 @@ class BaseModel extends Query {
      * @param string $operate_type 操作类型insert/update
      * @return array
      */
-    protected function preprocessDataBeforeOperateDb($data, $operate_type) {
+    protected function preprocessDataBeforeExecute($data, $operate_type) {
+        //非array数据，不进行处理
+        if (!is_array($data)) {
+            return $data;
+        }
         $data = array_merge(self::$fields_default_values, $data);
         if ($operate_type == 'insert') {
             //自动完成字段
@@ -157,6 +161,50 @@ class BaseModel extends Query {
             if (in_array('update_time', static::getAllFields())) {
                 if (!isset($data['update_time']) || empty($data['update_time'])) {
                     $data['update_time'] = time();
+                }
+            }
+            //去除只读字段
+            if (!empty(static::$fields_read_only)) {
+                foreach (static::$fields_read_only as $each_field) {
+                    if (isset($data[$each_field])) {
+                        unset($data[$each_field]);
+                    }
+                }
+            }
+        }
+        //存储格式处理
+        if (!empty(static::$fields_store_format)) {
+            foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
+                if (isset($data[$k_field])) {
+                    if (is_array($each_field_store_format)) {
+                        switch ($each_field_store_format[0]) {
+                            case 'password':
+                                $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
+                                break;
+                        }
+                    } else {
+                        switch ($each_field_store_format) {
+                            case 'json':
+                                if (empty($data[$k_field])) {
+                                    $data[$k_field] = [];
+                                } else if (!is_array($data[$k_field])) {
+                                    if (ClVerify::isJson($data[$k_field])) {
+                                        $data[$k_field] = json_decode($data[$k_field], true);
+                                    } else {
+                                        $data[$k_field] = [$data[$k_field]];
+                                    }
+                                }
+                                $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
+                                break;
+                            case 'base64':
+                                if (empty($data[$k_field])) {
+                                    $data[$k_field] = '';
+                                } else {
+                                    $data[$k_field] = base64_encode($data[$k_field]);
+                                }
+                                break;
+                        }
+                    }
                 }
             }
         }
@@ -210,45 +258,9 @@ class BaseModel extends Query {
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //预处理数据
-        $data = static::preprocessDataBeforeOperateDb($data, 'insert');
+        $data = static::preprocessDataBeforeExecute($data, 'insert');
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
-        //存储格式处理
-        if (!empty(static::$fields_store_format)) {
-            foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
-                if (isset($data[$k_field])) {
-                    if (is_array($each_field_store_format)) {
-                        switch ($each_field_store_format[0]) {
-                            case 'password':
-                                $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
-                                break;
-                        }
-                    } else {
-                        switch ($each_field_store_format) {
-                            case 'json':
-                                if (empty($data[$k_field])) {
-                                    $data[$k_field] = [];
-                                } else if (!is_array($data[$k_field])) {
-                                    if (ClVerify::isJson($data[$k_field])) {
-                                        $data[$k_field] = json_decode($data[$k_field], true);
-                                    } else {
-                                        $data[$k_field] = [$data[$k_field]];
-                                    }
-                                }
-                                $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
-                                break;
-                            case 'base64':
-                                if (empty($data[$k_field])) {
-                                    $data[$k_field] = '';
-                                } else {
-                                    $data[$k_field] = base64_encode($data[$k_field]);
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-        }
         $result = parent::insert($data, $replace, $getLastInsID, $sequence);
         //执行
         if (!ClArray::isLinearArray($data)) {
@@ -276,48 +288,10 @@ class BaseModel extends Query {
         //校验参数
         foreach ($dataSet as $k_data => $data) {
             //预处理数据
-            $data = static::preprocessDataBeforeOperateDb($data, 'insert');
+            $data = static::preprocessDataBeforeExecute($data, 'insert');
+            //校验数据
             ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', $this->is_divide_table ? null : static::instance());
-            $dataSet[$k_data] = $data;
-        }
-        //字段处理
-        foreach ($dataSet as $k_data => $data) {
-            //存储格式处理
-            if (!empty(static::$fields_store_format)) {
-                foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
-                    if (isset($data[$k_field])) {
-                        if (is_array($each_field_store_format)) {
-                            switch ($each_field_store_format[0]) {
-                                case 'password':
-                                    $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
-                                    break;
-                            }
-                        } else {
-                            switch ($each_field_store_format) {
-                                case 'json':
-                                    if (empty($data[$k_field])) {
-                                        $data[$k_field] = [];
-                                    } else if (!is_array($data[$k_field])) {
-                                        if (ClVerify::isJson($data[$k_field])) {
-                                            $data[$k_field] = json_decode($data[$k_field], true);
-                                        } else {
-                                            $data[$k_field] = [$data[$k_field]];
-                                        }
-                                    }
-                                    $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
-                                    break;
-                                case 'base64':
-                                    if (empty($data[$k_field])) {
-                                        $data[$k_field] = '';
-                                    } else {
-                                        $data[$k_field] = base64_encode($data[$k_field]);
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
+            //替换数据
             $dataSet[$k_data] = $data;
         }
         $result = parent::insertAll($dataSet, $replace, $limit);
@@ -346,49 +320,7 @@ class BaseModel extends Query {
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', $this->is_divide_table ? null : static::instance());
         //预处理数据
-        $data = static::preprocessDataBeforeOperateDb($data, 'update');
-        //存储格式处理
-        if (!empty(static::$fields_store_format)) {
-            foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
-                if (isset($data[$k_field])) {
-                    if (is_array($each_field_store_format)) {
-                        switch ($each_field_store_format[0]) {
-                            case 'password':
-                                $data[$k_field] = md5($data[$k_field] . $each_field_store_format[1]);
-                                break;
-                        }
-                    } else {
-                        switch ($each_field_store_format) {
-                            case 'json':
-                                if (empty($data[$k_field])) {
-                                    $data[$k_field] = [];
-                                } else if (!is_array($data[$k_field])) {
-                                    if (ClVerify::isJson($data[$k_field])) {
-                                        $data[$k_field] = json_decode($data[$k_field], true);
-                                    } else {
-                                        $data[$k_field] = [$data[$k_field]];
-                                    }
-                                }
-                                $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
-                                break;
-                            case 'base64':
-                                if (empty($data[$k_field])) {
-                                    $data[$k_field] = '';
-                                } else {
-                                    $data[$k_field] = base64_encode($data[$k_field]);
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-        //去除只读字段
-        foreach (static::$fields_read_only as $each_field) {
-            if (isset($data[$each_field])) {
-                unset($data[$each_field]);
-            }
-        }
+        $data = static::preprocessDataBeforeExecute($data, 'update');
         return parent::update($data);
     }
 
@@ -606,68 +538,14 @@ class BaseModel extends Query {
     }
 
     /**
-     * 重写select
-     * @param null $data
-     * @return array|false|null|\PDOStatement|string|\think\Collection
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * 查询之后预处理数据
+     * @param $data
+     * @return array
      */
-    public function select($data = null) {
-        $data = parent::select($data);
-        if (empty($data)) {
-            return [];
-        }
-        if (is_array($data)) {
-            //存储格式处理
-            if (!empty(static::$fields_store_format)) {
-                foreach ($data as $k => $each) {
-                    foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
-                        if (isset($each[$k_field])) {
-                            if (is_string($each_field_store_format)) {
-                                switch ($each_field_store_format) {
-                                    case 'json':
-                                        if (empty($each[$k_field])) {
-                                            $data[$k][$k_field] = [];
-                                        } else {
-                                            $data[$k][$k_field] = json_decode($each[$k_field], true);
-                                            if (is_null($data[$k][$k_field])) {
-                                                $data[$k][$k_field] = [];
-                                            }
-                                        }
-                                        break;
-                                    case 'base64':
-                                        if (empty($data[$k_field])) {
-                                            $data[$k_field] = '';
-                                        } else {
-                                            $data[$k_field] = base64_decode($data[$k_field]);
-                                            if ($data[$k_field] == false) {
-                                                $data[$k_field] = '';
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $data;
-    }
-
-    /**
-     * 重写find
-     * @param null $data
-     * @return array|false|null|\PDOStatement|string|\think\Model
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public function find($data = null) {
-        $data = parent::find($data);
-        if (empty($data)) {
-            return [];
+    protected function preprocessDataAfterQuery($data) {
+        //不进行处理
+        if (!is_array($data) || empty($data)) {
+            return $data;
         }
         //存储格式处理
         if (!empty(static::$fields_store_format)) {
@@ -704,6 +582,47 @@ class BaseModel extends Query {
     }
 
     /**
+     * 重写select
+     * @param null $data
+     * @return array|false|null|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function select($data = null) {
+        $data = parent::select($data);
+        if (empty($data)) {
+            return [];
+        }
+        if (is_array($data)) {
+            if (!empty(static::$fields_store_format)) {
+                foreach ($data as $k => $each) {
+                    //预处理数据
+                    $data[$k] = $this->preprocessDataAfterQuery($each);
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 重写find
+     * @param null $data
+     * @return array|false|null|\PDOStatement|string|\think\Model
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function find($data = null) {
+        $data = parent::find($data);
+        if (!empty(static::$fields_store_format)) {
+            //预处理数据
+            $data = $this->preprocessDataAfterQuery($data);
+        }
+        return $data;
+    }
+
+    /**
      * 重写value
      * @param string $field
      * @param null $default
@@ -713,30 +632,10 @@ class BaseModel extends Query {
     public function value($field, $default = null, $force = false) {
         $value = parent::value($field, $default, $force);
         if (!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)) {
-            if (is_string(static::$fields_store_format[$field])) {
-                switch (static::$fields_store_format[$field]) {
-                    case 'json':
-                        if (empty($value)) {
-                            $value = [];
-                        } else {
-                            $value = json_decode($value, true);
-                            if (is_null($value)) {
-                                $value = [];
-                            }
-                        }
-                        break;
-                    case 'base64':
-                        if (empty($value)) {
-                            $value = '';
-                        } else {
-                            $value = base64_decode($value);
-                            if ($value == false) {
-                                $value = '';
-                            }
-                        }
-                        break;
-                }
-            }
+            //转换成数组进行处理
+            $value = $this->preprocessDataAfterQuery([$field => $value]);
+            //取数据
+            $value = $value[$field];
         }
         return $value;
     }
@@ -751,30 +650,10 @@ class BaseModel extends Query {
         $data = parent::column($field, $key);
         if (!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)) {
             foreach ($data as $key => $value) {
-                if (is_string(static::$fields_store_format[$field])) {
-                    switch (static::$fields_store_format[$field]) {
-                        case 'json':
-                            if (empty($value)) {
-                                $data[$key] = [];
-                            } else {
-                                $data[$key] = json_decode($value, true);
-                                if (is_null($data[$key])) {
-                                    $data[$key] = [];
-                                }
-                            }
-                            break;
-                        case 'base64':
-                            if (empty($data[$key])) {
-                                $data[$key] = '';
-                            } else {
-                                $data[$key] = base64_decode($data[$key]);
-                                if ($data[$key] == false) {
-                                    $data[$key] = '';
-                                }
-                            }
-                            break;
-                    }
-                }
+                //转换成数组进行处理
+                $value = $this->preprocessDataAfterQuery([$field => $value]);
+                //替换
+                $data[$key] = $value[$field];
             }
         }
         return $data;

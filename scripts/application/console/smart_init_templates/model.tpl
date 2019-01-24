@@ -30,8 +30,18 @@ class {$table_name}Model extends {$table_name}Map {
      * @param string $operate_type 操作类型insert/update
      * @return array
      */
-    protected function preprocessDataBeforeOperateDb($data, $operate_type) {
-        $data = parent::preprocessDataBeforeOperateDb($data, $operate_type);
+    protected function preprocessDataBeforeExecute($data, $operate_type) {
+        $data = parent::preprocessDataBeforeExecute($data, $operate_type);
+        return $data;
+    }
+
+    /**
+     * 查询之后预处理数据
+     * @param array $data
+     * @return array
+     */
+    protected function preprocessDataAfterQuery($data) {
+        $data = parent::preprocessDataAfterQuery($data);
         return $data;
     }
 
