@@ -18,6 +18,7 @@ use Phinx\Util\Util;
 use think\App;
 use think\Controller;
 use think\db\Query;
+use think\Exception;
 
 /**
  * 基础类
@@ -308,7 +309,9 @@ class MigrateBaseController extends Controller {
         //处理字段类型
         if (in_array($field_info['field_type'], ['int', 'int_big', 'int_tiny', 'int_small'])) {
             //数字
-            $field_info['field_type']          = 'integer';
+            $field_info['field_type'] = 'integer';
+            //数字类型的默认值，只能是数字
+            $field_info['field_default_value'] = is_numeric($field_info['field_default_value']) ? $field_info['field_default_value'] : 0;
             $field_info['field_default_value'] = "'default' => " . $field_info['field_default_value'] . ", ";
         } else if (in_array($field_info['field_type'], ['string'])) {
             //字符串
@@ -392,8 +395,18 @@ class MigrateBaseController extends Controller {
      */
     protected function run($table_name) {
         $cmd = sprintf("cd %s && php think migrate:run", DOCUMENT_ROOT_PATH . '/../');
-        //执行
-        exec($cmd);
+        try {
+            //执行
+            exec($cmd);
+        } catch (Exception $exception) {
+            log_info([
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+                'code'    => $exception->getCode(),
+                'data'    => $exception->getData()
+            ]);
+        }
         //清除缓存
         $key = $this->getKey($table_name);
         cache($key, null);
