@@ -611,6 +611,9 @@ class BaseModel extends Query {
      */
     public function find($data = null) {
         $data = parent::find($data);
+        if (empty($data)) {
+            return [];
+        }
         if (!empty(static::$fields_store_format)) {
             //预处理数据
             $data = $this->preprocessDataAfterQuery($data);
