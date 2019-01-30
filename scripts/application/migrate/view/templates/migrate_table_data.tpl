@@ -26,6 +26,9 @@ class {$class_name} extends Cmd {
         while (!feof($f_handle)) {
             $line_content = fgets($f_handle);
             $line_content = json_decode($line_content, true);
+            if (!is_array($line_content) || empty($line_content)) {
+                continue;
+            }
             $items[]      = $line_content;
             if (strlen(json_encode($items)) > $max_length) {
                 //批量插入
