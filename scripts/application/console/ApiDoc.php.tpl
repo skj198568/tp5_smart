@@ -19,6 +19,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\Output;
 use think\Exception;
+use think\exception\ErrorException;
 use think\exception\ThrowableError;
 use think\View;
 
@@ -562,10 +563,11 @@ class ApiDoc extends Command {
                                 $remark[]              = $each_const_param_line;
                             }
                             //丰富remark信息
-                            if (strpos($class_const_file_absolute_url_content, 'const C_' . strtoupper($each_param)) !== false) {
+                            if (strpos($class_const_file_absolute_url_content, 'const C_' . strtoupper($each_param) . ' ') !== false) {
                                 $field_config  = sprintf('%s::C_' . strtoupper($each_param), $class_name_with_namespace);
                                 $remark_append = [];
-                                eval(sprintf('$field_config=%s;', $field_config));
+                                $command       = sprintf('$field_config=%s;', $field_config);
+                                eval($command);
                                 foreach ($field_config as $each_field_key => $each_field_config) {
                                     $remark_append[] = $each_field_key . '/' . $each_field_config;
                                 }
