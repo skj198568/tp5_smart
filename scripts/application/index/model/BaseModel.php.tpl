@@ -107,7 +107,17 @@ class BaseModel extends Query {
      * 分表规则
      * @var array
      */
-    public static $partition = ["platform_id", "1"];
+    public static $partition = [];
+
+    /**
+     * 操作-插入
+     */
+    const V_OPERATE_TYPE_INSERT = 'insert';
+
+    /**
+     * 操作-更新
+     */
+    const V_OPERATE_TYPE_UPDATE = 'update';
 
     /**
      * 构造函数
@@ -140,7 +150,7 @@ class BaseModel extends Query {
     /**
      * 在操作数据库之前预处理数据
      * @param array $data
-     * @param string $operate_type 操作类型insert/update
+     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
      * @return array
      */
     protected function preprocessDataBeforeExecute($data, $operate_type) {
@@ -149,14 +159,14 @@ class BaseModel extends Query {
             return $data;
         }
         $data = array_merge(self::$fields_default_values, $data);
-        if ($operate_type == 'insert') {
+        if ($operate_type == self::V_OPERATE_TYPE_INSERT) {
             //自动完成字段
             if (in_array('create_time', static::getAllFields())) {
                 if (!isset($data['create_time']) || empty($data['create_time'])) {
                     $data['create_time'] = time();
                 }
             }
-        } else if ($operate_type == 'update') {
+        } else if ($operate_type == self::V_OPERATE_TYPE_UPDATE) {
             //自动完成字段
             if (in_array('update_time', static::getAllFields())) {
                 if (!isset($data['update_time']) || empty($data['update_time'])) {

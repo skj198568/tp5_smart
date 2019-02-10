@@ -27,7 +27,7 @@ class {$table_name}Model extends {$table_name}Map {
     /**
      * 在操作数据库之前预处理数据
      * @param array $data
-     * @param string $operate_type 操作类型insert/update
+     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
      * @return array
      */
     protected function preprocessDataBeforeExecute($data, $operate_type) {
