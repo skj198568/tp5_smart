@@ -47,7 +47,7 @@ class BaseApiController extends Controller {
     /**
      * 返回信息
      * @param int $code 返回码
-     * @param array $data 返回的值
+     * @param array $data 返回的值，如果传入为字符串，则默认该字符串为返回message信息内容
      * @param string $example 例子，用于自动生成api文档
      * @param bool $is_log
      * @return \think\response\Json|\think\response\Jsonp
@@ -64,7 +64,7 @@ class BaseApiController extends Controller {
         //转换为字符串
         $status = implode('', $status);
         $status = str_replace('/_', '/', $status);
-        $data   = is_array($data) ? $data : [$data];
+        $data   = is_array($data) ? $data : ['message' => $data];
         return json_return(array_merge([
             'status'      => $status,
             'status_code' => $code
