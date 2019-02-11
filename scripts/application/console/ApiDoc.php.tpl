@@ -167,7 +167,7 @@ class ApiDoc extends Command {
             //赋值给上一个接口
             $last_api_desc = $api_desc;
             //替换
-            $api_desc  = str_replace($api_desc_controller_name, sprintf('<span style="color:%s;">%s</span>', $color, $api_desc_controller_name), $api_desc);
+            $api_desc  = ClString::replaceOnce($api_desc_controller_name, sprintf('<span style="color:%s;">%s</span>', $color, $api_desc_controller_name), $api_desc);
             $a_name    = 'name' . str_replace('/', '_', $request_url);
             $api_items .= $this->view->fetch($api_item_template, [
                 'id'         => ClString::append($id, 0, 3),
