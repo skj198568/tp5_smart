@@ -25,18 +25,18 @@
                style="table-layout: fixed;">
             <thead>
             <tr>
-                <th style="width: 20%;">名称</th>
-                <th style="width: 30%;">校验条件</th>
+                <th style="width: 20%;">字段</th>
                 <th style="width: 50%;">描述</th>
+                <th style="width: 30%;">校验</th>
             </tr>
             </thead>
             <tbody>
             <foreach name="params" item="vo">
                 <tr>
                     <td style="width: 20%;">{$vo['name']}</td>
-                    <td style="width: 30%;word-wrap:break-word;word-break:break-all;"><span class="text-danger">{$vo['filters']}</span>
-                    </td>
                     <td style="width: 50%;word-wrap:break-word;word-break:break-all;"><span class="text-info">{$vo['remark']}</span>
+                    </td>
+                    <td style="width: 30%;word-wrap:break-word;word-break:break-all;"><span class="text-danger">{$vo['filters']}</span>
                     </td>
                 </tr>
             </foreach>
