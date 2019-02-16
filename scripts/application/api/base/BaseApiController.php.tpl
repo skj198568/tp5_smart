@@ -112,7 +112,7 @@ class BaseApiController extends Controller {
             //上次sql
             $last_sql = $model_instance->getLastSql();
             //拼接total sql
-            $total_sql = 'SELECT COUNT(*) FROM ' . ClString::getBetween($last_sql, 'FROM', '', false);
+            $total_sql = 'SELECT COUNT(*) FROM ' . ClString::getBetween($last_sql, 'FROM', 'ORDER', false);
             //获取总数
             $total_count = $model_instance->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)->query($total_sql);
             if (empty($total_count)) {
