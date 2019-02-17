@@ -73,23 +73,15 @@ class ApiController extends BaseApiController {
      */
     public function _empty() {
         if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && App::$debug) {
-            $api_file_name = get_param('api_file_name', [], '接口文件名', '');
-            $api_doc_dir   = DOCUMENT_ROOT_PATH . '/../doc/api';
-            if (!empty($api_file_name)) {
-                $api_file = $api_doc_dir . '/' . $api_file_name . '.html';
-                if (is_file($api_file)) {
-                    return $this->fetch($api_file);
-                }
-            }
-            $api_files = ClFile::dirGetFiles($api_doc_dir, ['.html']);
+            $api_doc_dir = DOCUMENT_ROOT_PATH . '/../doc/api';
+            $api_files   = ClFile::dirGetFiles($api_doc_dir, ['.html']);
             foreach ($api_files as $k => $each) {
                 $api_files[$k] = ClFile::getName($each, true);
             }
             //倒序
             arsort($api_files);
-            //赋值
-            $this->assign('api_files', array_values($api_files));
-            return $this->fetch(DOCUMENT_ROOT_PATH . '/../application/console/api_doc_templates/api_list.html');
+            $newest_api_file = $api_files[0];
+            return $this->fetch($api_doc_dir . '/' . $newest_api_file);
         } else {
             return '<h1 style="text-align: center;font-size: 5em;">404</h1>';
         }
