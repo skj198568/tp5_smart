@@ -110,7 +110,7 @@ class MigrateBaseController extends Controller {
         if (is_file(APP_PATH . $file)) {
             return $this->fetch(APP_PATH . $file);
         } else {
-            if (ClVerify::isLocalIp() || APP::$debug) {
+            if (ClVerify::isLocalIp() || App::$debug) {
                 log_info(request()->controller(), request()->action());
                 echo sprintf("the file '<span style=\"color: red;\">%s</span>' is not exist", $file);
                 exit;
