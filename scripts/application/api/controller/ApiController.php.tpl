@@ -79,7 +79,7 @@ class ApiController extends BaseApiController {
                 $api_files[$k] = ClFile::getName($each, true);
             }
             //倒序
-            arsort($api_files);
+            rsort($api_files);
             $newest_api_file = $api_files[0];
             return $this->fetch($api_doc_dir . '/' . $newest_api_file);
         } else {
