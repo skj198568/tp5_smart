@@ -34,6 +34,12 @@ class SmartInit extends Command {
      */
     protected $view;
 
+    /**
+     * 待处理文件
+     * @var array
+     */
+    protected $undo_files = [];
+
     protected function configure() {
         $this->setName('smart_init')
             ->addOption('--table_name', '-t', Option::VALUE_REQUIRED, '不带前缀的数据库表名，例如：user_goods，如果参数为空则创建所有表')
@@ -87,6 +93,8 @@ class SmartInit extends Command {
         $this->initController($input, $output);
         //分割
         $output->highlight('');
+        //处理文件版本
+        $this->dealFilesVersion($output);
         //修改目录权限为www
         $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
@@ -366,8 +374,16 @@ class SmartInit extends Command {
         if ($content != $old_content) {
             if (empty($old_content)) {
                 $output->info('[Map]:create ' . $map_file . " ok");
+                $this->undo_files[] = [
+                    'file' => $map_file,
+                    'type' => 'create'
+                ];
             } else {
                 $output->info('[Map]:modify ' . $map_file . " ok");
+                $this->undo_files[] = [
+                    'file' => $map_file,
+                    'type' => 'update'
+                ];
             }
         }
         return true;
@@ -388,16 +404,20 @@ class SmartInit extends Command {
             $class_desc    = ClString::getBetween($model_content, '/**', ' extends ', false);
             $class_desc    = explode("\n", $class_desc);
             //第一行即Model注释
-            $desc           = $class_desc[0];
-            $table_comment  = $this->getTableComment($table_name);
-            $new_model_desc = '* ' . $table_comment['name'];
-            if ($desc != $new_model_desc) {
+            $desc          = $class_desc[0];
+            $table_comment = $this->getTableComment($table_name);
+            if ($table_comment['name'] != ClString::getBetween($desc, '*', '', false)) {
+                $new_model_desc = '* ' . $table_comment['name'];
                 //替换Model name
                 $model_content = str_replace($desc, $new_model_desc, $model_content);
                 //写入文件
                 file_put_contents($model_name_file, $model_content);
                 //输出
                 $output->highlight('[Model]:modify model name ' . $model_name_file);
+                $this->undo_files[] = [
+                    'file' => $model_name_file,
+                    'type' => 'update'
+                ];
             }
             return false;
         }
@@ -414,6 +434,10 @@ class SmartInit extends Command {
             //写入
             file_put_contents($model_name_file, $content);
             $output->highlight('[Model]:create ' . $model_name_file . " ok");
+            $this->undo_files[] = [
+                'file' => $model_name_file,
+                'type' => 'create'
+            ];
         }
         return true;
     }
@@ -623,8 +647,16 @@ class SmartInit extends Command {
             if ($old_content != $content) {
                 if (empty($old_content)) {
                     $output->info('[Base]:create ' . $base_name_file . " ok");
+                    $this->undo_files[] = [
+                        'file' => $base_name_file,
+                        'type' => 'create'
+                    ];
                 } else {
                     $output->info('[Base]:modify ' . $base_name_file . " ok");
+                    $this->undo_files[] = [
+                        'file' => $base_name_file,
+                        'type' => 'update'
+                    ];
                 }
             }
         }
@@ -648,14 +680,18 @@ class SmartInit extends Command {
             //第一行即注释
             $desc          = $class_desc[0];
             $table_comment = $this->getTableComment($table_name);
-            $new_desc      = '* ' . $table_comment['name'];
-            if ($desc != $new_desc) {
+            if ($table_comment['name'] != ClString::getBetween($desc, '*', '', false)) {
+                $new_desc = '* ' . $table_comment['name'];
                 //替换Model name
                 $controller_content = str_replace($desc, $new_desc, $controller_content);
                 //写入文件
                 file_put_contents($api_controller_file, $controller_content);
                 //输出
                 $output->highlight('[Api]:modify controller name ' . $api_controller_file);
+                $this->undo_files[] = [
+                    'file' => $api_controller_file,
+                    'type' => 'update'
+                ];
             }
             return false;
         }
@@ -672,8 +708,64 @@ class SmartInit extends Command {
             //写入
             file_put_contents($api_controller_file, $content);
             $output->info('[Api]:create ' . $api_controller_file . " ok");
+            $this->undo_files[] = [
+                'file' => $api_controller_file,
+                'type' => 'create'
+            ];
         }
         return true;
+    }
+
+    /**
+     * 处理所有文件版本
+     */
+    private function dealFilesVersion(Output $output) {
+        if (empty($this->undo_files)) {
+            return;
+        }
+        $cmd    = [];
+        $is_svn = is_dir(DOCUMENT_ROOT_PATH . '/../.svn');
+        foreach ($this->undo_files as $each) {
+            $each_file = str_replace(DOCUMENT_ROOT_PATH . '/../', '', $each['file']);
+            if ($each['type'] == 'create') {
+                if ($is_svn) {
+                    $cmd[] = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create', $each_file);
+                } else {
+                    // todo git
+                }
+            } else {
+                if ($is_svn) {
+                    $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update', $each_file);
+                } else {
+                    // todo git
+                }
+            }
+        }
+        if (empty($cmd)) {
+            return;
+        }
+        array_unshift($cmd, '#!/bin/bash');
+        //写入bash文件
+        $sh_file_name = 'smart_init.sh';
+        $file         = APP_PATH . 'console/' . $sh_file_name;
+        file_put_contents($file, implode("\n", $cmd));
+        //执行文件
+        $cmd = sprintf('chmod 777 %s && %s', $file, $file);
+        exec($cmd);
+        $output->error('exec ' . $file);
+        //删除
+        unlink($file);
+        $output->error('unlink ' . $file);
+        //处理migrate bash
+        $file = DOCUMENT_ROOT_PATH . '/../database/migrate.sh';
+        if (is_file($file)) {
+            //执行
+            exec(sprintf('chmod 777 %s && %s', $file, $file));
+            $output->warning('exec ' . $file);
+            //删除
+            unlink($file);
+            $output->warning('unlink ' . $file);
+        }
     }
 
 }
