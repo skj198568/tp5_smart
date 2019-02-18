@@ -416,7 +416,7 @@ class MigrateBaseController extends Controller {
         $migrate_absolute_file = str_replace(DOCUMENT_ROOT_PATH . '/../', '', $migrate_absolute_file);
         if (is_dir(DOCUMENT_ROOT_PATH . '/../.svn')) {
             //svn版本
-            $cmd = sprintf("cd %s && svn add %s && svn ci -m \"%s\" %s", DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $svn_msg, $migrate_absolute_file);
+            $cmd = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $svn_msg, $migrate_absolute_file);
         } else {
             //todo git
             $cmd = '';
@@ -424,23 +424,15 @@ class MigrateBaseController extends Controller {
         if (empty($cmd)) {
             return;
         }
-        //因权限问题，临时写入shell脚本来处理
-        $migrate_sh_file_name = 'migrate.sh';
-        $file                 = DOCUMENT_ROOT_PATH . '/../database/' . $migrate_sh_file_name;
-        file_put_contents($file, "#!/bin/bash\n" . $cmd);
-        //执行文件
-        $cmd = sprintf('cd %s && chmod 777 %s && ./%s', DOCUMENT_ROOT_PATH . '/../database/', $migrate_sh_file_name, $migrate_sh_file_name);
-        try {
-            //执行
-            exec($cmd);
-        } catch (Exception $exception) {
-            log_info('migrate cmd error', [
-                'message' => $exception->getMessage(),
-                'file'    => $exception->getFile(),
-                'line'    => $exception->getLine(),
-                'code'    => $exception->getCode(),
-                'data'    => $exception->getData()
-            ]);
+        //写入shell脚本来处理版本问题
+        $file = DOCUMENT_ROOT_PATH . '/../database/migrate.sh';
+        if (is_file($file)) {
+            $f_handle = fopen($file, 'a');
+            //拼接
+            fputs($f_handle, $cmd);
+            fclose($f_handle);
+        } else {
+            file_put_contents($file, "#!/bin/bash\n" . $cmd);
         }
     }
 
