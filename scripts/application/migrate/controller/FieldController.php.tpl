@@ -162,7 +162,7 @@ class FieldController extends MigrateBaseController {
     public function getList() {
         $table_name   = get_param('table_name', ClFieldVerify::instance()->fetchVerifies(), '表名', '');
         $table_fields = $this->getTableFields($table_name);
-        $return = [
+        $return       = [
             'limit'  => 1000,
             'offset' => 0,
             'total'  => count($table_fields),
@@ -182,8 +182,8 @@ class FieldController extends MigrateBaseController {
         $this->assign('table_name', $table_name);
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
-        $class_name = $this->getClassName([$table_name, 'delete', $field_name]);
-        $fields = $this->getTableFields($table_name);
+        $class_name       = $this->getClassName([$table_name, 'delete', $field_name]);
+        $fields           = $this->getTableFields($table_name);
         $field_change_str = '';
         foreach ($fields as $k => $each_field) {
             if ($each_field['field_name'] == $field_name) {
@@ -203,7 +203,7 @@ class FieldController extends MigrateBaseController {
         //写入文件
         file_put_contents($file, "<?php\n" . $content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file, sprintf('%s delete field %s', $table_name, $field_name));
         return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -290,7 +290,7 @@ class FieldController extends MigrateBaseController {
         //写入文件
         file_put_contents($file, "<?php\n" . $content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file, sprintf('%s rename field %s to %s', $table_name, $old_name, $new_name));
         return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -338,7 +338,7 @@ class FieldController extends MigrateBaseController {
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_change_position.tpl'));
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('%s change field position %s', $table_name, $field_name));
         return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -386,7 +386,7 @@ class FieldController extends MigrateBaseController {
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_update.tpl'));
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('%s update field %s', $table_name, $field_name));
         return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -425,7 +425,7 @@ class FieldController extends MigrateBaseController {
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_add.tpl'));
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('%s add field %s', $table_name, $field_name));
         return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 

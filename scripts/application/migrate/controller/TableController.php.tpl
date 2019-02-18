@@ -119,7 +119,7 @@ class TableController extends MigrateBaseController {
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('create table %s', $table_name));
         return $this->getMigrateFileName($class_name);
     }
 
@@ -187,7 +187,7 @@ class TableController extends MigrateBaseController {
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('update table %s', $table_name));
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -206,7 +206,7 @@ class TableController extends MigrateBaseController {
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('rename table %s to %s', $table_name, $new_table_name));
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -307,7 +307,7 @@ class TableController extends MigrateBaseController {
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('delete table %s index %s', $table_name, $this->getModelName(implode('_', array_merge(['index'], $fields)), false)));
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
     }
 
@@ -345,7 +345,7 @@ class TableController extends MigrateBaseController {
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name);
+        $this->run($table_name, $file_path, sprintf('create table %s index %s', $table_name, $this->getModelName(implode('_', array_merge(['index'], $fields)), false)));
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
     }
 
