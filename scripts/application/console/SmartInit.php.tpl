@@ -95,6 +95,8 @@ class SmartInit extends Command {
         $output->highlight('');
         //处理文件版本
         $this->dealFilesVersion($output);
+        //处理api doc
+        $this->dealApiDoc($output);
         //修改目录权限为www
         $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
@@ -718,6 +720,7 @@ class SmartInit extends Command {
 
     /**
      * 处理所有文件版本
+     * @param Output $output
      */
     private function dealFilesVersion(Output $output) {
         if (empty($this->undo_files)) {
@@ -766,6 +769,16 @@ class SmartInit extends Command {
             unlink($file);
             $output->warning('unlink ' . $file);
         }
+    }
+
+    /**
+     * 处理api_doc
+     * @param Output $output
+     */
+    private function dealApiDoc(Output $output) {
+        $cmd = sprintf('cd %s && php think api_doc', DOCUMENT_ROOT_PATH . '/../');
+        exec($cmd);
+        $output->info('deal api doc');
     }
 
 }
