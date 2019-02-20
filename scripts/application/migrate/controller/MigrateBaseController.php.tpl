@@ -428,7 +428,7 @@ class MigrateBaseController extends Controller {
         if (is_file($file)) {
             $f_handle = fopen($file, 'a');
             //拼接
-            fputs($f_handle, $cmd);
+            fputs($f_handle, "\n" . $cmd);
             fclose($f_handle);
         } else {
             file_put_contents($file, "#!/bin/bash\n" . $cmd);
