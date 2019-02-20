@@ -755,19 +755,23 @@ class SmartInit extends Command {
         //执行文件
         $cmd = sprintf('chmod 777 %s && %s', $file, $file);
         exec($cmd);
-        $output->error('exec ' . $file);
+        $output->highlight('exec ' . $file);
         //删除
         unlink($file);
-        $output->error('unlink ' . $file);
+        $output->highlight('unlink ' . $file);
         //处理migrate bash
         $file = DOCUMENT_ROOT_PATH . '/../database/migrate.sh';
         if (is_file($file)) {
             //执行
             exec(sprintf('chmod 777 %s && %s', $file, $file));
-            $output->warning('exec ' . $file);
+            //分割
+            $output->info('');
+            $output->info('exec ' . $file);
             //删除
             unlink($file);
-            $output->warning('unlink ' . $file);
+            //分割
+            $output->info('');
+            $output->info('unlink ' . $file);
         }
     }
 
@@ -778,6 +782,8 @@ class SmartInit extends Command {
     private function dealApiDoc(Output $output) {
         $cmd = sprintf('cd %s && php think api_doc', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
+        //分割
+        $output->info('');
         $output->info('deal api doc');
     }
 
