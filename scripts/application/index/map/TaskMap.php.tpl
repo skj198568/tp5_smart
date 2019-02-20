@@ -134,6 +134,7 @@ class TaskMap extends BaseModel {
      */
     public function initialize() {
         parent::initialize();
+        //设置表名
         $this->table = config('database.prefix') . 'task';
     }
 
