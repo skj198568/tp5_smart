@@ -26,7 +26,7 @@ class {$table_name}Map extends BaseModel {
      * 当前数据表名称（含前缀）
      * @var string
      */
-    protected $table = '{$table_name_with_prefix}';
+    protected $table = '';
 {$const_fields}
 
     /**
@@ -83,6 +83,15 @@ class {$table_name}Map extends BaseModel {
      */
     public static $partition = {:is_array($table_comment['partition']) ? json_encode($table_comment['partition']) : []};
 </present>
+
+    /**
+     * 初始化
+     */
+    public function initialize() {
+        parent::initialize();
+        //设置表名
+        $this->table = config('database.prefix') . '{$table_name}';
+    }
 
     /**
      * 获取所有的字段
