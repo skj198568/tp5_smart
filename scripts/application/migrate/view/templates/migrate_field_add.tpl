@@ -18,9 +18,15 @@ class {$class_name} extends Cmd {
                 continue;
             }
             //新增字段名
-            $this->table($table)
-                {$field_str}
-                ->update();
+            if ($this->table($table)->hasColumn('{$after_field}') {
+                $this->table($table)
+                    {$field_str_with_after_field}
+                    ->update();
+            }else{
+                $this->table($table)
+                    {$field_str}
+                    ->update();
+            }
         }
     }
 

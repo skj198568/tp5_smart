@@ -17,7 +17,7 @@ class {$class_name} extends Cmd {
         //临时取消校验
         {$model_name}::$fields_verifies = [];
         //清空
-        {$model_name}::instance()->execute('TRUNCATE TABLE `{$table_name_with_prefix}`');
+        {$model_name}::instance()->execute('TRUNCATE TABLE `' . config('database.prefix') . '{$table_name}`');
         //db存储文件
         $db_file    = DOCUMENT_ROOT_PATH.'{$db_file}';
         $f_handle   = fopen($db_file, 'r');

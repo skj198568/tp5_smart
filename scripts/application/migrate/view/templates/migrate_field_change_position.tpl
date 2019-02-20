@@ -17,9 +17,15 @@ class {$class_name} extends Cmd {
             if(!$this->table($table)->hasColumn('{$field_name}')){
                 continue;
             }
-            $this->table($table)
+            if($this->table($table)->hasColumn('{$after_field}')){
+                $this->table($table)
+                {$fields_str_with_after_field}
+                ->update();
+            }else{
+                $this->table($table)
                 {$field_str}
                 ->update();
+            }
         }
     }
 
@@ -33,9 +39,15 @@ class {$class_name} extends Cmd {
             if(!$this->table($table)->hasColumn('{$field_name}')){
                 continue;
             }
-            $this->table($table)
-                {$old_field_str}
-                ->update();
+            if($this->table($table)->hasColumn('{$old_after_field}')){
+                $this->table($table)
+                    {$old_field_str_with_after_field}
+                    ->update();
+            }else{
+                $this->table($table)
+                    {$old_field_str}
+                    ->update();
+            }
         }
     }
 

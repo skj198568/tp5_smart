@@ -182,22 +182,26 @@ class FieldController extends MigrateBaseController {
         $this->assign('table_name', $table_name);
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
-        $class_name       = $this->getClassName([$table_name, 'delete', $field_name]);
-        $fields           = $this->getTableFields($table_name);
-        $field_change_str = '';
+        $class_name                        = $this->getClassName([$table_name, 'delete', $field_name]);
+        $fields                            = $this->getTableFields($table_name);
+        $field_change_str                  = '';
+        $field_change_str_with_after_field = '';
         foreach ($fields as $k => $each_field) {
             if ($each_field['field_name'] == $field_name) {
                 $last_field = '';
                 if (isset($fields[$k - 1])) {
                     $last_field = $fields[$k - 1]['field_name'];
                 }
-                $field_change_str = $this->getFieldExecute('addColumn', $each_field, $last_field);
+                $this->assign('after_field', $last_field);
+                $field_change_str                  = $this->getFieldExecute('addColumn', $each_field);
+                $field_change_str_with_after_field = $this->getFieldExecute('addColumn', $each_field, $last_field);
                 unset($fields[$k]);
                 break;
             }
         }
         //设置执行修改命令
         $this->assign('field_change_str', $field_change_str);
+        $this->assign('field_change_str_with_after_field', $field_change_str_with_after_field);
         $file    = $this->getMigrateFilePath($class_name);
         $content = $this->fetch($this->getTemplateFilePath('migrate_field_delete.tpl'));
         //写入文件
@@ -313,25 +317,33 @@ class FieldController extends MigrateBaseController {
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
         $after_field_name = get_param('after_field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
-        $table_name       = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $this->assign('after_field', $after_field_name);
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
-        $key            = $this->getKey($table_name);
-        $fields         = cache($key);
-        $fields_str     = '';
-        $old_fields_str = '';
+        $key                             = $this->getKey($table_name);
+        $fields                          = cache($key);
+        $fields_str                      = '';
+        $fields_str_with_after_field     = '';
+        $old_fields_str                  = '';
+        $old_fields_str_with_after_field = '';
         foreach ($fields as $k => $each) {
             if ($each['field_name'] == $field_name) {
-                $fields_str = $this->getFieldExecute('changeColumn', $each, $after_field_name);
+                $fields_str                  = $this->getFieldExecute('changeColumn', $each);
+                $fields_str_with_after_field = $this->getFieldExecute('changeColumn', $each, $after_field_name);
                 if ($k == 0) {
                     $old_after_field = 'id';
                 } else {
                     $old_after_field = $fields[$k - 1]['field_name'];
                 }
-                $old_fields_str = $this->getFieldExecute('changeColumn', $each, $old_after_field);
+                $this->assign('old_after_field', $old_after_field);
+                $old_fields_str                  = $this->getFieldExecute('changeColumn', $each);
+                $old_fields_str_with_after_field = $this->getFieldExecute('changeColumn', $each, $old_after_field);
             }
         }
         $this->assign('field_str', $fields_str);
+        $this->assign('fields_str_with_after_field', $fields_str_with_after_field);
         $this->assign('old_field_str', $old_fields_str);
+        $this->assign('old_field_str_with_after_field', $old_fields_str_with_after_field);
         //写入文件
         $class_name    = $this->getClassName([$table_name, $field_name, 'change_position']);
         $file_path     = $this->getMigrateFilePath($class_name);
@@ -400,8 +412,9 @@ class FieldController extends MigrateBaseController {
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
         $after_field = get_param('after_field', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '前一个字段');
+        $this->assign('after_field', $after_field);
         get_param('field_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段注释');
-        $fields    = ClArray::getByKeys(input(), [
+        $fields                     = ClArray::getByKeys(input(), [
             'field_name',
             'field_desc',
             'field_default_value',
@@ -417,7 +430,9 @@ class FieldController extends MigrateBaseController {
             'store_format',
             'verifies'
         ]);
-        $field_str = $this->getFieldExecute('addColumn', $fields, $after_field);
+        $field_str_with_after_field = $this->getFieldExecute('addColumn', $fields, $after_field);
+        $this->assign('field_str_with_after_field', $field_str_with_after_field);
+        $field_str = $this->getFieldExecute('addColumn', $fields);
         $this->assign('field_str', $field_str);
         //写入文件
         $class_name    = $this->getClassName([$table_name, 'add', $field_name]);

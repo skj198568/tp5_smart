@@ -34,10 +34,17 @@ class {$class_name} extends Cmd {
             if ($this->table($table)->hasColumn('{$field_name}')) {
                 continue;
             }
-            //新增
-            $this->table($table)
-                {$field_change_str}
-                ->update();
+            if ($this->table($table)->hasColumn('{$after_field}')) {
+                //新增
+                $this->table($table)
+                    {$field_change_str_with_after_field}
+                    ->update();
+            }else{
+                //新增
+                $this->table($table)
+                    {$field_change_str}
+                    ->update();
+            }
         }
     }
 

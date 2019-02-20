@@ -220,11 +220,12 @@ class TableController extends MigrateBaseController {
      */
     public function backUpData() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $this->assign('table_name', $table_name);
         $this->assign('model_name', $this->getModelName($table_name));
         $class_name = $this->getClassName([$table_name, 'data']);
-        $table_name = $this->getTableNameWithPrefix($table_name);
-        $this->assign('table_name_with_prefix', $table_name);
-        $this->query_instance->setTable($table_name);
+        $table_name_with_prefix = $this->getTableNameWithPrefix($table_name);
+        $this->assign('table_name_with_prefix', $table_name_with_prefix);
+        $this->query_instance->setTable($table_name_with_prefix);
         $all_count = $this->query_instance->count();
         if (empty($all_count)) {
             return $this->ar(2, ['message' => '数据为空，不可备份']);
