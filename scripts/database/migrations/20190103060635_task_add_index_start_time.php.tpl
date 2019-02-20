@@ -15,12 +15,12 @@ class TaskAddIndexStartTime extends Migrator {
         }
         //判断是否可以添加索引
         $can_add_index = true;
-        foreach(['start_time'] as $each_field){
-            if(!$this->table($table)->hasColumn($each_field)){
+        foreach (['start_time'] as $each_field) {
+            if (!$this->table($table)->hasColumn($each_field)) {
                 $can_add_index = false;
             }
         }
-        if(!$can_add_index){
+        if (!$can_add_index) {
             return;
         }
         $this->table($table)
