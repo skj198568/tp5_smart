@@ -47,6 +47,14 @@ class TableController extends MigrateBaseController {
             }
         }
         $tables = array_values($tables);
+        //按表名首字母排序
+        usort($tables, function ($a, $b) {
+            if ($a['name']{0} > $b['name']{0}) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
         $return = [
             'limit'  => 1000,
             'offset' => 0,
@@ -222,7 +230,7 @@ class TableController extends MigrateBaseController {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
         $this->assign('model_name', $this->getModelName($table_name));
-        $class_name = $this->getClassName([$table_name, 'data']);
+        $class_name             = $this->getClassName([$table_name, 'data']);
         $table_name_with_prefix = $this->getTableNameWithPrefix($table_name);
         $this->assign('table_name_with_prefix', $table_name_with_prefix);
         $this->query_instance->setTable($table_name_with_prefix);
