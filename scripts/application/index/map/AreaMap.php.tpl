@@ -27,7 +27,7 @@ class AreaMap extends BaseModel {
      * 当前数据表名称（含前缀）
      * @var string
      */
-    protected $table = 't_area';
+    protected $table = '';
 
     /**
      * 名称
@@ -79,9 +79,9 @@ class AreaMap extends BaseModel {
      * @var array
      */
     public static $fields_verifies = [
-        self::F_NAME => ["is_required","chinese",["length_max",255]], 
-        self::F_F_ID => ["is_required","number",["length_max",11]], 
-        self::F_TYPE => ["is_required","number",["in_array",["1","2","3"]],["length_max",11]], 
+        self::F_NAME => ["is_required", "chinese", ["length_max", 255]],
+        self::F_F_ID => ["is_required", "number", ["length_max", 11]],
+        self::F_TYPE => ["is_required", "number", ["in_array", ["1", "2", "3"]], ["length_max", 11]],
     ];
 
     /**
@@ -107,7 +107,7 @@ class AreaMap extends BaseModel {
      * @var array
      */
     protected static $fields_show_format = [
-        self::F_TYPE => [[[["1","省\/直辖市"],["2","城市"],["3","区县"]],"_show"]]
+        self::F_TYPE => [[[["1", "省\/直辖市"], ["2", "城市"], ["3", "区县"]], "_show"]]
     ];
 
     /**
@@ -132,6 +132,14 @@ class AreaMap extends BaseModel {
     protected static $fields_default_values = [];
 
     /**
+     * 初始化
+     */
+    public function initialize() {
+        parent::initialize();
+        $this->table = config('database.prefix') . 'area';
+    }
+
+    /**
      * 获取所有的字段
      * @param array $exclude_fields 不包含的字段
      * @return array
@@ -147,7 +155,7 @@ class AreaMap extends BaseModel {
      * @return int|mixed|null|static
      */
     public static function instance($id = 0) {
-        if($id >= 0) {
+        if ($id >= 0) {
             if (!isset(static::$instances_array[$id])) {
                 static::$instances_array[$id] = new static();
             }

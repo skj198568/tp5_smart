@@ -28,7 +28,7 @@ class TaskMap extends BaseModel {
      * 当前数据表名称（含前缀）
      * @var string
      */
-    protected $table = 't_task';
+    protected $table = '';
 
     /**
      * 带有命名空间的任务调用地址
@@ -128,6 +128,14 @@ class TaskMap extends BaseModel {
     protected static $fields_default_values = [
         self::F_REMARK => ''
     ];
+
+    /**
+     * 初始化
+     */
+    public function initialize() {
+        parent::initialize();
+        $this->table = config('database.prefix') . 'task';
+    }
 
     /**
      * 获取所有的字段

@@ -29,7 +29,7 @@ class UrlShortMap extends BaseModel {
      * 当前数据表名称（含前缀）
      * @var string
      */
-    protected $table = 't_url_short';
+    protected $table = '';
 
     /**
      * 短连接
@@ -64,10 +64,10 @@ class UrlShortMap extends BaseModel {
      * @var array
      */
     public static $fields_verifies = [
-        self::F_SHORT_URL => [["length_max",255]], 
-        self::F_TRUE_URL => [["length_max",255]], 
-        self::F_END_TIME => ["number",["length_max",11]], 
-        self::F_CREATE_TIME => ["number",["length_max",11]], 
+        self::F_SHORT_URL   => [["length_max", 255]],
+        self::F_TRUE_URL    => [["length_max", 255]],
+        self::F_END_TIME    => ["number", ["length_max", 11]],
+        self::F_CREATE_TIME => ["number", ["length_max", 11]],
     ];
 
     /**
@@ -93,8 +93,8 @@ class UrlShortMap extends BaseModel {
      * @var array
      */
     protected static $fields_show_format = [
-        self::F_END_TIME => [["date('Y-m-d H:i:s', %s)","_show"]],
-        self::F_CREATE_TIME => [["date('Y-m-d H:i:s', %s)","_show"]]
+        self::F_END_TIME    => [["date('Y-m-d H:i:s', %s)", "_show"]],
+        self::F_CREATE_TIME => [["date('Y-m-d H:i:s', %s)", "_show"]]
     ];
 
     /**
@@ -107,9 +107,9 @@ class UrlShortMap extends BaseModel {
      * 所有字段的注释
      */
     public static $fields_names = [
-        self::F_SHORT_URL => '短连接',
-        self::F_TRUE_URL => '真实url',
-        self::F_END_TIME => '超时时间，如果为0，则永不超时',
+        self::F_SHORT_URL   => '短连接',
+        self::F_TRUE_URL    => '真实url',
+        self::F_END_TIME    => '超时时间，如果为0，则永不超时',
         self::F_CREATE_TIME => '创建时间'
     ];
 
@@ -118,6 +118,14 @@ class UrlShortMap extends BaseModel {
      * @var array
      */
     protected static $fields_default_values = [];
+
+    /**
+     * 初始化
+     */
+    public function initialize() {
+        parent::initialize();
+        $this->table = config('database.prefix') . 'url_short';
+    }
 
     /**
      * 获取所有的字段
@@ -135,7 +143,7 @@ class UrlShortMap extends BaseModel {
      * @return int|mixed|null|static
      */
     public static function instance($id = 0) {
-        if($id >= 0) {
+        if ($id >= 0) {
             if (!isset(static::$instances_array[$id])) {
                 static::$instances_array[$id] = new static();
             }
