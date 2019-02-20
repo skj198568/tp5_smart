@@ -222,7 +222,7 @@
             }, function (r) {
                 tables.is_backup = false;
                 $('#id_modal_backup').modal('hide');
-                if (r.status == 'migrate/table/backupdata/1') {
+                if (r.status_code == 1) {
                     layer.msg('备份成功，文件为：' + r.file, function () {
                     });
                 } else {

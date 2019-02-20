@@ -121,8 +121,7 @@ class TableController extends MigrateBaseController {
             $api_functions = $table_comment['create_api'];
         }
         $this->assign('api_functions', $api_functions);
-        $key       = $this->getKey([$table_name]);
-        $fields    = cache($key);
+        $fields    = $this->getTableFields($table_name);
         $old_table = $this->query("SHOW TABLES LIKE '%$table_name'");
         $file_path = $this->getMigrateFilePath($class_name);
         if (empty($old_table)) {

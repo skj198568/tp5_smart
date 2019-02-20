@@ -71,89 +71,6 @@ class FieldController extends MigrateBaseController {
     }
 
     /**
-     * 获取表所有的字段
-     * @param $table_name
-     * @return array|mixed
-     * @throws \think\db\exception\BindParamException
-     * @throws \think\exception\PDOException
-     */
-    private function getTableFields($table_name) {
-        if (empty($table_name)) {
-            $table_fields = [];
-        } else {
-            //缓存
-            $key = $this->getKey([$table_name]);
-            //获取
-            $table_fields = cache($key);
-            if (empty($table_fields)) {
-                $table_fields = [];
-                if ($this->tableIsExist($table_name)) {
-                    //尝试从数据库获取
-                    $fields = $this->getAllFields($table_name);
-                    foreach ($fields as $each_field) {
-                        if ($each_field['Field'] == 'id') {
-                            continue;
-                        }
-                        //设置字段默认值
-                        if (strtolower($each_field['Default']) == 'null' || is_null($each_field['Default'])) {
-                            $each_field['Default'] = '';
-                        }
-                        //字段名
-                        $cache_filed = [
-                            'field_name'          => $each_field['Field'],
-                            'field_default_value' => $each_field['Default']
-                        ];
-                        //类型
-                        if (strpos($each_field['Type'], 'decimal') !== false) {
-                            $cache_filed['field_type'] = 'decimal';
-                            $field_detail              = '';
-                            if (strpos($each_field['Type'], '(') !== false) {
-                                $field_detail = ClString::getBetween($each_field['Type'], '(', ')', false);
-                            }
-                            $field_detail               = explode(',', $field_detail);
-                            $cache_filed['field_scale'] = $field_detail[1];
-                        } else if (strpos($each_field['Type'], 'bigint') !== false) {
-                            $cache_filed['field_type'] = 'int_big';
-                        } else if (strpos($each_field['Type'], 'tinyint') !== false) {
-                            $cache_filed['field_type'] = 'int_tiny';
-                        } else if (strpos($each_field['Type'], 'smallint') !== false) {
-                            $cache_filed['field_type'] = 'int_small';
-                        } else if (strpos($each_field['Type'], 'int') !== false) {
-                            $cache_filed['field_type'] = 'int';
-                        } else if (strpos($each_field['Type'], 'longtext') !== false) {
-                            $cache_filed['field_type'] = 'text_long';
-                        } else if (strpos($each_field['Type'], 'text') !== false) {
-                            $cache_filed['field_type'] = 'text';
-                        } else if (strpos($each_field['Type'], 'varchar') !== false) {
-                            $cache_filed['field_type'] = 'string';
-                        }
-                        if (ClVerify::isJson($each_field['Comment'])) {
-                            $comment = json_decode($each_field['Comment'], true);
-                            //字段描述
-                            $cache_filed['field_desc'] = $comment['name'];
-                            unset($comment['name']);
-                            $cache_filed = array_merge($cache_filed, $comment);
-                        } else {
-                            $cache_filed['field_desc'] = $each_field['Comment'];
-                        }
-                        //json_encode
-                        if (isset($cache_filed['show_map_fields'])) {
-                            $cache_filed['show_map_fields'] = json_encode($cache_filed['show_map_fields'], JSON_UNESCAPED_UNICODE);
-                        }
-                        if (isset($cache_filed['show_format'])) {
-                            $cache_filed['show_format'] = json_encode($cache_filed['show_format'], JSON_UNESCAPED_UNICODE);
-                        }
-                        $table_fields[] = $cache_filed;
-                    }
-                }
-                //记录缓存
-                cache($key, $table_fields, 3600 * 24);
-            }
-        }
-        return $table_fields;
-    }
-
-    /**
      * 获取字段列表
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\db\exception\BindParamException
@@ -267,6 +184,8 @@ class FieldController extends MigrateBaseController {
     /**
      * 字段重命名
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
      */
     public function rename() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
@@ -276,8 +195,7 @@ class FieldController extends MigrateBaseController {
         $new_name = get_param('new_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('new_name', $new_name);
         $class_name       = $this->getClassName([$table_name, 'rename', $old_name, 'to', $new_name]);
-        $key              = $this->getKey($table_name);
-        $fields           = cache($key);
+        $fields           = $this->getTableFields($table_name);
         $field_change_str = '';
         foreach ($fields as $k => $each_field) {
             if ($each_field['field_name'] == $old_name) {
@@ -299,19 +217,10 @@ class FieldController extends MigrateBaseController {
     }
 
     /**
-     * 获取所有字段
-     * @param $table_name
-     * @return mixed
-     * @throws \think\db\exception\BindParamException
-     * @throws \think\exception\PDOException
-     */
-    private function getAllFields($table_name) {
-        return $this->query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
-    }
-
-    /**
      * 移动位置
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
      */
     public function changePosition() {
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
@@ -320,8 +229,7 @@ class FieldController extends MigrateBaseController {
         $this->assign('after_field', $after_field_name);
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
-        $key                             = $this->getKey($table_name);
-        $fields                          = cache($key);
+        $fields                          = $this->getTableFields($table_name);
         $fields_str                      = '';
         $fields_str_with_after_field     = '';
         $old_fields_str                  = '';
@@ -379,8 +287,7 @@ class FieldController extends MigrateBaseController {
             'store_format',
             'verifies'
         ]);
-        $key          = $this->getKey($table_name);
-        $table_fields = cache($key);
+        $table_fields = $this->getTableFields($table_name);
         $old_fields   = [];
         foreach ($table_fields as $each_field) {
             if ($each_field['field_name'] == $field_name) {
