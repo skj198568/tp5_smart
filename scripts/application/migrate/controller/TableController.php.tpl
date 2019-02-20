@@ -49,7 +49,23 @@ class TableController extends MigrateBaseController {
         $tables = array_values($tables);
         //按表名首字母排序
         usort($tables, function ($a, $b) {
-            if ($a['name']{0} > $b['name']{0}) {
+            $a_name = $a['name'];
+            if (strpos($a_name, '_') !== false) {
+                $a_name_array = explode('_', $a_name);
+                $a_name       = '';
+                foreach ($a_name_array as $each) {
+                    $a_name .= $each{0};
+                }
+            }
+            $b_name = $b['name'];
+            if (strpos($b_name, '_') !== false) {
+                $b_name_array = explode('_', $b_name);
+                $b_name       = '';
+                foreach ($b_name_array as $each) {
+                    $b_name .= $each{0};
+                }
+            }
+            if ($a_name > $b_name) {
                 return 1;
             } else {
                 return -1;
