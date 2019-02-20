@@ -13,6 +13,16 @@ class TaskAddIndexStartTime extends Migrator {
         if ($this->table($table)->hasIndex(['start_time'])) {
             return;
         }
+        //判断是否可以添加索引
+        $can_add_index = true;
+        foreach(['start_time'] as $each_field){
+            if(!$this->table($table)->hasColumn($each_field)){
+                $can_add_index = false;
+            }
+        }
+        if(!$can_add_index){
+            return;
+        }
         $this->table($table)
             ->addIndex(['start_time'], ['type' => \Phinx\Db\Table\Index::INDEX, 'unique' => false, 'name' => 'index_start_time'])
             ->update();

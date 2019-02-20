@@ -18,15 +18,27 @@ class TaskAddEndTime20180910143527 extends Cmd {
             if ($this->table($table)->hasColumn('end_time')) {
                 continue;
             }
-            //新增字段名
-            $this->table($table)
-                ->addColumn('end_time', 'integer', ['after' => 'start_time', 'default' => 0, 'comment' =>
-                    ClMigrateField::instance()
-                        ->showFormat("date('Y-m-d H:i:s', %s)", '_show')
-                        ->verifyNumber()
-                        ->fetch('结束时间')
-                ])
-                ->update();
+            if ($this->table($table)->hasColumn('start_time')) {
+                //新增字段名
+                $this->table($table)
+                    ->addColumn('end_time', 'integer', ['after' => 'start_time', 'default' => 0, 'comment' =>
+                        ClMigrateField::instance()
+                            ->showFormat("date('Y-m-d H:i:s', %s)", '_show')
+                            ->verifyNumber()
+                            ->fetch('结束时间')
+                    ])
+                    ->update();
+            } else {
+//新增字段名
+                $this->table($table)
+                    ->addColumn('end_time', 'integer', ['default' => 0, 'comment' =>
+                        ClMigrateField::instance()
+                            ->showFormat("date('Y-m-d H:i:s', %s)", '_show')
+                            ->verifyNumber()
+                            ->fetch('结束时间')
+                    ])
+                    ->update();
+            }
         }
     }
 

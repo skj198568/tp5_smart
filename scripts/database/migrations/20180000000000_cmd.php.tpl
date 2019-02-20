@@ -92,13 +92,14 @@ class Cmd extends \think\migration\Migrator {
      * @throws \think\exception\PDOException
      */
     protected function getAllTables($table_name_without_prefix) {
-        $table_comment = $this->getTableComment($this->getTableNameWithPrefix($table_name_without_prefix));
-        $database      = config('database.database');
-        $query         = new \think\db\Query();
-        $result        = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
-        $tables        = [];
+        $table_name_with_prefix = $this->getTableNameWithPrefix($table_name_without_prefix);
+        $table_comment          = $this->getTableComment($table_name_with_prefix);
+        $database               = config('database.database');
+        $query                  = new \think\db\Query();
+        $result                 = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
+        $tables                 = [];
         foreach ($result as $each) {
-            if ($this->getTableComment($each['table_name']) == $table_comment) {
+            if (strpos($each['table_name'], $table_name_with_prefix) === 0 && $this->getTableComment($each['table_name']) == $table_comment) {
                 $tables[] = $this->getTableNameWithoutPrefix($each['table_name']);
             }
         }

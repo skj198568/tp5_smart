@@ -18,13 +18,24 @@ class TaskAddRemark20180910143601 extends Cmd {
             if ($this->table($table)->hasColumn('remark')) {
                 continue;
             }
-            //新增字段名
-            $this->table($table)
-                ->addColumn('remark', 'text', ['after' => 'end_time', 'limit' => MysqlAdapter::TEXT_REGULAR, 'comment' =>
-                    ClMigrateField::instance()
-                        ->fetch('备注')
-                ])
-                ->update();
+            if ($this->table($table)->hasColumn('end_time')) {
+                //新增字段名
+                $this->table($table)
+                    ->addColumn('remark', 'text', ['after' => 'end_time', 'limit' => MysqlAdapter::TEXT_REGULAR, 'comment' =>
+                        ClMigrateField::instance()
+                            ->fetch('备注')
+                    ])
+                    ->update();
+            } else {
+                //新增字段名
+                $this->table($table)
+                    ->addColumn('remark', 'text', ['limit' => MysqlAdapter::TEXT_REGULAR, 'comment' =>
+                        ClMigrateField::instance()
+                            ->fetch('备注')
+                    ])
+                    ->update();
+            }
+
         }
     }
 

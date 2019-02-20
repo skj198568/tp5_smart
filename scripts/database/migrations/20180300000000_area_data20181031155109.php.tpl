@@ -1,4 +1,5 @@
 <?php
+
 use think\migration\Migrator;
 use think\migration\db\Column;
 use app\index\model\AreaModel;
@@ -18,9 +19,9 @@ class AreaData20181031155109 extends Cmd {
         //临时取消校验
         AreaModel::$fields_verifies = [];
         //清空
-        AreaModel::instance()->execute('TRUNCATE TABLE `t_area`');
+        AreaModel::instance()->execute('TRUNCATE TABLE `' . config('database.prefix') . 'area`');
         //db存储文件
-        $db_file    = DOCUMENT_ROOT_PATH.'/../database/data/20181031155109_t_area.json';
+        $db_file    = DOCUMENT_ROOT_PATH . '/../database/data/20181031155109_area.json';
         $f_handle   = fopen($db_file, 'r');
         $max_length = 1024 * 1024;
         $items      = [];
@@ -34,7 +35,7 @@ class AreaData20181031155109 extends Cmd {
                 $items = [];
             }
         }
-        if(!empty($items)){
+        if (!empty($items)) {
             //批量插入
             AreaModel::instance()->insertAll($items);
         }
