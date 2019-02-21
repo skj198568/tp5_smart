@@ -36,14 +36,14 @@ class UserController extends MigrateBaseController {
             if ($each_user[0] == $account) {
                 if ($each_user[1] == md5(md5($password))) {
                     $each_user['token'] = ClCrypt::encrypt($each_user[0], CRYPT_KEY);
-                    return $this->ar(3, ['info' => $each_user]);
+                    return $this->ar(1, ['info' => $each_user]);
                 } else {
                     return $this->ar(2, ['message' => '密码错误']);
                 }
                 break;
             }
         }
-        return $this->ar(1, ['message' => '账号不存在']);
+        return $this->ar(3, ['message' => '账号不存在']);
     }
 
     /**

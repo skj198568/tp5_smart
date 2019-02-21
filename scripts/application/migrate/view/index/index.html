@@ -33,9 +33,9 @@
                 account: login.account,
                 password: login.password
             }, function (r) {
-                if (r.status_code == 3) {
+                if (r.status_code == 1) {
                     //存入cookie
-                    jCommon.cookieAdd('token', r.info.token, 24 * 3600);
+                    jCommon.cookieAdd('migrate_token', r.info.token, 24 * 3600);
                     //跳转
                     window.location.href = '{:url("tables/index")}';
                 } else {

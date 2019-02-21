@@ -94,7 +94,7 @@
         },
         $logout: function () {
             //清除cookie
-            jCommon.cookieDel('token');
+            jCommon.cookieDel('migrate_token');
             //跳转至登录页面
             window.location.href = '{:url("index/index")}';
         }

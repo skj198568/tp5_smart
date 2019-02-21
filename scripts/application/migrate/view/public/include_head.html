@@ -62,7 +62,7 @@
      * token值
      * @type {string}
      */
-    var token = jCommon.cookieGet('token');
+    var token = jCommon.cookieGet('migrate_token');
 
     /**
      * ajax完成回调函数
@@ -101,7 +101,7 @@
                 _opt.data = {};
             }
             //自动拼接token值
-            if (!_opt.data.hasOwnProperty('token') && !jCommon.empty(token)) {
+            if (!_opt.data.hasOwnProperty('migrate_token') && !jCommon.empty(token)) {
                 _opt.data.token = token;
             }
             //回调函数
