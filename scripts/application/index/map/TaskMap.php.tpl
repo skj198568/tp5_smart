@@ -32,7 +32,7 @@ class TaskMap extends BaseModel {
 
     /**
      * 带有命名空间的任务调用地址
-     * Type: varchar(1000)
+     * Type: varchar(512)
      * Default: ''
      */
     const F_COMMAND = 'command';
@@ -70,7 +70,7 @@ class TaskMap extends BaseModel {
      * @var array
      */
     public static $fields_verifies = [
-        self::F_COMMAND => ["is_required",["length_max",1000]], 
+        self::F_COMMAND => ["is_required",["length_max",512]], 
         self::F_CREATE_TIME => ["number",["length_max",11]], 
         self::F_START_TIME => ["number",["length_max",11]], 
         self::F_END_TIME => ["number",["length_max",11]], 

@@ -21,7 +21,7 @@ class Task201808101027 extends Cmd {
                     ->createApi([])
                     ->fetch('后台任务')
             )
-            ->addColumn('command', 'string', ['limit' => 1000, 'default' => '', 'comment' =>
+            ->addColumn('command', 'string', ['limit' => 512, 'default' => '', 'comment' =>
                 ClMigrateField::instance()
                     ->verifyIsRequire()
                     ->fetch('带有命名空间的任务调用地址')
