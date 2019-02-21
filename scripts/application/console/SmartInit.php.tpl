@@ -95,6 +95,8 @@ class SmartInit extends Command {
         $output->highlight('');
         //处理文件版本
         $this->dealFilesVersion($output);
+        //处理migrate
+        $this->dealMigrate($output);
         //处理api doc
         $this->dealApiDoc($output);
         //修改目录权限为www
@@ -735,13 +737,13 @@ class SmartInit extends Command {
                 if ($is_svn) {
                     $cmd[] = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create', $each_file);
                 } else {
-                    // todo git
+                    $cmd[] = sprintf('cd %s && git add %s && git commit -m "%s" && git push', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create');
                 }
             } else {
                 if ($is_svn) {
                     $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update', $each_file);
                 } else {
-                    // todo git
+                    $cmd[] = sprintf('cd %s && git ci -m "%s" && git push', DOCUMENT_ROOT_PATH . '/../', 'update');
                 }
             }
         }
@@ -760,6 +762,13 @@ class SmartInit extends Command {
         //删除
         unlink($file);
         $output->highlight('unlink ' . $file);
+    }
+
+    /**
+     * 处理migrate文件
+     * @param Output $output
+     */
+    private function dealMigrate(Output $output) {
         //处理migrate bash
         $file = DOCUMENT_ROOT_PATH . '/../database/migrate.sh';
         if (is_file($file)) {
