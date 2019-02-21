@@ -32,10 +32,17 @@ class TaskMap extends BaseModel {
 
     /**
      * 带有命名空间的任务调用地址
-     * Type: varchar(512)
+     * Type: varchar(10000)
      * Default: ''
      */
     const F_COMMAND = 'command';
+
+    /**
+     * 命令行crc32方式存储，用于索引
+     * Type: int(20)
+     * Default: 0
+     */
+    const F_COMMAND_CRC32 = 'command_crc32';
 
     /**
      * 创建时间
@@ -70,7 +77,8 @@ class TaskMap extends BaseModel {
      * @var array
      */
     public static $fields_verifies = [
-        self::F_COMMAND => ["is_required",["length_max",512]], 
+        self::F_COMMAND => ["is_required",["length_max",10000]], 
+        self::F_COMMAND_CRC32 => ["number",["length_max",20]], 
         self::F_CREATE_TIME => ["number",["length_max",11]], 
         self::F_START_TIME => ["number",["length_max",11]], 
         self::F_END_TIME => ["number",["length_max",11]], 
@@ -115,6 +123,7 @@ class TaskMap extends BaseModel {
      */
     public static $fields_names = [
         self::F_COMMAND => '带有命名空间的任务调用地址',
+        self::F_COMMAND_CRC32 => '命令行crc32方式存储，用于索引',
         self::F_CREATE_TIME => '创建时间',
         self::F_START_TIME => '开始时间',
         self::F_END_TIME => '结束时间',
@@ -144,7 +153,7 @@ class TaskMap extends BaseModel {
      * @return array
      */
     public static function getAllFields($exclude_fields = [self::F_ID]) {
-        $fields = [self::F_ID, self::F_COMMAND, self::F_CREATE_TIME, self::F_START_TIME, self::F_END_TIME, self::F_REMARK];
+        $fields = [self::F_ID, self::F_COMMAND, self::F_COMMAND_CRC32, self::F_CREATE_TIME, self::F_START_TIME, self::F_END_TIME, self::F_REMARK];
         return array_diff($fields, $exclude_fields);
     }
 
@@ -335,6 +344,20 @@ class TaskMap extends BaseModel {
     }
 
     /**
+     * 在操作数据库之前预处理数据
+     * @param array $data
+     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     * @return array
+     */
+    protected function preprocessDataBeforeExecute($data, $operate_type) {
+        $data = parent::preprocessDataBeforeExecute($data, $operate_type);
+        if (isset($data[self::F_COMMAND])) {
+            $data[self::F_COMMAND_CRC32] = crc32($data[self::F_COMMAND]);
+        }
+        return $data;
+    }
+
+    /**
      * 处理任务
      * @param int $id 执行的id
      * @return bool
@@ -400,9 +423,11 @@ class TaskMap extends BaseModel {
      */
     public static function createTask($command, $within_seconds_ignore_this_cmd = 0) {
         $is_insert = true;
+        //转为crc32，用于处理索引
+        $command_crc32 = crc32($command);
         if ($within_seconds_ignore_this_cmd > 0) {
             $last_create_time = self::instance()->where([
-                self::F_COMMAND => $command
+                self::F_COMMAND_CRC32 => $command_crc32
             ])->order([self::F_ID => self::V_ORDER_DESC])->value(self::F_CREATE_TIME);
             if (!is_numeric($last_create_time) || time() - $last_create_time > $within_seconds_ignore_this_cmd) {
                 $is_insert = true;
