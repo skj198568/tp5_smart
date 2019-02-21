@@ -285,26 +285,22 @@ class MigrateBaseController extends Controller {
         }
         $field_info['after_field'] = $after_field;
         //处理limit
-        $field_info['field_limit'] = '';
-        switch ($field_info['field_type']) {
-            case 'int_tiny':
-                $field_info['field_limit'] = "'limit' => MysqlAdapter::INT_TINY, ";
-                break;
-            case 'int_small':
-                $field_info['field_limit'] = "'limit' => MysqlAdapter::INT_SMALL, ";
-                break;
-            case 'int_big':
-                $field_info['field_limit'] = "'limit' => MysqlAdapter::INT_BIG, ";
-                break;
-            case 'text':
-                $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_REGULAR, ";
-                break;
-            case 'text_long':
-                $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_LONG, ";
-                break;
-            case 'decimal':
-                $field_info['field_limit'] = sprintf("'precision' => 11, 'scale' => %s, ", $field_info['field_scale']);
-                break;
+        if (strpos($field_info['field_limit'], '-') !== false) {
+
+            switch ($field_info['field_type']) {
+                case 'text':
+                    $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_REGULAR, ";
+                    break;
+                case 'text_long':
+                    $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_LONG, ";
+                    break;
+            }
+        } else {
+            if ($field_info['field_type'] == 'decimal') {
+                $field_info['field_limit'] = sprintf("'precision' => %s, 'scale' => %s, ", $field_info['field_limit'], $field_info['field_scale']);
+            } else {
+                $field_info['field_limit'] = sprintf("'limit' => %s, ", $field_info['field_limit']);
+            }
         }
         //处理字段类型
         if (in_array($field_info['field_type'], ['int', 'int_big', 'int_tiny', 'int_small'])) {
@@ -461,6 +457,7 @@ class MigrateBaseController extends Controller {
             $key = $this->getKey([$table_name]);
             //获取
             $table_fields = cache($key);
+            $table_fields = [];
             if (empty($table_fields)) {
                 $table_fields = [];
                 if ($this->tableIsExist($table_name)) {
@@ -475,10 +472,12 @@ class MigrateBaseController extends Controller {
                             $each_field['Default'] = '';
                         }
                         //字段名
-                        $cache_filed = [
+                        $cache_filed                = [
                             'field_name'          => $each_field['Field'],
                             'field_default_value' => $each_field['Default']
                         ];
+                        $cache_filed['field_limit'] = '-';
+                        $cache_filed['field_scale'] = '-';
                         //类型
                         if (strpos($each_field['Type'], 'decimal') !== false) {
                             $cache_filed['field_type'] = 'decimal';
@@ -487,21 +486,27 @@ class MigrateBaseController extends Controller {
                                 $field_detail = ClString::getBetween($each_field['Type'], '(', ')', false);
                             }
                             $field_detail               = explode(',', $field_detail);
+                            $cache_filed['field_limit'] = $field_detail[0];
                             $cache_filed['field_scale'] = $field_detail[1];
                         } else if (strpos($each_field['Type'], 'bigint') !== false) {
-                            $cache_filed['field_type'] = 'int_big';
+                            $cache_filed['field_type']  = 'int_big';
+                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
                         } else if (strpos($each_field['Type'], 'tinyint') !== false) {
-                            $cache_filed['field_type'] = 'int_tiny';
+                            $cache_filed['field_type']  = 'int_tiny';
+                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
                         } else if (strpos($each_field['Type'], 'smallint') !== false) {
-                            $cache_filed['field_type'] = 'int_small';
+                            $cache_filed['field_type']  = 'int_small';
+                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
                         } else if (strpos($each_field['Type'], 'int') !== false) {
-                            $cache_filed['field_type'] = 'int';
+                            $cache_filed['field_type']  = 'int';
+                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
                         } else if (strpos($each_field['Type'], 'longtext') !== false) {
                             $cache_filed['field_type'] = 'text_long';
                         } else if (strpos($each_field['Type'], 'text') !== false) {
                             $cache_filed['field_type'] = 'text';
                         } else if (strpos($each_field['Type'], 'varchar') !== false) {
-                            $cache_filed['field_type'] = 'string';
+                            $cache_filed['field_type']  = 'string';
+                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
                         }
                         if (ClVerify::isJson($each_field['Comment'])) {
                             $comment = json_decode($each_field['Comment'], true);

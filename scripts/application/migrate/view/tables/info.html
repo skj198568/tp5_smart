@@ -177,7 +177,7 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <label class="text-warning">字段类型</label>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -189,18 +189,26 @@
                                                     <option ms-attr-value="el">{{el}}</option>
                                                 </select>
                                             </div>
-                                            <div class="form-group">
-                                                <div class="input-group"
-                                                     ms-if="field_type != 'text' && field_type != 'text_long'">
+                                            <div class="form-group"
+                                                 ms-if="field_type != 'text' && field_type != 'text_long'">
+                                                <div class="input-group">
                                                     <div class="input-group-addon">默认</div>
-                                                    <input class="form-control" type="text" style="width: 60px;"
+                                                    <input class="form-control" type="text" style="width: 40px;"
                                                            placeholder="default value" ms-duplex="field_default_value">
+                                                </div>
+                                            </div>
+                                            <div class="form-group"
+                                                 ms-if="field_type != 'text' && field_type != 'text_long'">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">长度</div>
+                                                    <input class="form-control" type="text" style="width: 80px;"
+                                                           placeholder="长度" ms-duplex="field_limit">
                                                 </div>
                                             </div>
                                             <div class="form-group" ms-if="field_type == 'decimal'">
                                                 <div class="input-group">
                                                     <div class="input-group-addon">精度</div>
-                                                    <input class="form-control" type="text" style="width: 60px;"
+                                                    <input class="form-control" type="text" style="width: 40px;"
                                                            placeholder="精度" ms-duplex="field_scale">
                                                 </div>
                                             </div>
@@ -209,7 +217,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <div ms-if="!$fieldTypeIsInt()">
                                     <label class="text-warning">存储类型</label>
                                     <!--内联表单begin-->
@@ -625,969 +633,1049 @@
             </div>
         </div>
     </div>
-</div>
-<!--删除模态框end-->
-<script type="text/javascript">
+    <script type="text/javascript">
 
-    var editor_json = null;
+        var editor_json = null;
 
-    var table_info = avalon.define({
-        $id: 'avalon_controller',
-        $init: function () {
-            //类型处理
-            table_info.is_add = table_info.is_add == 0 ? false : true;
-            table_info.$getTableInfo();
-            table_info.$initTable();
-        },
-        table_name: '{:input("table_name")}',
-        is_add: '{:empty(input("table_name")) ? 1 : 0}',
-        table_desc: '',
-        using_cache: 0,
-        cache_seconds: 0,
-        is_partition: 0,
-        partition_type: 'field',
-        partition_field: '',
-        partition_value: 1,
-        api_functions: ['get', 'create', 'delete', 'update'],
-        api_functions_selected: ['get', 'create', 'delete', 'update'],
-        engine: 'InnoDB',
-        $getTableInfo: function () {
-            if (jCommon.empty(table_info.table_name)) {
-                return;
-            }
-            $.get('/migrate/table/get', {
-                table_name: table_info.table_name
-            }, function (r) {
-                table_info.table_desc = r.info.name;
-                table_info.using_cache = r.info.is_cache > 0 ? 1 : 0;
-                table_info.cache_seconds = r.info.is_cache;
-                table_info.api_functions_selected = r.info.create_api;
-                table_info.engine = r.info.engine;
-                if (r.info.hasOwnProperty('partition')) {
-                    table_info.is_partition = 1;
-                    table_info.partition_type = r.info.partition[0];
-                    if (r.info.partition.length == 2) {
-                        table_info.partition_type = 'field';
-                        table_info.partition_field = r.info.partition[0];
-                        table_info.partition_value = r.info.partition[1];
+        var table_info = avalon.define({
+            $id: 'avalon_controller',
+            $init: function () {
+                //类型处理
+                table_info.is_add = table_info.is_add == 0 ? false : true;
+                table_info.$getTableInfo();
+                table_info.$initTable();
+            },
+            table_name: '{:input("table_name")}',
+            is_add: '{:empty(input("table_name")) ? 1 : 0}',
+            table_desc: '',
+            using_cache: 0,
+            cache_seconds: 0,
+            is_partition: 0,
+            partition_type: 'field',
+            partition_field: '',
+            partition_value: 1,
+            api_functions: ['get', 'create', 'delete', 'update'],
+            api_functions_selected: ['get', 'create', 'delete', 'update'],
+            engine: 'InnoDB',
+            $getTableInfo: function () {
+                if (jCommon.empty(table_info.table_name)) {
+                    return;
+                }
+                $.get('/migrate/table/get', {
+                    table_name: table_info.table_name
+                }, function (r) {
+                    table_info.table_desc = r.info.name;
+                    table_info.using_cache = r.info.is_cache > 0 ? 1 : 0;
+                    table_info.cache_seconds = r.info.is_cache;
+                    table_info.api_functions_selected = r.info.create_api;
+                    table_info.engine = r.info.engine;
+                    if (r.info.hasOwnProperty('partition')) {
+                        table_info.is_partition = 1;
+                        table_info.partition_type = r.info.partition[0];
+                        if (r.info.partition.length == 2) {
+                            table_info.partition_type = 'field';
+                            table_info.partition_field = r.info.partition[0];
+                            table_info.partition_value = r.info.partition[1];
+                        }
+                    } else {
+                        table_info.is_partition = 0;
                     }
+                });
+            },
+            $apiIsChecked: function (function_name) {
+                if (table_info.api_functions_selected.indexOf(function_name) == -1) {
+                    return 0;
                 } else {
-                    table_info.is_partition = 0;
+                    return 1;
                 }
-            });
-        },
-        $apiIsChecked: function (function_name) {
-            if (table_info.api_functions_selected.indexOf(function_name) == -1) {
-                return 0;
-            } else {
-                return 1;
-            }
-        },
-        $apiChecked: function (function_name) {
-            if (table_info.$apiIsChecked(function_name)) {
-                //删除
-                table_info.api_functions_selected.remove(function_name);
-            } else {
-                //新增
-                table_info.api_functions_selected.push(function_name);
-            }
-        },
-        items: [],
-        $initTable: function () {
-            $('#id_table').bootstrapTable({
-                url: '{:url("/migrate/field/getList")}',
-                cache: false,
-                sortOrder: 'desc',
-                pageSize: 1000,
-                pageList: [],
-                queryParams: function (params) {
-                    if (!jCommon.empty(table_info.condition)) {
-                        params.condition = table_info.condition;
-                    }
-                    if (!jCommon.empty(table_info.table_name)) {
-                        params.table_name = table_info.table_name;
-                    }
-                    return params;
-                },
-                responseHandler: function (r) {
-                    //处理显示
-                    $.each(r.items, function (k, v) {
-                        $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_field, v_field) {
-                            if (!v.hasOwnProperty(v_field)) {
-                                if (v_field == 'visible') {
-                                    v[v_field] = 1;
-                                } else {
-                                    v[v_field] = 0;
+            },
+            $apiChecked: function (function_name) {
+                if (table_info.$apiIsChecked(function_name)) {
+                    //删除
+                    table_info.api_functions_selected.remove(function_name);
+                } else {
+                    //新增
+                    table_info.api_functions_selected.push(function_name);
+                }
+            },
+            items: [],
+            $initTable: function () {
+                $('#id_table').bootstrapTable({
+                    url: '{:url("/migrate/field/getList")}',
+                    cache: false,
+                    sortOrder: 'desc',
+                    pageSize: 1000,
+                    pageList: [],
+                    queryParams: function (params) {
+                        if (!jCommon.empty(table_info.condition)) {
+                            params.condition = table_info.condition;
+                        }
+                        if (!jCommon.empty(table_info.table_name)) {
+                            params.table_name = table_info.table_name;
+                        }
+                        return params;
+                    },
+                    responseHandler: function (r) {
+                        //处理显示
+                        $.each(r.items, function (k, v) {
+                            $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_field, v_field) {
+                                if (!v.hasOwnProperty(v_field)) {
+                                    if (v_field == 'visible') {
+                                        v[v_field] = 1;
+                                    } else {
+                                        v[v_field] = 0;
+                                    }
+                                }
+                            });
+                            if (!v.hasOwnProperty('verifies')) {
+                                v.verifies = [];
+                            }
+                            if (!v.hasOwnProperty('const_values')) {
+                                v.const_values = '';
+                            } else {
+                                if (jCommon.isArray(v.const_values)) {
+                                    v.const_values = JSON.stringify(v.const_values);
                                 }
                             }
+                            if (!v.hasOwnProperty('show_map_fields')) {
+                                v.show_map_fields = '';
+                            } else {
+                                if (jCommon.isArray(v.show_map_fields)) {
+                                    v.show_map_fields = JSON.stringify(v.show_map_fields);
+                                }
+                            }
+                            if (!v.hasOwnProperty('show_format')) {
+                                v.show_format = [];
+                            } else {
+                                if (jCommon.isArray(v.show_format)) {
+                                    v.show_format = JSON.stringify(v.show_format);
+                                }
+                            }
+                            if (!v.hasOwnProperty('store_format')) {
+                                v.store_format = 'string';
+                            }
+                            r.items[k] = v;
                         });
-                        if (!v.hasOwnProperty('verifies')) {
-                            v.verifies = [];
+                        //设置分表字段值
+                        if (r.items.length > 0 && table_info.partition_field.length == 0) {
+                            table_info.partition_field = r.items[0].field_name;
                         }
-                        if (!v.hasOwnProperty('const_values')) {
-                            v.const_values = '';
-                        } else {
-                            if (jCommon.isArray(v.const_values)) {
-                                v.const_values = JSON.stringify(v.const_values);
-                            }
-                        }
-                        if (!v.hasOwnProperty('show_map_fields')) {
-                            v.show_map_fields = '';
-                        } else {
-                            if (jCommon.isArray(v.show_map_fields)) {
-                                v.show_map_fields = JSON.stringify(v.show_map_fields);
-                            }
-                        }
-                        if (!v.hasOwnProperty('show_format')) {
-                            v.show_format = [];
-                        } else {
-                            if (jCommon.isArray(v.show_format)) {
-                                v.show_format = JSON.stringify(v.show_format);
-                            }
-                        }
-                        if (!v.hasOwnProperty('store_format')) {
-                            v.store_format = 'string';
-                        }
-                        r.items[k] = v;
-                    });
-                    //设置分表字段值
-                    if (r.items.length > 0 && table_info.partition_field.length == 0) {
-                        table_info.partition_field = r.items[0].field_name;
-                    }
-                    //先删除所有
-                    table_info.items.removeAll();
-                    //赋值
-                    table_info.items = r.items;
-                    return {
-                        'rows': r.items,
-                        'total': r.total,
-                        'page': r.offset / r.limit + 1
-                    };
-                },
-                idField: 'id',
-                toolbar: '#id_tools_div',
-                pagination: true,
-                sidePagination: "server",
-                showColumns: true,
-                showRefresh: true,
-                columns: [
-                    // {
-                    //     checkbox: true
-                    // },
-                    {
-                        field: 'field_name',
-                        title: '字段',
-                        formatter: function (value, row, index) {
-                            var btn = [value];
-                            if (!table_info.is_add) {
-                                btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
-                            }
-                            btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
-                            btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
-                            if (!table_info.is_add) {
-                                //编辑
-                                btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
-                            } else {
-                                //新增
-                                if (index > 0) {
-                                    btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$move(\'' + value + '\', \'up\')"><i class="fa fa-arrow-up"></i> 上移</button>');
-                                } else {
-                                    btn.push('<button class="btn btn-info btn-xs" disabled="disabled"><i class="fa fa-arrow-up"></i> 上移</button>');
+                        //先删除所有
+                        table_info.items.removeAll();
+                        //赋值
+                        table_info.items = r.items;
+                        return {
+                            'rows': r.items,
+                            'total': r.total,
+                            'page': r.offset / r.limit + 1
+                        };
+                    },
+                    idField: 'id',
+                    toolbar: '#id_tools_div',
+                    pagination: true,
+                    sidePagination: "server",
+                    showColumns: true,
+                    showRefresh: true,
+                    columns: [
+                        // {
+                        //     checkbox: true
+                        // },
+                        {
+                            field: 'field_name',
+                            title: '字段',
+                            formatter: function (value, row, index) {
+                                var btn = [value];
+                                if (!table_info.is_add) {
+                                    btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
                                 }
-                                if (index == table_info.items.length - 1) {
-                                    btn.push('<button class="btn btn-warning btn-xs" disabled="disabled"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
+                                btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
+                                if (!table_info.is_add) {
+                                    //编辑
+                                    btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
                                 } else {
-                                    btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$move(\'' + value + '\', \'down\')"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                    //新增
+                                    if (index > 0) {
+                                        btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$move(\'' + value + '\', \'up\')"><i class="fa fa-arrow-up"></i> 上移</button>');
+                                    } else {
+                                        btn.push('<button class="btn btn-info btn-xs" disabled="disabled"><i class="fa fa-arrow-up"></i> 上移</button>');
+                                    }
+                                    if (index == table_info.items.length - 1) {
+                                        btn.push('<button class="btn btn-warning btn-xs" disabled="disabled"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                    } else {
+                                        btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$move(\'' + value + '\', \'down\')"><i class="fa fa-arrow-down"></i> 下移</button>');
+                                    }
                                 }
+                                return btn.join('&nbsp;&nbsp;')
                             }
-                            return btn.join('&nbsp;&nbsp;')
-                        }
-                    },
-                    {
-                        field: 'field_desc',
-                        title: '描述'
-                    },
-                    {
-                        field: 'field_type',
-                        title: '类型'
-                    },
-                    {
-                        field: 'field_default_value',
-                        title: '默认值',
-                        formatter: function (value, row, index) {
-                            if (row.field_type == 'text' || row.field_type == 'text_long') {
-                                value = '<span class="text-danger">-</span>';
-                            } else {
-                                value = '<span class="text-primary">' + value + '</span>';
+                        },
+                        {
+                            field: 'field_desc',
+                            title: '描述'
+                        },
+                        {
+                            field: 'field_type',
+                            title: '类型'
+                        },
+                        {
+                            field: 'field_default_value',
+                            title: '默认值',
+                            formatter: function (value, row, index) {
+                                if (row.field_type == 'text' || row.field_type == 'text_long') {
+                                    value = '<span class="text-danger">-</span>';
+                                } else {
+                                    value = '<span class="text-primary">' + value + '</span>';
+                                }
+                                return value;
                             }
-                            return value;
-                        }
-                    },
-                    {
-                        field: 'field_scale',
-                        title: '精度',
-                        visible: false,
-                        formatter: function (value, row, index) {
-                            if (value == 0) {
-                                value = '<span class="text-danger">-</span>';
-                            } else {
-                                value = '<span class="text-primary">' + value + '</span>';
+                        },
+                        {
+                            field: 'field_limit',
+                            title: '长度',
+                            formatter: function (value, row, index) {
+                                if (row.field_type == 'text' || row.field_type == 'text_long') {
+                                    value = '<span class="text-danger">-</span>';
+                                } else {
+                                    value = '<span class="text-primary">' + value + '</span>';
+                                }
+                                return value;
                             }
-                            return value;
-                        }
-                    },
-                    {
-                        field: 'verifies',
-                        title: '校验器',
-                        formatter: function (value, row, index) {
-                            // $.each(value, function(k, v){
-                            //     if(jCommon.isArray(v)){
-                            //         value[k] = '['+v.join(',')+']'
-                            //     }
-                            // });
-                            return value;
-                        }
-                    },
-                    {
-                        field: 'const_values',
-                        title: 'const_values'
-                    },
-                    {
-                        field: 'show_map_fields',
-                        title: 'show_map_fields'
-                    },
-                    {
-                        field: 'show_format',
-                        title: 'show_format'
-                    },
-                    {
-                        field: 'visible',
-                        title: '可见',
-                        visible: false,
-                        formatter: function (value, row, index) {
-                            if (value == 0) {
-                                value = '<span class="text-danger">否</span>';
-                            } else {
-                                value = '<span class="text-primary">是</span>';
+                        },
+                        {
+                            field: 'field_scale',
+                            title: '精度',
+                            visible: false,
+                            formatter: function (value, row, index) {
+                                return value;
                             }
-                            return value;
-                        }
-                    },
-                    {
-                        field: 'is_searchable',
-                        title: '可检索',
-                        visible: false,
-                        formatter: function (value, row, index) {
-                            if (value == 0) {
-                                value = '<span class="text-danger">否</span>';
-                            } else {
-                                value = '<span class="text-primary">是</span>';
+                        },
+                        {
+                            field: 'verifies',
+                            title: '校验器',
+                            formatter: function (value, row, index) {
+                                // $.each(value, function(k, v){
+                                //     if(jCommon.isArray(v)){
+                                //         value[k] = '['+v.join(',')+']'
+                                //     }
+                                // });
+                                return value;
                             }
-                            return value;
-                        }
-                    },
-                    {
-                        field: 'is_sortable',
-                        title: '可排序',
-                        visible: false,
-                        formatter: function (value, row, index) {
-                            if (value == 0) {
-                                value = '<span class="text-danger">否</span>';
-                            } else {
-                                value = '<span class="text-primary">是</span>';
+                        },
+                        {
+                            field: 'const_values',
+                            title: 'const_values'
+                        },
+                        {
+                            field: 'show_map_fields',
+                            title: 'show_map_fields'
+                        },
+                        {
+                            field: 'show_format',
+                            title: 'show_format'
+                        },
+                        {
+                            field: 'visible',
+                            title: '可见',
+                            visible: false,
+                            formatter: function (value, row, index) {
+                                if (value == 0) {
+                                    value = '<span class="text-danger">否</span>';
+                                } else {
+                                    value = '<span class="text-primary">是</span>';
+                                }
+                                return value;
                             }
-                            return value;
-                        }
-                    },
-                    {
-                        field: 'is_read_only',
-                        title: '只读',
-                        visible: false,
-                        formatter: function (value, row, index) {
-                            if (value == 0) {
-                                value = '<span class="text-danger">否</span>';
-                            } else {
-                                value = '<span class="text-primary">是</span>';
+                        },
+                        {
+                            field: 'is_searchable',
+                            title: '可检索',
+                            visible: false,
+                            formatter: function (value, row, index) {
+                                if (value == 0) {
+                                    value = '<span class="text-danger">否</span>';
+                                } else {
+                                    value = '<span class="text-primary">是</span>';
+                                }
+                                return value;
                             }
-                            return value;
+                        },
+                        {
+                            field: 'is_sortable',
+                            title: '可排序',
+                            visible: false,
+                            formatter: function (value, row, index) {
+                                if (value == 0) {
+                                    value = '<span class="text-danger">否</span>';
+                                } else {
+                                    value = '<span class="text-primary">是</span>';
+                                }
+                                return value;
+                            }
+                        },
+                        {
+                            field: 'is_read_only',
+                            title: '只读',
+                            visible: false,
+                            formatter: function (value, row, index) {
+                                if (value == 0) {
+                                    value = '<span class="text-danger">否</span>';
+                                } else {
+                                    value = '<span class="text-primary">是</span>';
+                                }
+                                return value;
+                            }
+                        },
+                        {
+                            field: 'store_format',
+                            title: '存储类型',
+                            visible: false
                         }
-                    },
-                    {
-                        field: 'store_format',
-                        title: '存储类型',
-                        visible: false
+                    ]
+                });
+            },
+            condition: '',
+            $search: function () {
+                $('#id_table').bootstrapTable('refresh', {
+                    query: {
+                        offset: 0
                     }
-                ]
-            });
-        },
-        condition: '',
-        $search: function () {
-            $('#id_table').bootstrapTable('refresh', {
-                query: {
-                    offset: 0
-                }
-            });
-        },
-        $refresh: function () {
-            $('#id_table').bootstrapTable('refresh', {});
-        },
-        //字段名
-        field_name: '',
-        field_desc: '',
-        field_type: 'int',
-        field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long'],
-        field_default_value: 0,
-        field_scale: 0,
-        //校验器 ['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password']
-        verifies: ['is_required', 'ip', 'postcode', 'id_card', 'number', 'tel', 'is_date', 'unique'],
-        verifies_selected: [],
-        common_settings: ['visible', 'is_sortable', 'is_searchable', 'is_read_only'],
-        common_settings_selected: ['visible'],
-        password: 0,
-        password_min_length: 6,
-        password_max_length: 18,
-        in_array: 0,
-        in_array_value: '',
-        in_scope: 0,
-        in_scope_min: 0,
-        in_scope_max: 0,
-        min: 0,
-        min_value: 0,
-        max: 0,
-        max_value: 0,
-        str_length_fixed: 0,
-        str_length_fixed_value: 0,
-        str_length_min: 0,
-        str_length_min_value: 0,
-        str_length_max: 0,
-        str_length_max_value: 0,
-        const_values: 0,
-        const_values_json: '',
-        show_map_fields: '',
-        show_map_fields_json: '',
-        //显示格式化
-        show_format: '',
-        show_format_str: '',
-        store_format: 'string',
-        password_salt: '',
-        /**
-         * 设置默认值
-         */
-        $setFieldDefaultValue: function () {
-            table_info.edit_field_name = '';
-            //默认值处理
-            table_info.field_name = '';
-            table_info.field_desc = '';
-            table_info.field_type = 'int';
-            table_info.field_default_value = 0;
-            table_info.field_scale = 0;
-            table_info.verifies_selected.clear();
-            table_info.verifies_selected.push('number');
-            table_info.common_settings_selected.clear();
-            table_info.common_settings_selected.push('visible');
-            table_info.password = 0;
-            table_info.password_min_length = 6;
-            table_info.password_max_length = 18;
-            table_info.in_array = 0;
-            table_info.in_array_value = '';
-            table_info.in_scope = 0;
-            table_info.in_scope_min = 0;
-            table_info.in_scope_max = 0;
-            table_info.min = 0;
-            table_info.min_value = 0;
-            table_info.max = 0;
-            table_info.max_value = 0;
-            table_info.str_length_fixed = 0;
-            table_info.str_length_fixed_value = 0;
-            table_info.str_length_min = 0;
-            table_info.str_length_min_value = 0;
-            table_info.str_length_max = 0;
-            table_info.str_length_max_value = 0;
-            table_info.const_values = 0;
-            table_info.const_values_json = '';
-            table_info.show_map_fields = 0;
-            table_info.show_map_fields_json = '';
+                });
+            },
+            $refresh: function () {
+                $('#id_table').bootstrapTable('refresh', {});
+            },
+            //字段名
+            field_name: '',
+            field_desc: '',
+            field_type: 'int',
+            field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long'],
+            field_default_value: 0,
+            field_limit: 0,
+            field_scale: 0,
+            //校验器 ['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password']
+            verifies: ['is_required', 'ip', 'postcode', 'id_card', 'number', 'tel', 'is_date', 'unique'],
+            verifies_selected: [],
+            common_settings: ['visible', 'is_sortable', 'is_searchable', 'is_read_only'],
+            common_settings_selected: ['visible'],
+            password: 0,
+            password_min_length: 6,
+            password_max_length: 18,
+            in_array: 0,
+            in_array_value: '',
+            in_scope: 0,
+            in_scope_min: 0,
+            in_scope_max: 0,
+            min: 0,
+            min_value: 0,
+            max: 0,
+            max_value: 0,
+            str_length_fixed: 0,
+            str_length_fixed_value: 0,
+            str_length_min: 0,
+            str_length_min_value: 0,
+            str_length_max: 0,
+            str_length_max_value: 0,
+            const_values: 0,
+            const_values_json: '',
+            show_map_fields: '',
+            show_map_fields_json: '',
             //显示格式化
-            table_info.show_format = 0;
-            table_info.show_format_str = '';
-            table_info.store_format = 'string';
-            table_info.password_salt = '';
-            //清空编辑器的内容
-            if (editor_json !== null) {
-                editor_json.setValue("");
-            }
-        },
-        $add: function () {
-            table_info.$setFieldDefaultValue();
-            table_info.after_field = 'id';
-            table_info.after_field_select_options.clear();
-            table_info.after_field_select_options.push('id');
-            $.each(table_info.items, function (k, v) {
-                table_info.after_field_select_options.push(v.field_name);
-            });
-            if (table_info.items.length > 0) {
-                table_info.after_field = table_info.items[table_info.items.length - 1].field_name;
-            }
-            table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
-            $('#id_modal_add_field').modal('show');
-            setTimeout(function () {
-                $('#id_field_name').focus();
-            }, 1000);
-        },
-        $commonSettingCheckIsChecked: function (function_name) {
-            if (table_info.common_settings_selected.indexOf(function_name) == -1) {
-                return 0;
-            } else {
-                return 1;
-            }
-        },
-        $commonSettingCheck: function (function_name) {
-            if (table_info.$commonSettingCheckIsChecked(function_name)) {
-                //删除
-                table_info.common_settings_selected.remove(function_name);
-            } else {
-                //新增
-                table_info.common_settings_selected.push(function_name);
-            }
-        },
-        $verifiesIsChecked: function (function_name) {
-            if (table_info.verifies_selected.indexOf(function_name) == -1) {
-                return 0;
-            } else {
-                return 1;
-            }
-        },
-        $verifiesCheck: function (function_name) {
-            if (table_info.$verifiesIsChecked(function_name)) {
-                //删除
-                table_info.verifies_selected.remove(function_name);
-            } else {
-                //新增
-                table_info.verifies_selected.push(function_name);
-            }
-        },
-        $checkPassword: function () {
-            table_info.password = table_info.password == 1 ? 0 : 1;
-        },
-        $checkInArray: function () {
-            table_info.in_array = table_info.in_array == 1 ? 0 : 1;
-        },
-        $checkInScope: function () {
-            table_info.in_scope = table_info.in_scope == 1 ? 0 : 1;
-        },
-        $checkMin: function () {
-            table_info.min = table_info.min == 1 ? 0 : 1;
-        },
-        $checkMax: function () {
-            table_info.max = table_info.max == 1 ? 0 : 1;
-        },
-        $checkStrLengthFixed: function () {
-            table_info.str_length_fixed = table_info.str_length_fixed == 1 ? 0 : 1;
-        },
-        $checkStrLengthMin: function () {
-            table_info.str_length_min = table_info.str_length_min == 1 ? 0 : 1;
-        },
-        $checkStrLengthMax: function () {
-            table_info.str_length_max = table_info.str_length_max == 1 ? 0 : 1;
-        },
-        $checkConstValues: function () {
-            table_info.const_values = table_info.const_values == 1 ? 0 : 1;
-        },
-        $checkShowMapFields: function () {
-            table_info.show_map_fields = table_info.show_map_fields == 1 ? 0 : 1;
-        },
-        $checkShowFormat: function () {
-            table_info.show_format = table_info.show_format == 1 ? 0 : 1;
-        },
-        $fieldTypeIsInt: function () {
-            if (['int', 'decimal', 'int_big', 'int_tiny', 'int_small'].indexOf(table_info.field_type) !== -1) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-        show_map_is_show: false,
-        $storeFormatIsJson: function () {
-            if (jCommon.isArray(table_info.store_format)) {
-                return false;
-            } else {
-                if (table_info.store_format == 'json') {
+            show_format: '',
+            show_format_str: '',
+            store_format: 'string',
+            password_salt: '',
+            /**
+             * 设置默认值
+             */
+            $setFieldDefaultValue: function () {
+                table_info.edit_field_name = '';
+                //默认值处理
+                table_info.field_name = '';
+                table_info.field_desc = '';
+                table_info.field_type = 'int';
+                table_info.field_default_value = 0;
+                table_info.field_limit = 11;
+                table_info.field_scale = 0;
+                table_info.verifies_selected.clear();
+                table_info.verifies_selected.push('number');
+                table_info.common_settings_selected.clear();
+                table_info.common_settings_selected.push('visible');
+                table_info.password = 0;
+                table_info.password_min_length = 6;
+                table_info.password_max_length = 18;
+                table_info.in_array = 0;
+                table_info.in_array_value = '';
+                table_info.in_scope = 0;
+                table_info.in_scope_min = 0;
+                table_info.in_scope_max = 0;
+                table_info.min = 0;
+                table_info.min_value = 0;
+                table_info.max = 0;
+                table_info.max_value = 0;
+                table_info.str_length_fixed = 0;
+                table_info.str_length_fixed_value = 0;
+                table_info.str_length_min = 0;
+                table_info.str_length_min_value = 0;
+                table_info.str_length_max = 0;
+                table_info.str_length_max_value = 0;
+                table_info.const_values = 0;
+                table_info.const_values_json = '';
+                table_info.show_map_fields = 0;
+                table_info.show_map_fields_json = '';
+                //显示格式化
+                table_info.show_format = 0;
+                table_info.show_format_str = '';
+                table_info.store_format = 'string';
+                table_info.password_salt = '';
+                //清空编辑器的内容
+                if (editor_json !== null) {
+                    editor_json.setValue("");
+                }
+            },
+            $add: function () {
+                table_info.$setFieldDefaultValue();
+                table_info.after_field = 'id';
+                table_info.after_field_select_options.clear();
+                table_info.after_field_select_options.push('id');
+                $.each(table_info.items, function (k, v) {
+                    table_info.after_field_select_options.push(v.field_name);
+                });
+                if (table_info.items.length > 0) {
+                    table_info.after_field = table_info.items[table_info.items.length - 1].field_name;
+                }
+                table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
+                $('#id_modal_add_field').modal('show');
+                setTimeout(function () {
+                    $('#id_field_name').focus();
+                }, 1000);
+            },
+            $commonSettingCheckIsChecked: function (function_name) {
+                if (table_info.common_settings_selected.indexOf(function_name) == -1) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            },
+            $commonSettingCheck: function (function_name) {
+                if (table_info.$commonSettingCheckIsChecked(function_name)) {
+                    //删除
+                    table_info.common_settings_selected.remove(function_name);
+                } else {
+                    //新增
+                    table_info.common_settings_selected.push(function_name);
+                }
+            },
+            $verifiesIsChecked: function (function_name) {
+                if (table_info.verifies_selected.indexOf(function_name) == -1) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            },
+            $verifiesCheck: function (function_name) {
+                if (table_info.$verifiesIsChecked(function_name)) {
+                    //删除
+                    table_info.verifies_selected.remove(function_name);
+                } else {
+                    //新增
+                    table_info.verifies_selected.push(function_name);
+                }
+            },
+            $checkPassword: function () {
+                table_info.password = table_info.password == 1 ? 0 : 1;
+            },
+            $checkInArray: function () {
+                table_info.in_array = table_info.in_array == 1 ? 0 : 1;
+            },
+            $checkInScope: function () {
+                table_info.in_scope = table_info.in_scope == 1 ? 0 : 1;
+            },
+            $checkMin: function () {
+                table_info.min = table_info.min == 1 ? 0 : 1;
+            },
+            $checkMax: function () {
+                table_info.max = table_info.max == 1 ? 0 : 1;
+            },
+            $checkStrLengthFixed: function () {
+                table_info.str_length_fixed = table_info.str_length_fixed == 1 ? 0 : 1;
+            },
+            $checkStrLengthMin: function () {
+                table_info.str_length_min = table_info.str_length_min == 1 ? 0 : 1;
+            },
+            $checkStrLengthMax: function () {
+                table_info.str_length_max = table_info.str_length_max == 1 ? 0 : 1;
+            },
+            $checkConstValues: function () {
+                table_info.const_values = table_info.const_values == 1 ? 0 : 1;
+            },
+            $checkShowMapFields: function () {
+                table_info.show_map_fields = table_info.show_map_fields == 1 ? 0 : 1;
+            },
+            $checkShowFormat: function () {
+                table_info.show_format = table_info.show_format == 1 ? 0 : 1;
+            },
+            $fieldTypeIsInt: function () {
+                if (['int', 'decimal', 'int_big', 'int_tiny', 'int_small'].indexOf(table_info.field_type) !== -1) {
                     return true;
                 } else {
                     return false;
                 }
-            }
-        },
-        do_add_or_update_loading: false,
-        $doAddOrUpdate: function () {
-            var param = {
-                field_name: table_info.field_name,
-                field_desc: table_info.field_desc,
-                field_type: table_info.field_type,
-                field_default_value: table_info.field_default_value,
-                field_scale: table_info.field_scale
-            };
-            //常规设置
-            $.each(table_info.common_settings_selected, function (k, v) {
-                param[v] = 1;
-            });
-            //不可见，特殊处理
-            if (!param.hasOwnProperty('visible')) {
-                param.visible = 0;
-            }
-            if (!jCommon.empty(table_info.show_map_fields)) {
-                param.show_map_fields = table_info.show_map_fields_json;
-            }
-            if (!jCommon.empty(table_info.show_format)) {
-                param.show_format = table_info.show_format_str;
-            }
-            var verifies = table_info.verifies_selected.$model;
-            if (table_info.store_format == 'password') {
-                param.store_format = ['password', table_info.password_salt];
-            } else {
-                param.store_format = table_info.store_format;
-            }
-            if (table_info.in_array) {
-                verifies.push(['in_array', table_info.in_array_value]);
-            }
-            if (table_info.in_scope) {
-                verifies.push(['in_scope', table_info.in_scope_min, table_info.in_scope_max]);
-            }
-            if (table_info.min) {
-                verifies.push(['min', table_info.min_value]);
-            }
-            if (table_info.max) {
-                verifies.push(['max', table_info.max_value]);
-            }
-            if (table_info.password) {
-                verifies.push(['password', table_info.password_min_length, table_info.password_max_length]);
-            }
-            if (table_info.str_length_fixed) {
-                verifies.push(['length', table_info.str_length_fixed_value]);
-            }
-            if (table_info.str_length_min) {
-                verifies.push(['length_min', table_info.str_length_min_value]);
-            }
-            if (table_info.str_length_max) {
-                verifies.push(['length_max', table_info.str_length_max_value]);
-            }
-            //去重
-            var verifies_unique = [];
-            $.each(verifies, function (k, v) {
-                if (verifies_unique.indexOf(v) === -1) {
-                    verifies_unique.push(v);
-                }
-            });
-            param.verifies = verifies_unique;
-            if (table_info.const_values) {
-                param.const_values = table_info.const_values_json;
-            }
-            if (table_info.show_map_fields) {
-                param.show_map_fields = table_info.show_map_fields_json;
-            }
-            if (table_info.show_format) {
-                if (jCommon.isJson(table_info.show_format_str)) {
-                    param.show_format = table_info.show_format_str;
+            },
+            show_map_is_show: false,
+            $storeFormatIsJson: function () {
+                if (jCommon.isArray(table_info.store_format)) {
+                    return false;
                 } else {
-                    param.show_format = [[table_info.show_format_str, '_show']];
-                }
-            }
-            param.table_name = table_info.table_name;
-            param.after_field = table_info.after_field;
-            var url = '';
-            if (!table_info.is_add) {
-                if (table_info.edit_field_name.length > 0) {
-                    url = '/migrate/field/update';
-                } else {
-                    url = '/migrate/field/createForExistTable';
-                }
-            } else {
-                url = '/migrate/field/create';
-            }
-            table_info.do_add_or_update_loading = true;
-            $.post(url, param, function (r) {
-                if (r.status_code == 1) {
-                    table_info.do_add_or_update_loading = false;
-                    layer.msg(table_info.edit_field_name.length > 0 ? '编辑成功' : '新增成功', function () {
-                    });
-                    $('#id_modal_add_field').modal('hide');
-                    table_info.$refresh();
-                } else {
-                    layer.msg('失败，请检查……', function () {
-
-                    });
-                }
-            });
-            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
-                setTimeout(function () {
-                    table_info.do_add_or_update_loading = false;
-                }, 1000);
-            };
-        },
-        edit_field_name: '',
-        $edit: function (field_name) {
-            table_info.$setFieldDefaultValue();
-            //用于控制add还是editor
-            table_info.edit_field_name = field_name;
-            //设置数据
-            $.each(table_info.items, function (k, v) {
-                if (v.field_name == field_name) {
-                    table_info.field_name = v.field_name;
-                    table_info.field_desc = v.field_desc;
-                    table_info.field_type = v.field_type;
-                    table_info.field_default_value = jCommon.isNumber(v.field_default_value) ? v.field_default_value : (jCommon.empty(v.field_default_value) ? '空' : v.field_default_value);
-                    table_info.field_scale = v.field_scale;
-                    $.each(['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password'], function (k_verify, v_verify) {
-                        if (v.verifies.indexOf(v_verify) !== -1) {
-                            table_info.verifies_selected.push(v_verify);
-                        }
-                    });
-                    //清空
-                    table_info.common_settings_selected.clear();
-                    $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_common_settings, v_common_settings) {
-                        if (v.hasOwnProperty(v_common_settings) && v[v_common_settings] == 1) {
-                            table_info.common_settings_selected.push(v_common_settings);
-                        }
-                    });
-                    //复杂校验器
-                    $.each(v.verifies, function (k_verify, v_verify) {
-                        if (jCommon.isArray(v_verify)) {
-                            switch (v_verify[0]) {
-                                case 'password':
-                                    table_info.password = 1;
-                                    table_info.password_min_length = v_verify[1];
-                                    table_info.password_max_length = v_verify[2];
-                                    break;
-                                case 'in_array':
-                                    table_info.in_array = 1;
-                                    table_info.in_array_value = JSON.stringify(v_verify[1]);
-                                    break;
-                                case 'in_scope':
-                                    table_info.in_scope = 1;
-                                    table_info.in_scope_min = v_verify[1];
-                                    table_info.in_scope_max = v_verify[2];
-                                    break;
-                                case 'min':
-                                    table_info.min = 1;
-                                    table_info.min_value = v_verify[1];
-                                    break;
-                                case 'max':
-                                    table_info.max = 1;
-                                    table_info.max_value = v_verify[1];
-                                    break;
-                                case 'length':
-                                    table_info.str_length_fixed = 1;
-                                    table_info.str_length_fixed_value = v_verify[1];
-                                    break;
-                                case 'length_min':
-                                    table_info.str_length_min = 1;
-                                    table_info.str_length_min_value = v_verify[1];
-                                    break;
-                                case 'length_max':
-                                    table_info.str_length_max = 1;
-                                    table_info.str_length_max_value = v_verify[1];
-                                    break;
-                            }
-                        }
-                    });
-                    if (v.hasOwnProperty('const_values') && !jCommon.empty(v.const_values)) {
-                        table_info.const_values = 1;
-                        table_info.const_values_json = v.const_values;
-                    }
-                    if (v.hasOwnProperty('show_map_fields') && !jCommon.empty(v.show_map_fields)) {
-                        table_info.show_map_fields = 1;
-                        table_info.show_map_fields_json = v.show_map_fields;
-                    }
-                    if (v.hasOwnProperty('show_format') && !jCommon.empty(v.show_format)) {
-                        table_info.show_format = 1;
-                        //只显示内容部分
-                        var show_format = JSON.parse(v.show_format);
-                        table_info.show_format_str = show_format[0][0];
-                    }
-                    if (v.hasOwnProperty('store_format') && !jCommon.empty(v.store_format)) {
-                        if (jCommon.isArray(v.store_format)) {
-                            table_info.store_format = v.store_format[0];
-                            table_info.password_salt = v.store_format[1];
-                        } else {
-                            table_info.store_format = v.store_format;
-                        }
+                    if (table_info.store_format == 'json') {
+                        return true;
                     } else {
-                        table_info.store_format = 'string';
+                        return false;
                     }
                 }
-            });
-            $('#id_modal_add_field').modal('show');
-            table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
-            setTimeout(function () {
-                $('#id_field_name').focus();
-            }, 1000);
-        },
-        del_loading: false,
-        del_field_name: '',
-        $del: function (field_name) {
-            table_info.del_field_name = field_name;
-            $('#id_modal_del').modal('show');
-        },
-        $doDel: function () {
-            table_info.del_loading = true;
-            var url = '/migrate/field/delete';
-            if (table_info.is_add) {
-                url = '/migrate/field/deleteForCreateTable';
-            }
-            $.post(url, {
-                table_name: table_info.table_name,
-                field_name: table_info.del_field_name
-            }, function (r) {
-                if (r.status_code == 1) {
-                    table_info.del_loading = false;
-                    $('#id_modal_del').modal('hide');
-                    layer.msg('删除成功，' + r.hasOwnProperty('file_name') ? r.file_name : r.message, function () {
+            },
+            do_add_or_update_loading: false,
+            $doAddOrUpdate: function () {
+                //判断长度是否超标
+                var max_limit = table_info.getFieldMaxLimit(table_info.field_type);
+                if (max_limit != '-') {
+                    if (table_info.field_limit > max_limit) {
+                        layer.msg('字段长度不可超过' + max_limit, function () {
+
+                        });
+                        return false;
+                    }
+                }
+                var param = {
+                    field_name: table_info.field_name,
+                    field_desc: table_info.field_desc,
+                    field_type: table_info.field_type,
+                    field_default_value: table_info.field_default_value,
+                    field_scale: table_info.field_scale,
+                    field_limit: table_info.field_limit
+                };
+                //常规设置
+                $.each(table_info.common_settings_selected, function (k, v) {
+                    param[v] = 1;
+                });
+                //不可见，特殊处理
+                if (!param.hasOwnProperty('visible')) {
+                    param.visible = 0;
+                }
+                if (!jCommon.empty(table_info.show_map_fields)) {
+                    param.show_map_fields = table_info.show_map_fields_json;
+                }
+                if (!jCommon.empty(table_info.show_format)) {
+                    param.show_format = table_info.show_format_str;
+                }
+                var verifies = table_info.verifies_selected.$model;
+                if (table_info.store_format == 'password') {
+                    param.store_format = ['password', table_info.password_salt];
+                } else {
+                    param.store_format = table_info.store_format;
+                }
+                if (table_info.in_array) {
+                    verifies.push(['in_array', table_info.in_array_value]);
+                }
+                if (table_info.in_scope) {
+                    verifies.push(['in_scope', table_info.in_scope_min, table_info.in_scope_max]);
+                }
+                if (table_info.min) {
+                    verifies.push(['min', table_info.min_value]);
+                }
+                if (table_info.max) {
+                    verifies.push(['max', table_info.max_value]);
+                }
+                if (table_info.password) {
+                    verifies.push(['password', table_info.password_min_length, table_info.password_max_length]);
+                }
+                if (table_info.str_length_fixed) {
+                    verifies.push(['length', table_info.str_length_fixed_value]);
+                }
+                if (table_info.str_length_min) {
+                    verifies.push(['length_min', table_info.str_length_min_value]);
+                }
+                if (table_info.str_length_max) {
+                    verifies.push(['length_max', table_info.str_length_max_value]);
+                }
+                //去重
+                var verifies_unique = [];
+                $.each(verifies, function (k, v) {
+                    if (verifies_unique.indexOf(v) === -1) {
+                        verifies_unique.push(v);
+                    }
+                });
+                param.verifies = verifies_unique;
+                if (table_info.const_values) {
+                    param.const_values = table_info.const_values_json;
+                }
+                if (table_info.show_map_fields) {
+                    param.show_map_fields = table_info.show_map_fields_json;
+                }
+                if (table_info.show_format) {
+                    if (jCommon.isJson(table_info.show_format_str)) {
+                        param.show_format = table_info.show_format_str;
+                    } else {
+                        param.show_format = [[table_info.show_format_str, '_show']];
+                    }
+                }
+                param.table_name = table_info.table_name;
+                param.after_field = table_info.after_field;
+                var url = '';
+                if (!table_info.is_add) {
+                    if (table_info.edit_field_name.length > 0) {
+                        url = '/migrate/field/update';
+                    } else {
+                        url = '/migrate/field/createForExistTable';
+                    }
+                } else {
+                    url = '/migrate/field/create';
+                }
+                table_info.do_add_or_update_loading = true;
+                $.post(url, param, function (r) {
+                    if (r.status_code == 1) {
+                        table_info.do_add_or_update_loading = false;
+                        layer.msg(table_info.edit_field_name.length > 0 ? '编辑成功' : '新增成功', function () {
+                        });
+                        $('#id_modal_add_field').modal('hide');
+                        table_info.$refresh();
+                    } else {
+                        layer.msg('失败，请检查……', function () {
+
+                        });
+                    }
+                });
+                ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                    setTimeout(function () {
+                        table_info.do_add_or_update_loading = false;
+                    }, 1000);
+                };
+            },
+            edit_field_name: '',
+            $edit: function (field_name) {
+                table_info.$setFieldDefaultValue();
+                //用于控制add还是editor
+                table_info.edit_field_name = field_name;
+                //设置数据
+                $.each(table_info.items, function (k, v) {
+                    if (v.field_name == field_name) {
+                        table_info.field_name = v.field_name;
+                        table_info.field_desc = v.field_desc;
+                        table_info.field_type = v.field_type;
+                        table_info.field_default_value = jCommon.isNumber(v.field_default_value) ? v.field_default_value : (jCommon.empty(v.field_default_value) ? '空' : v.field_default_value);
+                        table_info.field_scale = v.field_scale;
+                        table_info.field_limit = v.field_limit;
+                        $.each(['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password'], function (k_verify, v_verify) {
+                            if (v.verifies.indexOf(v_verify) !== -1) {
+                                table_info.verifies_selected.push(v_verify);
+                            }
+                        });
+                        //清空
+                        table_info.common_settings_selected.clear();
+                        $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_common_settings, v_common_settings) {
+                            if (v.hasOwnProperty(v_common_settings) && v[v_common_settings] == 1) {
+                                table_info.common_settings_selected.push(v_common_settings);
+                            }
+                        });
+                        //复杂校验器
+                        $.each(v.verifies, function (k_verify, v_verify) {
+                            if (jCommon.isArray(v_verify)) {
+                                switch (v_verify[0]) {
+                                    case 'password':
+                                        table_info.password = 1;
+                                        table_info.password_min_length = v_verify[1];
+                                        table_info.password_max_length = v_verify[2];
+                                        break;
+                                    case 'in_array':
+                                        table_info.in_array = 1;
+                                        table_info.in_array_value = JSON.stringify(v_verify[1]);
+                                        break;
+                                    case 'in_scope':
+                                        table_info.in_scope = 1;
+                                        table_info.in_scope_min = v_verify[1];
+                                        table_info.in_scope_max = v_verify[2];
+                                        break;
+                                    case 'min':
+                                        table_info.min = 1;
+                                        table_info.min_value = v_verify[1];
+                                        break;
+                                    case 'max':
+                                        table_info.max = 1;
+                                        table_info.max_value = v_verify[1];
+                                        break;
+                                    case 'length':
+                                        table_info.str_length_fixed = 1;
+                                        table_info.str_length_fixed_value = v_verify[1];
+                                        break;
+                                    case 'length_min':
+                                        table_info.str_length_min = 1;
+                                        table_info.str_length_min_value = v_verify[1];
+                                        break;
+                                    case 'length_max':
+                                        table_info.str_length_max = 1;
+                                        table_info.str_length_max_value = v_verify[1];
+                                        break;
+                                }
+                            }
+                        });
+                        if (v.hasOwnProperty('const_values') && !jCommon.empty(v.const_values)) {
+                            table_info.const_values = 1;
+                            table_info.const_values_json = v.const_values;
+                        }
+                        if (v.hasOwnProperty('show_map_fields') && !jCommon.empty(v.show_map_fields)) {
+                            table_info.show_map_fields = 1;
+                            table_info.show_map_fields_json = v.show_map_fields;
+                        }
+                        if (v.hasOwnProperty('show_format') && !jCommon.empty(v.show_format)) {
+                            table_info.show_format = 1;
+                            //只显示内容部分
+                            var show_format = JSON.parse(v.show_format);
+                            table_info.show_format_str = show_format[0][0];
+                        }
+                        if (v.hasOwnProperty('store_format') && !jCommon.empty(v.store_format)) {
+                            if (jCommon.isArray(v.store_format)) {
+                                table_info.store_format = v.store_format[0];
+                                table_info.password_salt = v.store_format[1];
+                            } else {
+                                table_info.store_format = v.store_format;
+                            }
+                        } else {
+                            table_info.store_format = 'string';
+                        }
+                    }
+                });
+                $('#id_modal_add_field').modal('show');
+                table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
+                setTimeout(function () {
+                    $('#id_field_name').focus();
+                }, 1000);
+            },
+            del_loading: false,
+            del_field_name: '',
+            $del: function (field_name) {
+                table_info.del_field_name = field_name;
+                $('#id_modal_del').modal('show');
+            },
+            $doDel: function () {
+                table_info.del_loading = true;
+                var url = '/migrate/field/delete';
+                if (table_info.is_add) {
+                    url = '/migrate/field/deleteForCreateTable';
+                }
+                $.post(url, {
+                    table_name: table_info.table_name,
+                    field_name: table_info.del_field_name
+                }, function (r) {
+                    if (r.status_code == 1) {
+                        table_info.del_loading = false;
+                        $('#id_modal_del').modal('hide');
+                        layer.msg('删除成功，' + r.hasOwnProperty('file_name') ? r.file_name : r.message, function () {
+
+                        });
+                        //刷新数据
+                        table_info.$refresh();
+                    } else {
+                        layer.msg('失败，请检查！', function () {
+
+                        });
+                    }
+                });
+                ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                    setTimeout(function () {
+                        table_info.del_loading = false;
+                    }, 3600);
+                };
+            },
+            $move: function (field_name, type) {
+                $.post('/migrate/field/move', {
+                    table_name: table_info.table_name,
+                    field_name: field_name,
+                    type: type
+                }, function (r) {
+                    layer.msg('移动成功', function () {
 
                     });
                     //刷新数据
                     table_info.$refresh();
-                } else {
-                    layer.msg('失败，请检查！', function () {
-
+                });
+            },
+            create_loading: false,
+            $create: function () {
+                table_info.create_loading = true;
+                $.get('/migrate/table/create', {
+                    table_name: table_info.table_name,
+                    table_desc: table_info.table_desc,
+                    cache_seconds: table_info.using_cache ? table_info.cache_seconds : 'null',
+                    api_functions: table_info.api_functions_selected.$model,
+                    engine: table_info.engine
+                }, function (r) {
+                    layer.msg('创建成功，文件地址：' + r.file_name, function () {
                     });
-                }
-            });
-            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
-                setTimeout(function () {
-                    table_info.del_loading = false;
-                }, 3600);
-            };
-        },
-        $move: function (field_name, type) {
-            $.post('/migrate/field/move', {
-                table_name: table_info.table_name,
-                field_name: field_name,
-                type: type
-            }, function (r) {
-                layer.msg('移动成功', function () {
-
-                });
-                //刷新数据
-                table_info.$refresh();
-            });
-        },
-        create_loading: false,
-        $create: function () {
-            table_info.create_loading = true;
-            $.get('/migrate/table/create', {
-                table_name: table_info.table_name,
-                table_desc: table_info.table_desc,
-                cache_seconds: table_info.using_cache ? table_info.cache_seconds : 'null',
-                api_functions: table_info.api_functions_selected.$model,
-                engine: table_info.engine
-            }, function (r) {
-                layer.msg('创建成功，文件地址：' + r.file_name, function () {
-                });
-                //跳转
-                window.location.href = "/migrate/tables/index.html";
-                table_info.create_loading = false;
-            });
-            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
-                setTimeout(function () {
+                    //跳转
+                    window.location.href = "/migrate/tables/index.html";
                     table_info.create_loading = false;
-                }, 1000)
-            };
-        },
-        $fieldRename: function (field_name) {
-            //prompt层
-            layer.prompt({
-                title: '将字段“<span class="text-danger">' + field_name + '</span>”改为',
-                value: field_name
-            }, function (new_name, index) {
-                if (jCommon.empty(new_name)) {
-                    //不处理
+                });
+                ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                    setTimeout(function () {
+                        table_info.create_loading = false;
+                    }, 1000)
+                };
+            },
+            $fieldRename: function (field_name) {
+                //prompt层
+                layer.prompt({
+                    title: '将字段“<span class="text-danger">' + field_name + '</span>”改为',
+                    value: field_name
+                }, function (new_name, index) {
+                    if (jCommon.empty(new_name)) {
+                        //不处理
+                        return;
+                    }
+                    //关闭
+                    layer.close(index);
+                    //提交
+                    $.get('/migrate/field/rename', {
+                        table_name: table_info.table_name,
+                        old_name: field_name,
+                        new_name: new_name
+                    }, function (r) {
+                        layer.msg('修改字段名成功:' + r.file_name, function () {
+                        });
+                        //刷新数据
+                        table_info.$refresh();
+                    });
+                });
+            },
+            $change_position_field_name: '',
+            after_field: '',
+            after_field_select_options: [],
+            change_position_loading: false,
+            $changePosition: function (field_name) {
+                table_info.$change_position_field_name = field_name;
+                table_info.after_field = 'id';
+                table_info.after_field_select_options.clear();
+                table_info.after_field_select_options.push('id');
+                $.each(table_info.items, function (k, v) {
+                    if (v.field_name != field_name) {
+                        table_info.after_field_select_options.push(v.field_name);
+                    } else {
+                        if (k > 0) {
+                            table_info.after_field = table_info.items[k - 1].field_name;
+                        }
+                    }
+                });
+                $('#id_modal_change_position').modal('show');
+            },
+            $doChangePosition: function () {
+                //如果位置没改变，则不提交
+                var old_after_field_name = '';
+                $.each(table_info.items, function (k, v) {
+                    if (v.field_name == table_info.$change_position_field_name) {
+                        if (k == 0) {
+                            old_after_field_name = 'id';
+                        } else {
+                            old_after_field_name = table_info.items[k - 1].field_name;
+                        }
+                        return false;
+                    }
+                });
+                if (old_after_field_name == table_info.after_field) {
                     return;
                 }
-                //关闭
-                layer.close(index);
-                //提交
-                $.get('/migrate/field/rename', {
+                table_info.change_position_loading = true;
+                $.get('/migrate/field/changePosition', {
                     table_name: table_info.table_name,
-                    old_name: field_name,
-                    new_name: new_name
+                    field_name: table_info.$change_position_field_name,
+                    after_field_name: table_info.after_field
                 }, function (r) {
-                    layer.msg('修改字段名成功:' + r.file_name, function () {
+                    table_info.change_position_loading = false;
+                    layer.msg('修改字段位置成功:' + r.file_name, function () {
                     });
+                    $('#id_modal_change_position').modal('hide');
                     //刷新数据
                     table_info.$refresh();
                 });
-            });
-        },
-        $change_position_field_name: '',
-        after_field: '',
-        after_field_select_options: [],
-        change_position_loading: false,
-        $changePosition: function (field_name) {
-            table_info.$change_position_field_name = field_name;
-            table_info.after_field = 'id';
-            table_info.after_field_select_options.clear();
-            table_info.after_field_select_options.push('id');
-            $.each(table_info.items, function (k, v) {
-                if (v.field_name != field_name) {
-                    table_info.after_field_select_options.push(v.field_name);
-                } else {
-                    if (k > 0) {
-                        table_info.after_field = table_info.items[k - 1].field_name;
-                    }
-                }
-            });
-            $('#id_modal_change_position').modal('show');
-        },
-        $doChangePosition: function () {
-            //如果位置没改变，则不提交
-            var old_after_field_name = '';
-            $.each(table_info.items, function (k, v) {
-                if (v.field_name == table_info.$change_position_field_name) {
-                    if (k == 0) {
-                        old_after_field_name = 'id';
+                ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                    setTimeout(function () {
+                        table_info.change_position_loading = false;
+                    }, 1000);
+                };
+            },
+            $updateTable: function () {
+                var param = {
+                    table_name: table_info.table_name,
+                    table_desc: table_info.table_desc,
+                    engine: table_info.engine,
+                    api_functions: table_info.api_functions_selected.$model,
+                    cache_seconds: table_info.cache_seconds,
+                    partition: []
+                };
+                if (table_info.is_partition == 1) {
+                    if (table_info.partition_type == 'field') {
+                        if (table_info.partition_field.length == 0) {
+                            layer.msg('请选择字段', function () {
+                            });
+                            return;
+                        }
+                        if (!jCommon.isNumber(table_info.partition_value)) {
+                            layer.msg('请输入数字类型的范围值', function () {
+                            });
+                            return;
+                        }
+                        param.partition = [table_info.partition_field, table_info.partition_value];
                     } else {
-                        old_after_field_name = table_info.items[k - 1].field_name;
+                        param.partition = [table_info.partition_type];
                     }
-                    return false;
-                }
-            });
-            if (old_after_field_name == table_info.after_field) {
-                return;
-            }
-            table_info.change_position_loading = true;
-            $.get('/migrate/field/changePosition', {
-                table_name: table_info.table_name,
-                field_name: table_info.$change_position_field_name,
-                after_field_name: table_info.after_field
-            }, function (r) {
-                table_info.change_position_loading = false;
-                layer.msg('修改字段位置成功:' + r.file_name, function () {
-                });
-                $('#id_modal_change_position').modal('hide');
-                //刷新数据
-                table_info.$refresh();
-            });
-            ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
-                setTimeout(function () {
-                    table_info.change_position_loading = false;
-                }, 1000);
-            };
-        },
-        $updateTable: function () {
-            var param = {
-                table_name: table_info.table_name,
-                table_desc: table_info.table_desc,
-                engine: table_info.engine,
-                api_functions: table_info.api_functions_selected.$model,
-                cache_seconds: table_info.cache_seconds,
-                partition: []
-            };
-            if (table_info.is_partition == 1) {
-                if (table_info.partition_type == 'field') {
-                    if (table_info.partition_field.length == 0) {
-                        layer.msg('请选择字段', function () {
-                        });
-                        return;
-                    }
-                    if (!jCommon.isNumber(table_info.partition_value)) {
-                        layer.msg('请输入数字类型的范围值', function () {
-                        });
-                        return;
-                    }
-                    param.partition = [table_info.partition_field, table_info.partition_value];
                 } else {
-                    param.partition = [table_info.partition_type];
+                    param.partition = [];
                 }
-            } else {
-                param.partition = [];
-            }
-            $.get('/migrate/table/update', param, function (r) {
-                layer.msg('更新成功', function () {
+                $.get('/migrate/table/update', param, function (r) {
+                    layer.msg('更新成功', function () {
 
+                    });
+                    table_info.$getTableInfo();
                 });
-                table_info.$getTableInfo();
-            });
-        }
-    });
+            },
+            getFieldDefaultLimit: function ($field_type) {
+                var limit = '-';
+                $.each(table_info.items, function (k, v) {
+                    if (v.field_name == table_info.field_name && v.field_type == $field_type) {
+                        limit = v.field_limit;
+                    }
+                });
+                if (limit != '-') {
+                    return limit;
+                }
+                switch ($field_type) {
+                    case 'int':
+                        limit = 11;
+                        break;
+                    case 'string':
+                        limit = 256;
+                        break;
+                    case 'decimal':
+                        limit = 11;
+                        break;
+                    case 'int_big':
+                        limit = 20;
+                        break;
+                    case 'int_tiny':
+                        limit = 4;
+                        break;
+                    case 'int_small':
+                        limit = 6;
+                        break;
+                }
+                return limit;
+            },
+            //最大长度
+            getFieldMaxLimit: function ($field_type) {
+                var limit = '-';
+                switch ($field_type) {
+                    case 'int':
+                        limit = 11;
+                        break;
+                    case 'string':
+                        limit = 21845;
+                        break;
+                    case 'decimal':
+                        limit = 11;
+                        break;
+                    case 'int_big':
+                        limit = 20;
+                        break;
+                    case 'int_tiny':
+                        limit = 4;
+                        break;
+                    case 'int_small':
+                        limit = 6;
+                        break;
+                }
+                return limit;
+            }
+        });
 
-    avalon.ready(function () {
-        table_info.$init();
-        setTimeout(function () {
-            $('#id_table_name').focus();
-        }, 1000);
-    });
+        avalon.ready(function () {
+            table_info.$init();
+            setTimeout(function () {
+                $('#id_table_name').focus();
+            }, 1000);
+        });
 
-    /**
-     * 监听
-     */
-    table_info.$watch('field_type', function (new_value, old_value) {
-        //设置类型
-        if (table_info.$fieldTypeIsInt()) {
-            table_info.field_default_value = 0;
-            table_info.verifies.clear();
-            table_info.verifies.pushArray(['is_required', 'ip', 'postcode', 'id_card', 'number', 'is_date', 'unique']);
-            table_info.in_scope = 0;
-            table_info.min = 0;
-            table_info.max = 0;
-            table_info.const_values = 0;
-            table_info.show_map_fields = 0;
-            table_info.show_format = 0;
-            table_info.field_scale = 0;
-            table_info.verifies_selected.clear();
-            table_info.verifies_selected.push('number');
-        } else {
-            table_info.field_default_value = '空';
-            table_info.verifies.clear();
-            table_info.verifies.pushArray(['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash']);
-            table_info.store_format = 'string';
-            table_info.password = 0;
-            table_info.str_length_fixed = 0;
-            table_info.str_length_max = 0;
-            table_info.str_length_min = 0;
-            table_info.field_scale = 0;
-            table_info.verifies_selected.clear();
-        }
-        //设置数据
-        switch (new_value) {
-            case 'decimal':
-                table_info.field_scale = 2;
-                break;
-        }
-    });
+        /**
+         * 监听
+         */
+        table_info.$watch('field_type', function (new_value, old_value) {
+            //设置类型
+            if (table_info.$fieldTypeIsInt()) {
+                table_info.field_default_value = 0;
+                table_info.verifies.clear();
+                table_info.verifies.pushArray(['is_required', 'ip', 'postcode', 'id_card', 'number', 'is_date', 'unique']);
+                table_info.in_scope = 0;
+                table_info.min = 0;
+                table_info.max = 0;
+                table_info.const_values = 0;
+                table_info.show_map_fields = 0;
+                table_info.show_format = 0;
+                table_info.field_scale = 0;
+                table_info.verifies_selected.clear();
+                table_info.verifies_selected.push('number');
+            } else {
+                table_info.field_default_value = '空';
+                table_info.verifies.clear();
+                table_info.verifies.pushArray(['is_required', 'mobile', 'email', 'ip', 'id_card', 'url', 'array', 'tel', 'unique', 'is_domain', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash']);
+                table_info.store_format = 'string';
+                table_info.password = 0;
+                table_info.str_length_fixed = 0;
+                table_info.str_length_max = 0;
+                table_info.str_length_min = 0;
+                table_info.field_scale = 0;
+                table_info.verifies_selected.clear();
+            }
+            //设置长度
+            table_info.field_limit = table_info.getFieldDefaultLimit(new_value);
+            //设置数据
+            switch (new_value) {
+                case 'decimal':
+                    table_info.field_scale = 2;
+                    break;
+            }
+        });
 
-    /**
-     * 字段类型自动添加过滤
-     */
-    table_info.$watch('field_name', function (new_value, old_value) {
-        if (new_value.length > 6 && new_value.indexOf('_time') == new_value.length - 5) {
-            //时间类型
-            table_info.show_format = 1;
-            table_info.show_format_str = "date('Y-m-d H:i:s', %s)";
-        } else {
-            table_info.show_format = 0;
-            table_info.show_format_str = '';
-        }
-    });
+        /**
+         * 字段类型自动添加过滤
+         */
+        table_info.$watch('field_name', function (new_value, old_value) {
+            if (new_value.length > 6 && new_value.indexOf('_time') == new_value.length - 5) {
+                //时间类型
+                table_info.show_format = 1;
+                table_info.show_format_str = "date('Y-m-d H:i:s', %s)";
+            } else {
+                table_info.show_format = 0;
+                table_info.show_format_str = '';
+            }
+        });
 
-    /**
-     * 检索
-     */
-    table_info.$watch('table_name', function (new_value, old_value) {
-        if (new_value.length > 3) {
-            table_info.$refresh();
-        }
-    });
+        /**
+         * 检索
+         */
+        table_info.$watch('table_name', function (new_value, old_value) {
+            if (new_value.length > 3) {
+                table_info.$refresh();
+            }
+        });
 
-    //初始化编辑器
-    editor_json = ace.edit("id_div_editor", {
-        theme: "ace/theme/tomorrow_night_eighties",
-        mode: "ace/mode/json",
-        minLines: 3,
-        maxLines: 3,
-        wrap: true,
-        autoScrollEditorIntoView: false
-    });
-    //设置编辑器字体的大小
-    document.getElementById('id_div_editor').style.fontSize = '16px';
+        //初始化编辑器
+        editor_json = ace.edit("id_div_editor", {
+            theme: "ace/theme/tomorrow_night_eighties",
+            mode: "ace/mode/json",
+            minLines: 3,
+            maxLines: 3,
+            wrap: true,
+            autoScrollEditorIntoView: false
+        });
+        //设置编辑器字体的大小
+        document.getElementById('id_div_editor').style.fontSize = '16px';
 
-</script>
+    </script>
+</div>
+<!--删除模态框end-->

@@ -276,6 +276,7 @@ class FieldController extends MigrateBaseController {
             'field_desc',
             'field_default_value',
             'field_type',
+            'field_limit',
             'field_scale',
             'is_sortable',
             'is_searchable',
