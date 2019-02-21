@@ -1,4 +1,18 @@
     /**
+     * 在操作数据库之前预处理数据
+     * @param array $data
+     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     * @return array
+     */
+    protected function preprocessDataBeforeExecute($data, $operate_type) {
+        $data = parent::preprocessDataBeforeExecute($data, $operate_type);
+        if (isset($data[self::F_COMMAND])) {
+            $data[self::F_COMMAND_CRC32] = crc32($data[self::F_COMMAND]);
+        }
+        return $data;
+    }
+
+    /**
      * 处理任务
      * @param int $id 执行的id
      * @return bool
@@ -64,9 +78,11 @@
      */
     public static function createTask($command, $within_seconds_ignore_this_cmd = 0) {
         $is_insert = true;
+        //转为crc32，用于处理索引
+        $command_crc32 = crc32($command);
         if ($within_seconds_ignore_this_cmd > 0) {
             $last_create_time = self::instance()->where([
-                self::F_COMMAND => $command
+                self::F_COMMAND_CRC32 => $command_crc32
             ])->order([self::F_ID => self::V_ORDER_DESC])->value(self::F_CREATE_TIME);
             if (!is_numeric($last_create_time) || time() - $last_create_time > $within_seconds_ignore_this_cmd) {
                 $is_insert = true;
