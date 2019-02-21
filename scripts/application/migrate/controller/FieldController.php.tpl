@@ -23,6 +23,28 @@ use think\db\Query;
 class FieldController extends MigrateBaseController {
 
     /**
+     * 所有字段
+     * @var array
+     */
+    protected $all_fields = [
+        'field_name',
+        'field_desc',
+        'field_default_value',
+        'field_type',
+        'field_limit',
+        'field_scale',
+        'is_sortable',
+        'is_searchable',
+        'visible',
+        'is_read_only',
+        'const_values',
+        'show_map_fields',
+        'show_format',
+        'store_format',
+        'verifies'
+    ];
+
+    /**
      * 创建字段，如果存在，则替换
      * @return \think\response\Json|\think\response\Jsonp
      */
@@ -30,22 +52,7 @@ class FieldController extends MigrateBaseController {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         get_param('field_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段注释');
-        $fields = ClArray::getByKeys(input(), [
-            'field_name',
-            'field_desc',
-            'field_default_value',
-            'field_type',
-            'field_scale',
-            'is_sortable',
-            'is_searchable',
-            'visible',
-            'is_read_only',
-            'const_values',
-            'show_map_fields',
-            'show_format',
-            'store_format',
-            'verifies'
-        ]);
+        $fields = ClArray::getByKeys(input(), $this->all_fields);
         //缓存
         $key = $this->getKey([$table_name]);
         //获取
@@ -271,23 +278,7 @@ class FieldController extends MigrateBaseController {
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
         get_param('field_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段注释');
-        $fields       = ClArray::getByKeys(input(), [
-            'field_name',
-            'field_desc',
-            'field_default_value',
-            'field_type',
-            'field_limit',
-            'field_scale',
-            'is_sortable',
-            'is_searchable',
-            'visible',
-            'is_read_only',
-            'const_values',
-            'show_map_fields',
-            'show_format',
-            'store_format',
-            'verifies'
-        ]);
+        $fields       = ClArray::getByKeys(input(), $this->all_fields);
         $table_fields = $this->getTableFields($table_name);
         $old_fields   = [];
         foreach ($table_fields as $each_field) {
@@ -322,22 +313,7 @@ class FieldController extends MigrateBaseController {
         $after_field = get_param('after_field', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '前一个字段');
         $this->assign('after_field', $after_field);
         get_param('field_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段注释');
-        $fields                     = ClArray::getByKeys(input(), [
-            'field_name',
-            'field_desc',
-            'field_default_value',
-            'field_type',
-            'field_scale',
-            'is_sortable',
-            'is_searchable',
-            'visible',
-            'is_read_only',
-            'const_values',
-            'show_map_fields',
-            'show_format',
-            'store_format',
-            'verifies'
-        ]);
+        $fields                     = ClArray::getByKeys(input(), $this->all_fields);
         $field_str_with_after_field = $this->getFieldExecute('addColumn', $fields, $after_field);
         $this->assign('field_str_with_after_field', $field_str_with_after_field);
         $field_str = $this->getFieldExecute('addColumn', $fields);
