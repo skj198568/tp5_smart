@@ -46,31 +46,22 @@ class TableController extends MigrateBaseController {
                 ];
             }
         }
-        $tables = array_values($tables);
-        //按表名首字母排序
-        usort($tables, function ($a, $b) {
-            $a_name = $a['name'];
-            if (strpos($a_name, '_') !== false) {
-                $a_name_array = explode('_', $a_name);
-                $a_name       = '';
-                foreach ($a_name_array as $each) {
-                    $a_name .= $each{0};
+        $tables       = array_values($tables);
+        $tables_names = array_column($tables, 'name');
+        //排序
+        sort($tables_names);
+        //按排序后的表名，进行显示
+        $tables_temp = [];
+        foreach ($tables_names as $each_name) {
+            foreach ($tables as $each_table) {
+                if ($each_name == $each_table['name']) {
+                    $tables_temp[] = $each_table;
                 }
             }
-            $b_name = $b['name'];
-            if (strpos($b_name, '_') !== false) {
-                $b_name_array = explode('_', $b_name);
-                $b_name       = '';
-                foreach ($b_name_array as $each) {
-                    $b_name .= $each{0};
-                }
-            }
-            if ($a_name > $b_name) {
-                return 1;
-            } else {
-                return -1;
-            }
-        });
+        }
+        //赋值
+        $tables = $tables_temp;
+        //组织返回值
         $return = [
             'limit'  => 1000,
             'offset' => 0,
@@ -121,7 +112,7 @@ class TableController extends MigrateBaseController {
             $api_functions = $table_comment['create_api'];
         }
         $this->assign('api_functions', $api_functions);
-        $fields    = $this->getTableFields($table_name);
+        $fields    = $this->getTableFieldsAfterFormat($table_name);
         $old_table = $this->query("SHOW TABLES LIKE '%$table_name'");
         $file_path = $this->getMigrateFilePath($class_name);
         if (empty($old_table)) {
@@ -164,7 +155,9 @@ class TableController extends MigrateBaseController {
      */
     public function get() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
-        $info       = $this->getTableComment($table_name);
+        //先处理默认值数据
+        $this->alterFieldDefaultValue($table_name);
+        $info = $this->getTableComment($table_name);
         return $this->ar(1, ['info' => $info]);
     }
 
@@ -243,6 +236,8 @@ class TableController extends MigrateBaseController {
      */
     public function backUpData() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        //先处理默认值数据
+        $this->alterFieldDefaultValue($table_name);
         $this->assign('table_name', $table_name);
         $this->assign('model_name', $this->getModelName($table_name));
         $class_name             = $this->getClassName([$table_name, 'data']);
@@ -371,6 +366,37 @@ class TableController extends MigrateBaseController {
         //执行
         $this->run($table_name, $file_path, sprintf('create table %s index %s', $table_name, $this->getModelName(implode('_', array_merge(['index'], $fields)), false)));
         return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+    }
+
+    /**
+     * 判断字段是否是null，如果是null，int默认值改为0，string默认值改为''
+     * @param $table_name
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    private function alterFieldDefaultValue($table_name) {
+        $fields = $this->getAllFields($table_name);
+        $up_sql = [];
+        foreach ($fields as $each) {
+            if (is_null($each['Default'])) {
+                $sql = sprintf("UPDATE `\".table_name_for_replace.\"` SET `%s`=%s WHERE `%s` IS NULL", $each['Field'], $this->fieldTypeIsInt($each['Type']) ? 0 : "''", $each['Field']);;
+                $up_sql[$each['Field']] = str_replace('table_name_for_replace', '$table_name_for_replace', $sql);
+            }
+        }
+        //无需执行
+        if (empty($up_sql)) {
+            return;
+        }
+        //赋值
+        $this->assign('table_name', $table_name);
+        $this->assign('up_sql', $up_sql);
+        //写入文件
+        $class_name    = $this->getClassName([$table_name, 'change_null_field_value']);
+        $file_path     = $this->getMigrateFilePath($class_name);
+        $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_change_null.tpl'));
+        file_put_contents($file_path, "<?php\n" . $table_content);
+        //执行
+        $this->run($table_name, $file_path, sprintf('%s chang field null', $table_name));
     }
 
 }
