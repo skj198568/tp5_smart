@@ -2,11 +2,16 @@
 <layout name="public/layout" replace="{__CONTENT__}"/>
 <!--布局end-->
 <!--jQuery bootstrap table tools内联表单begin-->
-<div id="id_tools_div" class="form-inline">
-    <button type="button" class="btn btn-success" ms-click="$add"><i class="fa fa-plus"></i> 新增</button>
+<div ms-if="error_msg.length == 0">
+    <div id="id_tools_div" class="form-inline">
+        <button type="button" class="btn btn-success" ms-click="$add"><i class="fa fa-plus"></i> 新增</button>
+    </div>
+    <!--jQuery bootstrap table tools内联表单end-->
+    <table id="id_table"></table>
 </div>
-<!--jQuery bootstrap table tools内联表单end-->
-<table id="id_table"></table>
+<div ms-if="error_msg.length > 0">
+    {{error_msg|html}}
+</div>
 <!--删除模态框begin-->
 <div class="modal fade" id="id_modal_del" tabindex="-1" role="dialog" aria-labelledby="id_modal_del_title"
      aria-hidden="true">
@@ -92,6 +97,8 @@
             tables.$initTable();
         },
         $items: [],
+        //错误信息
+        error_msg: '<h1 style="text-align: center;">数据加载中……</h1>',
         $initTable: function () {
             $('#id_table').bootstrapTable({
                 url: '{:url("/migrate/table/getList")}',
@@ -107,6 +114,17 @@
                 },
                 responseHandler: function (r) {
                     tables.$items = r.items;
+                    tables.error_msg = '';
+                    var table_index = 0;
+                    $.each(tables.$items, function (k, v) {
+                        if (v.need_to_convert_null_value) {
+                            if (tables.error_msg.length == 0) {
+                                tables.error_msg = '<h1 style="text-align: center;">数据表有待Convert数据字段，请执行<span style="color: red;">php think migrate:run</span></h1>';
+                            }
+                            table_index++;
+                            tables.error_msg += '<p>' + table_index + '. ' + v.name + '</p>';
+                        }
+                    });
                     return {
                         'rows': r.items,
                         'total': r.total,

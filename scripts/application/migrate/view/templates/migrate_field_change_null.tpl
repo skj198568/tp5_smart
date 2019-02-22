@@ -15,7 +15,7 @@ class {$class_name} extends Cmd {
                 continue;
             }
             $table_name_for_replace = config('database.prefix').$table;
-            $up_fields = [<foreach name="up_fields" item="v"><php>echo "\n        ";</php>'{$key}' => "{$v}"<if condition="$key neq end($up_fields)">,</if></foreach><php>echo "\n    ";</php>];
+            $up_fields = [<foreach name="up_fields" item="v"><php>echo "\n        ";</php>'{$v['field']}' => "{$v['default_value']}"<if condition="$key neq end($up_fields)">,</if></foreach><php>echo "\n    ";</php>];
             foreach ($up_fields as $each_field => $default_value) {
                 if ($this->table($table)->hasColumn($each_field)) {
                     //先设置已存在数据的默认值
@@ -27,6 +27,8 @@ class {$class_name} extends Cmd {
                 }
             }
         }
+        //清除缓存
+        cache('{$cache_key}', null);
     }
 
     public function down() {

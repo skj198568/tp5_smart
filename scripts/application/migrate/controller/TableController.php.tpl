@@ -12,6 +12,7 @@ namespace app\migrate\controller;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
+use Mpdf\Tag\P;
 
 /**
  * 表
@@ -27,6 +28,8 @@ class TableController extends MigrateBaseController {
      * @throws \think\exception\PDOException
      */
     public function getList() {
+        //超时时间设置为10分钟，用于处理大数据库
+        set_time_limit(600);
         $tables_select = $this->query("SHOW TABLES");
         $tables        = [];
         foreach ($tables_select as $k => $table) {
@@ -34,14 +37,20 @@ class TableController extends MigrateBaseController {
             if (!empty(config('database.prefix')) && strpos($table, config('database.prefix')) === 0) {
                 $table = substr($table, strlen(config('database.prefix')));
             }
-            if ($table == 'migrations') {
+            if ($table == 'migrations' || $table == 'phinxlog') {
                 continue;
             }
-            $comment = $this->getTableComment($table);
-            $comment = json_encode($comment);
-            if (!isset($tables[$comment]) || (isset($tables[$comment]) && strlen($table) < strlen($tables[$comment]['name']))) {
-                $tables[$comment] = [
-                    'name' => $table
+            $fields = $this->getTableFieldsAfterFormat($table);
+            $fields = array_column($fields, 'field_name');
+            sort($fields);
+            $fields = implode('_', $fields);
+            if (!isset($tables[$fields])) {
+                //生成待转换的migrate
+                $this->alterFieldDefaultValue($table);
+                //添加
+                $tables[$fields] = [
+                    'name'                       => $table,
+                    'need_to_convert_null_value' => !empty($this->alterFieldDefaultValueGetFields($table))
                 ];
             }
         }
@@ -154,9 +163,7 @@ class TableController extends MigrateBaseController {
      */
     public function get() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
-        //先处理默认值数据
-        $this->alterFieldDefaultValue($table_name);
-        $info = $this->getTableComment($table_name);
+        $info       = $this->getTableComment($table_name);
         return $this->ar(1, ['info' => $info]);
     }
 
@@ -235,8 +242,6 @@ class TableController extends MigrateBaseController {
      */
     public function backUpData() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
-        //先处理默认值数据
-        $this->alterFieldDefaultValue($table_name);
         $this->assign('table_name', $table_name);
         $this->assign('model_name', $this->getModelName($table_name));
         $class_name             = $this->getClassName([$table_name, 'data']);
@@ -368,24 +373,44 @@ class TableController extends MigrateBaseController {
     }
 
     /**
+     * 获取待修改的字段
+     * @param $table_name
+     * @return mixed
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    private function alterFieldDefaultValueGetFields($table_name) {
+        $fields    = $this->getAllFields($table_name);
+        $up_fields = [];
+        foreach ($fields as $key => $each) {
+            if (is_null($each['Default']) && $key != 0 && $each['Field'] != 'id' && ($this->fieldTypeIsInt($each['Type']) || strpos($each['Type'], 'varchar') !== false)) {
+                $up_fields[] = [
+                    'field'         => $each['Field'],
+                    'default_value' => $this->fieldTypeIsInt($each['Type']) ? 0 : "''"
+                ];
+            }
+        }
+        return $up_fields;
+    }
+
+    /**
      * 判断字段是否是null，如果是null，int默认值改为0，string默认值改为''
      * @param $table_name
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
     private function alterFieldDefaultValue($table_name) {
-        $fields    = $this->getAllFields($table_name);
-        $up_fields = [];
-        foreach ($fields as $each) {
-            if ((is_null($each['Default']) && $each['Field'] != 'id') || strpos($each['Type'], 'varchar') !== false) {
-                $up_fields[$each['Field']] = $this->fieldTypeIsInt($each['Type']) ? 0 : "''";
-            }
+        $key = $this->getKey([$table_name, 'filed_alter_default_value']);
+        if (cache($key) !== false) {
+            return;
         }
+        $up_fields = $this->alterFieldDefaultValueGetFields($table_name);
         //无需执行
         if (empty($up_fields)) {
             return;
         }
         //赋值
+        $this->assign('cache_key', $key);
         $this->assign('table_name', $table_name);
         $this->assign('up_fields', $up_fields);
         //写入文件
@@ -394,7 +419,10 @@ class TableController extends MigrateBaseController {
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_field_change_null.tpl'));
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
-        $this->run($table_name, $file_path, sprintf('%s chang field null', $table_name));
+        $this->run($table_name, $file_path, sprintf('%s chang field null', $table_name), false);
+        cache($key, 1);
+        //防止版本冲突，停止1秒
+        sleep(1);
     }
 
 }

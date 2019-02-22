@@ -390,24 +390,27 @@ class MigrateBaseController extends Controller {
      * @param string $table_name 表名
      * @param string $migrate_absolute_file 执行文件绝对地址
      * @param string $svn_msg svn版本信息
+     * @param bool $run_now 是否理解执行
      */
-    protected function run($table_name, $migrate_absolute_file, $svn_msg) {
-        $cmd = sprintf("cd %s && php think migrate:run", DOCUMENT_ROOT_PATH . '/../');
-        try {
-            //执行
-            exec($cmd);
-        } catch (Exception $exception) {
-            log_info('migrate cmd error', [
-                'message' => $exception->getMessage(),
-                'file'    => $exception->getFile(),
-                'line'    => $exception->getLine(),
-                'code'    => $exception->getCode(),
-                'data'    => $exception->getData()
-            ]);
+    protected function run($table_name, $migrate_absolute_file, $svn_msg, $run_now = true) {
+        if ($run_now) {
+            $cmd = sprintf("cd %s && php think migrate:run", DOCUMENT_ROOT_PATH . '/../');
+            try {
+                //执行
+                exec($cmd);
+            } catch (Exception $exception) {
+                log_info('migrate cmd error', [
+                    'message' => $exception->getMessage(),
+                    'file'    => $exception->getFile(),
+                    'line'    => $exception->getLine(),
+                    'code'    => $exception->getCode(),
+                    'data'    => $exception->getData()
+                ]);
+            }
+            //清除缓存
+            $key = $this->getKey($table_name);
+            cache($key, null);
         }
-        //清除缓存
-        $key = $this->getKey($table_name);
-        cache($key, null);
         //替换路径
         $migrate_absolute_file = str_replace(DOCUMENT_ROOT_PATH . '/../', '', $migrate_absolute_file);
         if (is_dir(DOCUMENT_ROOT_PATH . '/../.svn')) {
@@ -459,72 +462,70 @@ class MigrateBaseController extends Controller {
             $table_fields = cache($key);
             if (empty($table_fields)) {
                 $table_fields = [];
-                if ($this->tableIsExist($table_name)) {
-                    //尝试从数据库获取
-                    $fields = $this->getAllFields($table_name);
-                    foreach ($fields as $each_field) {
-                        if ($each_field['Field'] == 'id') {
-                            continue;
-                        }
-                        //设置字段默认值
-                        if (is_null($each_field['Default'])) {
-                            $each_field['Default'] = '';
-                        }
-                        //字段名
-                        $cache_filed                = [
-                            'field_name'          => $each_field['Field'],
-                            'field_default_value' => $each_field['Default']
-                        ];
-                        $cache_filed['field_limit'] = '-';
-                        $cache_filed['field_scale'] = '-';
-                        //类型
-                        if (strpos($each_field['Type'], 'decimal') !== false) {
-                            $cache_filed['field_type'] = 'decimal';
-                            $field_detail              = '';
-                            if (strpos($each_field['Type'], '(') !== false) {
-                                $field_detail = ClString::getBetween($each_field['Type'], '(', ')', false);
-                            }
-                            $field_detail               = explode(',', $field_detail);
-                            $cache_filed['field_limit'] = $field_detail[0];
-                            $cache_filed['field_scale'] = $field_detail[1];
-                        } else if (strpos($each_field['Type'], 'bigint') !== false) {
-                            $cache_filed['field_type']  = 'int_big';
-                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
-                        } else if (strpos($each_field['Type'], 'tinyint') !== false) {
-                            $cache_filed['field_type']  = 'int_tiny';
-                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
-                        } else if (strpos($each_field['Type'], 'smallint') !== false) {
-                            $cache_filed['field_type']  = 'int_small';
-                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
-                        } else if (strpos($each_field['Type'], 'int') !== false) {
-                            $cache_filed['field_type']  = 'int';
-                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
-                        } else if (strpos($each_field['Type'], 'longtext') !== false) {
-                            $cache_filed['field_type'] = 'text_long';
-                        } else if (strpos($each_field['Type'], 'text') !== false) {
-                            $cache_filed['field_type'] = 'text';
-                        } else if (strpos($each_field['Type'], 'varchar') !== false) {
-                            $cache_filed['field_type']  = 'string';
-                            $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
-                        }
-                        if (ClVerify::isJson($each_field['Comment'])) {
-                            $comment = json_decode($each_field['Comment'], true);
-                            //字段描述
-                            $cache_filed['field_desc'] = $comment['name'];
-                            unset($comment['name']);
-                            $cache_filed = array_merge($cache_filed, $comment);
-                        } else {
-                            $cache_filed['field_desc'] = $each_field['Comment'];
-                        }
-                        //json_encode
-                        if (isset($cache_filed['show_map_fields'])) {
-                            $cache_filed['show_map_fields'] = json_encode($cache_filed['show_map_fields'], JSON_UNESCAPED_UNICODE);
-                        }
-                        if (isset($cache_filed['show_format'])) {
-                            $cache_filed['show_format'] = json_encode($cache_filed['show_format'], JSON_UNESCAPED_UNICODE);
-                        }
-                        $table_fields[] = $cache_filed;
+                //尝试从数据库获取
+                $fields = $this->getAllFields($table_name);
+                foreach ($fields as $each_field) {
+                    if ($each_field['Field'] == 'id') {
+                        continue;
                     }
+                    //设置字段默认值
+                    if (is_null($each_field['Default'])) {
+                        $each_field['Default'] = '';
+                    }
+                    //字段名
+                    $cache_filed                = [
+                        'field_name'          => $each_field['Field'],
+                        'field_default_value' => $each_field['Default']
+                    ];
+                    $cache_filed['field_limit'] = '-';
+                    $cache_filed['field_scale'] = '-';
+                    //类型
+                    if (strpos($each_field['Type'], 'decimal') !== false) {
+                        $cache_filed['field_type'] = 'decimal';
+                        $field_detail              = '';
+                        if (strpos($each_field['Type'], '(') !== false) {
+                            $field_detail = ClString::getBetween($each_field['Type'], '(', ')', false);
+                        }
+                        $field_detail               = explode(',', $field_detail);
+                        $cache_filed['field_limit'] = $field_detail[0];
+                        $cache_filed['field_scale'] = $field_detail[1];
+                    } else if (strpos($each_field['Type'], 'bigint') !== false) {
+                        $cache_filed['field_type']  = 'int_big';
+                        $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
+                    } else if (strpos($each_field['Type'], 'tinyint') !== false) {
+                        $cache_filed['field_type']  = 'int_tiny';
+                        $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
+                    } else if (strpos($each_field['Type'], 'smallint') !== false) {
+                        $cache_filed['field_type']  = 'int_small';
+                        $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
+                    } else if (strpos($each_field['Type'], 'int') !== false) {
+                        $cache_filed['field_type']  = 'int';
+                        $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
+                    } else if (strpos($each_field['Type'], 'longtext') !== false) {
+                        $cache_filed['field_type'] = 'text_long';
+                    } else if (strpos($each_field['Type'], 'text') !== false) {
+                        $cache_filed['field_type'] = 'text';
+                    } else if (strpos($each_field['Type'], 'varchar') !== false) {
+                        $cache_filed['field_type']  = 'string';
+                        $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
+                    }
+                    if (ClVerify::isJson($each_field['Comment'])) {
+                        $comment = json_decode($each_field['Comment'], true);
+                        //字段描述
+                        $cache_filed['field_desc'] = $comment['name'];
+                        unset($comment['name']);
+                        $cache_filed = array_merge($cache_filed, $comment);
+                    } else {
+                        $cache_filed['field_desc'] = $each_field['Comment'];
+                    }
+                    //json_encode
+                    if (isset($cache_filed['show_map_fields'])) {
+                        $cache_filed['show_map_fields'] = json_encode($cache_filed['show_map_fields'], JSON_UNESCAPED_UNICODE);
+                    }
+                    if (isset($cache_filed['show_format'])) {
+                        $cache_filed['show_format'] = json_encode($cache_filed['show_format'], JSON_UNESCAPED_UNICODE);
+                    }
+                    $table_fields[] = $cache_filed;
                 }
                 //记录缓存
                 cache($key, $table_fields, 3600 * 24);
