@@ -39,7 +39,7 @@ class TaskMap extends BaseModel {
 
     /**
      * 命令行crc32方式存储，用于索引
-     * Type: int(20)
+     * Type: bigint(20)
      * Default: 0
      */
     const F_COMMAND_CRC32 = 'command_crc32';
