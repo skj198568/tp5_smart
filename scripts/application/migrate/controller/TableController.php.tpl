@@ -383,7 +383,11 @@ class TableController extends MigrateBaseController {
         $fields    = $this->getAllFields($table_name);
         $up_fields = [];
         foreach ($fields as $key => $each) {
-            if (is_null($each['Default']) && $key != 0 && $each['Field'] != 'id' && ($this->fieldTypeIsInt($each['Type']) || strpos($each['Type'], 'varchar') !== false)) {
+            if ($each['Extra'] == 'auto_increment') {
+                //忽略主键
+                continue;
+            }
+            if (is_null($each['Default']) && ($this->fieldTypeIsInt($each['Type']) || strpos($each['Type'], 'varchar') !== false)) {
                 $up_fields[] = [
                     'field'         => $each['Field'],
                     'default_value' => $this->fieldTypeIsInt($each['Type']) ? 0 : "''"
