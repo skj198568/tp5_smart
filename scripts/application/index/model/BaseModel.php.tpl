@@ -158,7 +158,7 @@ class BaseModel extends Query {
         if (!is_array($data)) {
             return $data;
         }
-        $data = array_merge(self::$fields_default_values, $data);
+        $data = array_merge(static::$fields_default_values, $data);
         if ($operate_type == self::V_OPERATE_TYPE_INSERT) {
             //自动完成字段
             if (in_array('create_time', static::getAllFields())) {
