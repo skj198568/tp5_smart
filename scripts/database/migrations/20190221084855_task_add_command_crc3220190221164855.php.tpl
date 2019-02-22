@@ -21,7 +21,7 @@ class TaskAddCommandCrc3220190221164855 extends Cmd {
             //新增字段名
             if ($this->table($table)->hasColumn('command')) {
                 $this->table($table)
-                    ->addColumn('command_crc32', 'integer', [
+                    ->addColumn('command_crc32', 'biginteger', [
                         'after'   => 'command',
                         'limit'   => 20,
                         'default' => 0,
@@ -32,7 +32,7 @@ class TaskAddCommandCrc3220190221164855 extends Cmd {
                     ->update();
             } else {
                 $this->table($table)
-                    ->addColumn('command_crc32', 'integer', ['limit' => 20, 'default' => 0, 'comment' =>
+                    ->addColumn('command_crc32', 'biginteger', ['limit' => 20, 'default' => 0, 'comment' =>
                         ClMigrateField::instance()
                             ->verifyNumber()
                             ->fetch('命令行crc32方式存储，用于索引')
