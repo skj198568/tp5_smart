@@ -443,13 +443,13 @@ class MigrateBaseController extends Controller {
     }
 
     /**
-     * 获取表所有的字段
+     * 获取表所有格式化后的字段
      * @param $table_name
      * @return array|mixed
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    protected function getTableFields($table_name) {
+    protected function getTableFieldsAfterFormat($table_name) {
         if (empty($table_name)) {
             $table_fields = [];
         } else {
@@ -457,7 +457,6 @@ class MigrateBaseController extends Controller {
             $key = $this->getKey([$table_name]);
             //获取
             $table_fields = cache($key);
-            $table_fields = [];
             if (empty($table_fields)) {
                 $table_fields = [];
                 if ($this->tableIsExist($table_name)) {
@@ -468,7 +467,7 @@ class MigrateBaseController extends Controller {
                             continue;
                         }
                         //设置字段默认值
-                        if (strtolower($each_field['Default']) == 'null' || is_null($each_field['Default'])) {
+                        if (is_null($each_field['Default'])) {
                             $each_field['Default'] = '';
                         }
                         //字段名
@@ -541,8 +540,23 @@ class MigrateBaseController extends Controller {
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    private function getAllFields($table_name) {
+    protected function getAllFields($table_name) {
         return $this->query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
+    }
+
+    /**
+     * 字段类型是否是数值型
+     * @param $field_type
+     * @return bool
+     */
+    protected function fieldTypeIsInt($field_type) {
+        $is_int = false;
+        foreach (['decimal', 'bigint', 'tinyint', 'smallint', 'int'] as $each_type) {
+            if (strpos(strtolower($field_type), $each_type) !== false) {
+                $is_int = true;
+            }
+        }
+        return $is_int;
     }
 
 }
