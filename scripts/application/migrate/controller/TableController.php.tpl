@@ -375,21 +375,20 @@ class TableController extends MigrateBaseController {
      * @throws \think\exception\PDOException
      */
     private function alterFieldDefaultValue($table_name) {
-        $fields = $this->getAllFields($table_name);
-        $up_sql = [];
+        $fields    = $this->getAllFields($table_name);
+        $up_fields = [];
         foreach ($fields as $each) {
-            if (is_null($each['Default'])) {
-                $sql = sprintf("UPDATE `\".table_name_for_replace.\"` SET `%s`=%s WHERE `%s` IS NULL", $each['Field'], $this->fieldTypeIsInt($each['Type']) ? 0 : "''", $each['Field']);;
-                $up_sql[$each['Field']] = str_replace('table_name_for_replace', '$table_name_for_replace', $sql);
+            if (is_null($each['Default']) && $each['Field'] != 'id') {
+                $up_fields[$each['Field']] = $this->fieldTypeIsInt($each['Type']) ? 0 : "''";
             }
         }
         //无需执行
-        if (empty($up_sql)) {
+        if (empty($up_fields)) {
             return;
         }
         //赋值
         $this->assign('table_name', $table_name);
-        $this->assign('up_sql', $up_sql);
+        $this->assign('up_fields', $up_fields);
         //写入文件
         $class_name    = $this->getClassName([$table_name, 'change_null_field_value']);
         $file_path     = $this->getMigrateFilePath($class_name);
