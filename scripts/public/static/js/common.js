@@ -891,6 +891,10 @@ var jCommon = {
     hrefGetParams: function (name) {
         var default_value = arguments.length === 2 ? arguments[1] : null;
         var url = arguments.length === 3 ? arguments[2] : window.location.href;
+        //去除锚点
+        if (url.indexOf('#') > -1) {
+            url = url.substr(0, url.indexOf('#'));
+        }
         //替换?、=、&为“/”
         url = url.replace(/(\?)|(=)|(&)/g, '/');
         var domain = jCommon.hostGet();
