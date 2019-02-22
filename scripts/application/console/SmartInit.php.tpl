@@ -102,6 +102,7 @@ class SmartInit extends Command {
         //修改目录权限为www
         $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
+        $output->highlight('finished');
         return true;
     }
 
