@@ -96,7 +96,7 @@ class Cmd extends \think\migration\Migrator {
         $table_all_fields       = $this->getTableFieldsWithPrefixTableName($table_name_with_prefix);
         $table_all_fields       = array_column($table_all_fields, 'Field');
         //排序
-        asort($table_all_fields);
+        sort($table_all_fields);
         $database = config('database.database');
         $query    = new \think\db\Query();
         $result   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
@@ -106,7 +106,7 @@ class Cmd extends \think\migration\Migrator {
                 $each_table_all_fields = $this->getTableFieldsWithPrefixTableName($each['table_name']);
                 $each_table_all_fields = array_column($each_table_all_fields, 'Field');
                 //排序
-                asort($each_table_all_fields);
+                sort($each_table_all_fields);
                 if ($each_table_all_fields == $table_all_fields) {
                     $tables[] = $this->getTableNameWithoutPrefix($each['table_name']);
                 }
