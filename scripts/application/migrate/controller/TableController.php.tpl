@@ -12,7 +12,6 @@ namespace app\migrate\controller;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
-use think\db\Query;
 
 /**
  * 表
@@ -378,7 +377,7 @@ class TableController extends MigrateBaseController {
         $fields    = $this->getAllFields($table_name);
         $up_fields = [];
         foreach ($fields as $each) {
-            if (is_null($each['Default']) && $each['Field'] != 'id') {
+            if (is_null($each['Default']) && $each['Field'] != 'id' && in_array($each['field_type'], ['string'])) {
                 $up_fields[$each['Field']] = $this->fieldTypeIsInt($each['Type']) ? 0 : "''";
             }
         }

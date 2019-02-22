@@ -11,9 +11,6 @@ namespace app\migrate\controller;
 
 use ClassLibrary\ClArray;
 use ClassLibrary\ClFieldVerify;
-use ClassLibrary\ClString;
-use ClassLibrary\ClVerify;
-use think\db\Query;
 
 /**
  * 字段
