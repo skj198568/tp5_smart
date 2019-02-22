@@ -93,14 +93,23 @@ class Cmd extends \think\migration\Migrator {
      */
     protected function getAllTables($table_name_without_prefix) {
         $table_name_with_prefix = $this->getTableNameWithPrefix($table_name_without_prefix);
-        $table_comment          = $this->getTableComment($table_name_with_prefix);
-        $database               = config('database.database');
-        $query                  = new \think\db\Query();
-        $result                 = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
-        $tables                 = [];
+        $table_all_fields       = $this->getTableFieldsWithPrefixTableName($table_name_with_prefix);
+        $table_all_fields       = array_column($table_all_fields, 'Field');
+        //排序
+        asort($table_all_fields);
+        $database = config('database.database');
+        $query    = new \think\db\Query();
+        $result   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
+        $tables   = [];
         foreach ($result as $each) {
-            if (strpos($each['table_name'], $table_name_with_prefix) === 0 && $this->getTableComment($each['table_name']) == $table_comment) {
-                $tables[] = $this->getTableNameWithoutPrefix($each['table_name']);
+            if (strpos($each['table_name'], $table_name_with_prefix) === 0) {
+                $each_table_all_fields = $this->getTableFieldsWithPrefixTableName($each['table_name']);
+                $each_table_all_fields = array_column($each_table_all_fields, 'Field');
+                //排序
+                asort($each_table_all_fields);
+                if ($each_table_all_fields == $table_all_fields) {
+                    $tables[] = $this->getTableNameWithoutPrefix($each['table_name']);
+                }
             }
         }
         return $tables;
@@ -113,7 +122,7 @@ class Cmd extends \think\migration\Migrator {
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    protected function getTableComment($table_name_with_prefix) {
+    protected function getTableCommentWithPrefixTableName($table_name_with_prefix) {
         $query         = new \think\db\Query();
         $table_comment = $query->query(sprintf("SELECT TABLE_COMMENT,ENGINE FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name_with_prefix));
         $comment       = '';
@@ -121,6 +130,18 @@ class Cmd extends \think\migration\Migrator {
             $comment = $table_comment[0]['TABLE_COMMENT'];
         }
         return $comment;
+    }
+
+    /**
+     * 获取表所有字段
+     * @param $table_name_with_prefix
+     * @return mixed
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    protected function getTableFieldsWithPrefixTableName($table_name_with_prefix) {
+        $query = new \think\db\Query();
+        return $query->query('SHOW FULL FIELDS FROM `' . $table_name_with_prefix . '`');
     }
 
     /**
