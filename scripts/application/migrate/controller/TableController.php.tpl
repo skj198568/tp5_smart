@@ -377,7 +377,7 @@ class TableController extends MigrateBaseController {
         $fields    = $this->getAllFields($table_name);
         $up_fields = [];
         foreach ($fields as $each) {
-            if (is_null($each['Default']) && $each['Field'] != 'id' && strpos($each['Type'], 'varchar') !== false) {
+            if ((is_null($each['Default']) && $each['Field'] != 'id') || strpos($each['Type'], 'varchar') !== false) {
                 $up_fields[$each['Field']] = $this->fieldTypeIsInt($each['Type']) ? 0 : "''";
             }
         }
