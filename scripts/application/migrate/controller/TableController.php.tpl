@@ -383,7 +383,7 @@ class TableController extends MigrateBaseController {
         $fields    = $this->getAllFields($table_name);
         $up_fields = [];
         foreach ($fields as $key => $each) {
-            if ($each['Extra'] == 'auto_increment') {
+            if ($each['Extra'] == 'auto_increment' || $each['Field'] == 'id') {
                 //忽略主键
                 continue;
             }
