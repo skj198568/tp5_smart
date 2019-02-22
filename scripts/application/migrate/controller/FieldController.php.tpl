@@ -85,7 +85,7 @@ class FieldController extends MigrateBaseController {
      */
     public function getList() {
         $table_name   = get_param('table_name', ClFieldVerify::instance()->fetchVerifies(), '表名', '');
-        $table_fields = $this->getTableFields($table_name);
+        $table_fields = $this->getTableFieldsAfterFormat($table_name);
         $return       = [
             'limit'  => 1000,
             'offset' => 0,
@@ -107,7 +107,7 @@ class FieldController extends MigrateBaseController {
         $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('field_name', $field_name);
         $class_name                        = $this->getClassName([$table_name, 'delete', $field_name]);
-        $fields                            = $this->getTableFields($table_name);
+        $fields                            = $this->getTableFieldsAfterFormat($table_name);
         $field_change_str                  = '';
         $field_change_str_with_after_field = '';
         foreach ($fields as $k => $each_field) {
@@ -202,7 +202,7 @@ class FieldController extends MigrateBaseController {
         $new_name = get_param('new_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
         $this->assign('new_name', $new_name);
         $class_name       = $this->getClassName([$table_name, 'rename', $old_name, 'to', $new_name]);
-        $fields           = $this->getTableFields($table_name);
+        $fields           = $this->getTableFieldsAfterFormat($table_name);
         $field_change_str = '';
         foreach ($fields as $k => $each_field) {
             if ($each_field['field_name'] == $old_name) {
@@ -236,7 +236,7 @@ class FieldController extends MigrateBaseController {
         $this->assign('after_field', $after_field_name);
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
-        $fields                          = $this->getTableFields($table_name);
+        $fields                          = $this->getTableFieldsAfterFormat($table_name);
         $fields_str                      = '';
         $fields_str_with_after_field     = '';
         $old_fields_str                  = '';
@@ -271,6 +271,9 @@ class FieldController extends MigrateBaseController {
 
     /**
      * 更新
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
      */
     public function update() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
@@ -279,7 +282,7 @@ class FieldController extends MigrateBaseController {
         $this->assign('field_name', $field_name);
         get_param('field_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段注释');
         $fields       = ClArray::getByKeys(input(), $this->all_fields);
-        $table_fields = $this->getTableFields($table_name);
+        $table_fields = $this->getTableFieldsAfterFormat($table_name);
         $old_fields   = [];
         foreach ($table_fields as $each_field) {
             if ($each_field['field_name'] == $field_name) {
