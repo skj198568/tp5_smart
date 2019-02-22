@@ -790,6 +790,9 @@ class SmartInit extends Command {
      * @param Output $output
      */
     private function dealApiDoc(Output $output) {
+        if (empty($this->undo_files)) {
+            return;
+        }
         $cmd = sprintf('cd %s && php think api_doc', DOCUMENT_ROOT_PATH . '/../');
         exec($cmd);
         //分割
