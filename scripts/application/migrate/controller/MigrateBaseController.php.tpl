@@ -304,8 +304,14 @@ class MigrateBaseController extends Controller {
         }
         //处理字段类型
         if (in_array($field_info['field_type'], ['int', 'int_big', 'int_tiny', 'int_small'])) {
-            //数字
-            $field_info['field_type'] = 'integer';
+            //判断类型
+            switch ($field_info['field_type']) {
+                case 'int_big':
+                    $field_info['field_type'] = 'biginteger';
+                    break;
+                default:
+                    $field_info['field_type'] = 'integer';
+            }
             //数字类型的默认值，只能是数字
             $field_info['field_default_value'] = is_numeric($field_info['field_default_value']) ? $field_info['field_default_value'] : 0;
             $field_info['field_default_value'] = "'default' => " . $field_info['field_default_value'] . ", ";
