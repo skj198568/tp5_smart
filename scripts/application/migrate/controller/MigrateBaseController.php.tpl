@@ -294,6 +294,9 @@ class MigrateBaseController extends Controller {
                 case 'text_long':
                     $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_LONG, ";
                     break;
+                case 'timestamp':
+                    $field_info['field_limit'] = '';
+                    break;
             }
         } else {
             if ($field_info['field_type'] == 'decimal') {
@@ -329,6 +332,8 @@ class MigrateBaseController extends Controller {
         } else if (in_array($field_info['field_type'], ['text', 'text_long'])) {
             $field_info['field_type']          = 'text';
             $field_info['field_default_value'] = '';
+        } else if ($field_info['field_type'] == 'timestamp') {
+            $field_info['field_default_value'] = "'default' => 'CURRENT_TIMESTAMP', ";
         }
         $this->assign('field_info', $field_info);
         return $this->fetch($this->getTemplateFilePath('migrate_field.tpl')) . "\n";
@@ -514,6 +519,8 @@ class MigrateBaseController extends Controller {
                     } else if (strpos($each_field['Type'], 'varchar') !== false) {
                         $cache_filed['field_type']  = 'string';
                         $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
+                    } else if (strpos($each_field['Type'], 'timestamp') !== false) {
+                        $cache_filed['field_type'] = 'timestamp';
                     }
                     if (ClVerify::isJson($each_field['Comment'])) {
                         $comment = json_decode($each_field['Comment'], true);

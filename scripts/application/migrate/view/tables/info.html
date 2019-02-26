@@ -190,7 +190,7 @@
                                                 </select>
                                             </div>
                                             <div class="form-group"
-                                                 ms-if="field_type != 'text' && field_type != 'text_long'">
+                                                 ms-if="field_type != 'text' && field_type != 'text_long' && field_type != 'timestamp'">
                                                 <div class="input-group">
                                                     <div class="input-group-addon">默认</div>
                                                     <input class="form-control" type="text" style="width: 40px;"
@@ -198,7 +198,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group"
-                                                 ms-if="field_type != 'text' && field_type != 'text_long'">
+                                                 ms-if="field_type != 'text' && field_type != 'text_long' && field_type != 'timestamp'">
                                                 <div class="input-group">
                                                     <div class="input-group-addon">长度</div>
                                                     <input class="form-control" type="text" style="width: 80px;"
@@ -218,7 +218,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <div ms-if="!$fieldTypeIsInt()">
+                                <div ms-if="!$fieldTypeIsInt() && field_type != 'timestamp'">
                                     <label class="text-warning">存储类型</label>
                                     <!--内联表单begin-->
                                     <div class="form-inline">
@@ -948,7 +948,7 @@
             field_name: '',
             field_desc: '',
             field_type: 'int',
-            field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long'],
+            field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long', 'timestamp'],
             field_default_value: 0,
             field_limit: 0,
             field_scale: 0,
@@ -984,6 +984,7 @@
             show_format_str: '',
             store_format: 'string',
             password_salt: '',
+            deal_type: 'add',
             /**
              * 设置默认值
              */
@@ -1031,8 +1032,17 @@
                 if (editor_json !== null) {
                     editor_json.setValue("");
                 }
+                //设置字段类型
+                if (table_info.deal_type == 'add') {
+                    //去除timestamp字段类型
+                    table_info.field_type_values.remove('timestamp');
+                } else {
+                    //添加timestamp字段
+                    table_info.field_type_values.ensure('timestamp');
+                }
             },
             $add: function () {
+                table_info.deal_type = 'add';
                 table_info.$setFieldDefaultValue();
                 table_info.after_field = 'id';
                 table_info.after_field_select_options.clear();
@@ -1252,6 +1262,7 @@
             },
             edit_field_name: '',
             $edit: function (field_name) {
+                table_info.deal_type = 'edit';
                 table_info.$setFieldDefaultValue();
                 //用于控制add还是editor
                 table_info.edit_field_name = field_name;
