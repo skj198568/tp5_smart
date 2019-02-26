@@ -297,6 +297,9 @@ class MigrateBaseController extends Controller {
                 case 'timestamp':
                     $field_info['field_limit'] = '';
                     break;
+                case 'date':
+                    $field_info['field_limit'] = '';
+                    break;
             }
         } else {
             if ($field_info['field_type'] == 'decimal') {
@@ -334,6 +337,8 @@ class MigrateBaseController extends Controller {
             $field_info['field_default_value'] = '';
         } else if ($field_info['field_type'] == 'timestamp') {
             $field_info['field_default_value'] = "'default' => 'CURRENT_TIMESTAMP', ";
+        } else if ($field_info['field_type'] == 'date') {
+            $field_info['field_default_value'] = '';
         }
         $this->assign('field_info', $field_info);
         return $this->fetch($this->getTemplateFilePath('migrate_field.tpl')) . "\n";
@@ -516,11 +521,13 @@ class MigrateBaseController extends Controller {
                         $cache_filed['field_type'] = 'text_long';
                     } else if (strpos($each_field['Type'], 'text') !== false) {
                         $cache_filed['field_type'] = 'text';
-                    } else if (strpos($each_field['Type'], 'varchar') !== false) {
+                    } else if (strpos($each_field['Type'], 'varchar') !== false || strpos($each_field['Type'], 'char') !== false) {
                         $cache_filed['field_type']  = 'string';
                         $cache_filed['field_limit'] = ClString::getInt($each_field['Type']);
                     } else if (strpos($each_field['Type'], 'timestamp') !== false) {
                         $cache_filed['field_type'] = 'timestamp';
+                    } else if (strpos($each_field['Type'], 'date') !== false) {
+                        $cache_filed['field_type'] = 'date';
                     }
                     if (ClVerify::isJson($each_field['Comment'])) {
                         $comment = json_decode($each_field['Comment'], true);
