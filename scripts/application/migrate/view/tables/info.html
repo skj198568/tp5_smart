@@ -1675,6 +1675,17 @@
             }
         });
 
+        /**
+         * 字段设置默认缓存时间
+         */
+        table_info.$watch('using_cache', function (new_value, old_value) {
+            if (new_value == 1) {
+                if (!jCommon.isNumber(table_info.cache_seconds)) {
+                    table_info.cache_seconds = 3600;
+                }
+            }
+        });
+
         //初始化编辑器
         editor_json = ace.edit("id_div_editor", {
             theme: "ace/theme/tomorrow_night_eighties",
