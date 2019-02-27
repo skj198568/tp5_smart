@@ -14,6 +14,7 @@ use ClassLibrary\ClFile;
 use ClassLibrary\ClMysql;
 use ClassLibrary\ClString;
 use ClassLibrary\ClSystem;
+use ClassLibrary\ClVerify;
 use think\Config;
 use think\console\Command;
 use think\console\Input;
@@ -167,6 +168,7 @@ class SmartInit extends Command {
         $table_comment = ClMysql::query(sprintf("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name));
         $return        = [
             'name'     => '',
+            'ignore'   => 0,
             'is_cache' => 'null'
         ];
         foreach ($table_comment as $each_comment) {
@@ -465,10 +467,11 @@ class SmartInit extends Command {
             if ($table_name == 'migrations' || $table_name == 'phinxlog') {
                 continue;
             }
-            //处理分表问题
-            $table_comment = json_encode($this->getTableComment($table_name), JSON_UNESCAPED_UNICODE);
+            //comment
+            $comment       = $this->getTableComment($table_name);
+            $table_comment = json_encode($comment, JSON_UNESCAPED_UNICODE);
             //忽略表
-            if ($table_comment['ignore']) {
+            if (isset($table_comment['ignore']) && $table_comment['ignore']) {
                 continue;
             }
             if (!array_key_exists($table_comment, $table_names)) {
