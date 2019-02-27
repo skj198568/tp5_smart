@@ -1,4 +1,4 @@
-->{$field_deal_type}('{$field_info['field_name']}', '{$field_info['field_type']}', [{$field_info['after_field']}{$field_info['field_limit']}{$field_info['field_null']}{$field_info['field_default_value']}'comment' =>
+->{$field_deal_type}('{$field_info['field_name']}', '{$field_info['field_type']}', [{$field_info['after_field']}{$field_info['field_limit']}{$field_info['field_values']}{$field_info['field_null']}{$field_info['field_default_value']}'comment' =>
 ClMigrateField::instance()
 <present name="field_info['is_sortable']">
     <if condition="$field_info['is_sortable']">
@@ -39,7 +39,8 @@ ClMigrateField::instance()
                 ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (json_decode($v[0]) ? $v[0] : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))}
                 , '{$v[1]}')
                 <else/>
-                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (json_decode($v[0]) ? $v[0] : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))})
+                ->showFormat({:is_array($v[0]) ? trim(json_encode($v[0], JSON_UNESCAPED_UNICODE), '"') : (json_decode($v[0]) ? $v[0] : sprintf('"%s"', str_replace(['"'], ["'"], $v[0])))}
+                )
                 )
             </present>
         </foreach>

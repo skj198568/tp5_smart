@@ -286,9 +286,10 @@ class MigrateBaseController extends Controller {
         $field_info['after_field'] = $after_field;
         //是否可为空
         $field_info['field_null'] = '';
+        //默认值
+        $field_info['field_values'] = '';
         //处理limit
         if (strpos($field_info['field_limit'], '-') !== false) {
-
             switch ($field_info['field_type']) {
                 case 'text':
                     $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_REGULAR, ";
@@ -298,12 +299,8 @@ class MigrateBaseController extends Controller {
                     $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_LONG, ";
                     $field_info['field_null']  = "'null' => true, ";
                     break;
-                case 'timestamp':
+                default:
                     $field_info['field_limit'] = '';
-                    break;
-                case 'date':
-                    $field_info['field_limit'] = '';
-                    break;
             }
         } else {
             if ($field_info['field_type'] == 'decimal') {
@@ -342,6 +339,9 @@ class MigrateBaseController extends Controller {
         } else if ($field_info['field_type'] == 'timestamp') {
             $field_info['field_default_value'] = "'default' => 'CURRENT_TIMESTAMP', ";
         } else if ($field_info['field_type'] == 'date') {
+            $field_info['field_default_value'] = '';
+        } else if ($field_info['field_type'] == 'enum') {
+            $field_info['field_values']        = sprintf("'values' => %s, ", str_replace('"', "'", $field_info['field_default_value']));
             $field_info['field_default_value'] = '';
         }
         $this->assign('field_info', $field_info);
@@ -533,6 +533,9 @@ class MigrateBaseController extends Controller {
                         $cache_filed['field_type'] = 'timestamp';
                     } else if (strpos($each_field['Type'], 'date') !== false) {
                         $cache_filed['field_type'] = 'date';
+                    } else if (strpos($each_field['Type'], 'enum') !== false) {
+                        $cache_filed['field_type']          = 'enum';
+                        $cache_filed['field_default_value'] = '[' . ClString::getBetween($each_field['Type'], '(', ')', false) . ']';
                     }
                     if (ClVerify::isJson($each_field['Comment'])) {
                         $comment = json_decode($each_field['Comment'], true);

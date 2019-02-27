@@ -197,7 +197,7 @@
                     table_name: tables.del_table_name
                 }, function (r) {
                     tables.del_loading = false;
-                    layer.msg('删除成功, File:' + r.file_name, function () {
+                    layer.msg('删除成功:' + r.file_name, function () {
                     });
                     $('#id_modal_del').modal('hide');
                     tables.$refresh();
@@ -221,7 +221,7 @@
                 table_name: tables.rename_table_name,
                 new_table_name: tables.rename_new_table_name
             }, function (r) {
-                layer.msg('重命名成功，File:' + r.file_name, function () {
+                layer.msg('重命名成功:' + r.file_name, function () {
 
                 });
                 $('#id_modal_rename').modal('hide');
@@ -270,7 +270,7 @@
                     table_name: table_name,
                     ignore: ignore
                 }, function (r) {
-                    layer.msg('修改成功，File:' + r.file_name, function () {
+                    layer.msg('修改成功:' + r.file_name, function () {
 
                     });
                     tables.$refresh();

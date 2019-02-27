@@ -190,7 +190,7 @@
                                                 </select>
                                             </div>
                                             <div class="form-group"
-                                                 ms-if="field_type != 'text' && field_type != 'text_long' && field_type != 'timestamp'">
+                                                 ms-if="field_type != 'text' && field_type != 'text_long' && field_type != 'timestamp' && field_type != 'date'">
                                                 <div class="input-group">
                                                     <div class="input-group-addon">默认</div>
                                                     <input class="form-control" type="text" style="width: 100px;"
@@ -198,7 +198,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group"
-                                                 ms-if="field_type != 'text' && field_type != 'text_long' && field_type != 'timestamp'">
+                                                 ms-if="field_type != 'text' && field_type != 'text_long' && field_type != 'timestamp' && field_type != 'date' && field_type != 'enum'">
                                                 <div class="input-group">
                                                     <div class="input-group-addon">长度</div>
                                                     <input class="form-control" type="text" style="width: 80px;"
@@ -218,7 +218,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <div ms-if="!$fieldTypeIsInt() && field_type != 'timestamp'">
+                                <div ms-if="!$fieldTypeIsInt() && field_type != 'timestamp' && field_type != 'date' && field_type != 'enum'">
                                     <label class="text-warning">存储类型</label>
                                     <!--内联表单begin-->
                                     <div class="form-inline">
@@ -948,7 +948,7 @@
             field_name: '',
             field_desc: '',
             field_type: 'int',
-            field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long', 'timestamp'],
+            field_type_values: ['int', 'string', 'text', 'decimal', 'int_big', 'int_tiny', 'int_small', 'text_long', 'timestamp', 'date', 'enum'],
             field_default_value: 0,
             field_limit: 0,
             field_scale: 0,
@@ -1036,9 +1036,13 @@
                 if (table_info.deal_type == 'add') {
                     //去除timestamp字段类型
                     table_info.field_type_values.remove('timestamp');
+                    table_info.field_type_values.remove('date');
+                    table_info.field_type_values.remove('enum');
                 } else {
                     //添加timestamp字段
                     table_info.field_type_values.ensure('timestamp');
+                    table_info.field_type_values.ensure('date');
+                    table_info.field_type_values.ensure('enum');
                 }
             },
             $add: function () {
@@ -1540,7 +1544,7 @@
                     param.partition = [];
                 }
                 $.get('/migrate/table/update', param, function (r) {
-                    layer.msg('更新成功', function () {
+                    layer.msg('更新成功:' + r.file_name, function () {
 
                     });
                     table_info.$getTableInfo();
