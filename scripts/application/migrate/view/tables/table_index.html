@@ -266,7 +266,7 @@
             }, function (r) {
                 $('#id_modal_add').modal('hide');
                 //提醒消息
-                layer.msg('新增成功:' + r.file, function () {
+                layer.msg('新增成功:' + r.file_name, function () {
 
                 });
                 index.$refresh();
@@ -330,7 +330,7 @@
                     index_type: index_type
                 }, function (r) {
                     layer.close(layer_index);
-                    layer.msg('删除索引成功:' + r.file, function () {
+                    layer.msg('删除索引成功:' + r.file_name, function () {
 
                     });
                     index.$refresh();

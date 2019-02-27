@@ -146,12 +146,18 @@
                         title: '表名',
                         formatter: function (value, row, index) {
                             var btn = [];
-                            btn.push(value);
-                            btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
-                            btn.push('<button class="btn btn-info btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
-                            btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
-                            btn.push('<button class="btn btn-warning btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
-                            btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIndex(\'' + value + '\')"><i class="fa fa-key"></i> 索引</button>');
+                            if (row.ignore) {
+                                btn.push('<i class="fa fa-recycle" style="color: red;margin-right: 0.5em;"></i><s style="color: red;">' + value + '</s>');
+                                btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 0)"><i class="fa fa-check"></i> 启用</button>');
+                            } else {
+                                btn.push(value);
+                                btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
+                                btn.push('<button class="btn btn-info btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
+                                btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
+                                btn.push('<button class="btn btn-warning btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
+                                btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIndex(\'' + value + '\')"><i class="fa fa-key"></i> 索引</button>');
+                                btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 1)"><i class="fa fa-recycle"></i> 废弃</button>');
+                            }
                             return btn.join(' ');
                         }
                     }
@@ -191,7 +197,7 @@
                     table_name: tables.del_table_name
                 }, function (r) {
                     tables.del_loading = false;
-                    layer.msg('删除成功', function () {
+                    layer.msg('删除成功, File:' + r.file_name, function () {
                     });
                     $('#id_modal_del').modal('hide');
                     tables.$refresh();
@@ -215,7 +221,7 @@
                 table_name: tables.rename_table_name,
                 new_table_name: tables.rename_new_table_name
             }, function (r) {
-                layer.msg('更新成功', function () {
+                layer.msg('重命名成功，File:' + r.file_name, function () {
 
                 });
                 $('#id_modal_rename').modal('hide');
@@ -241,7 +247,7 @@
                 tables.is_backup = false;
                 $('#id_modal_backup').modal('hide');
                 if (r.status_code == 1) {
-                    layer.msg('备份成功，文件为：' + r.file, function () {
+                    layer.msg('备份成功，File：' + r.file_name, function () {
                     });
                 } else {
                     layer.msg(r.message, function () {
@@ -249,8 +255,29 @@
                 }
             });
         },
+        //索引
         $dealIndex: function (table_name) {
             window.location.href = '/migrate/tables/table_index/table_name/' + table_name + '.html';
+        },
+        //启用或废弃
+        $dealIgnore: function (table_name, ignore) {
+            //询问框
+            var msg = ignore ? '确认废弃<span style="color: red;">' + table_name + '</span>?' : '确认启用<span style="color: red;">' + table_name + '</span>?';
+            var index = layer.confirm(msg, {
+                btn: ['确认', '放弃'] //按钮
+            }, function () {
+                $.post('/migrate/table/update', {
+                    table_name: table_name,
+                    ignore: ignore
+                }, function (r) {
+                    layer.msg('修改成功，File:' + r.file_name, function () {
+
+                    });
+                    tables.$refresh();
+                });
+            }, function () {
+                layer.close(index);
+            });
         }
     });
 

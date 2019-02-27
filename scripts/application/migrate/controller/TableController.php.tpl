@@ -12,7 +12,7 @@ namespace app\migrate\controller;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClString;
-use Mpdf\Tag\P;
+use ClassLibrary\ClVerify;
 
 /**
  * 表
@@ -47,10 +47,16 @@ class TableController extends MigrateBaseController {
             if (!isset($tables[$fields])) {
                 //生成待转换的migrate
                 $this->alterFieldDefaultValue($table);
+                $comment = $this->getTableComment($table);
+                $ignore  = 0;
+                if (isset($comment['ignore'])) {
+                    $ignore = $comment['ignore'];
+                }
                 //添加
                 $tables[$fields] = [
                     'name'                       => $table,
-                    'need_to_convert_null_value' => !empty($this->alterFieldDefaultValueGetFields($table))
+                    'need_to_convert_null_value' => !empty($this->alterFieldDefaultValueGetFields($table)),
+                    'ignore'                     => $ignore
                 ];
             }
         }
@@ -186,23 +192,29 @@ class TableController extends MigrateBaseController {
     public function update() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
-        $table_desc = get_param('table_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表注释');
-        $this->assign('table_desc', $table_desc);
-        $engine = get_param('engine', ClFieldVerify::instance()->verifyInArray(['MyISAM', 'InnoDB'])->fetchVerifies(), '表引擎');
-        $this->assign('engine', $engine);
-        $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数', []);
-        $this->assign('api_functions', $api_functions);
-        $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间', null);
-        $this->assign('cache_seconds', $cache_seconds);
+        //原信息
         $old_table_comment = $this->getTableComment($table_name);
         $this->assign('old_table_desc', $old_table_comment['name']);
         $this->assign('old_engine', $old_table_comment['engine']);
         $this->assign('old_api_functions', $old_table_comment['create_api']);
         $this->assign('old_cache_seconds', $old_table_comment['is_cache']);
+        $this->assign('old_ignore', $old_table_comment['ignore']);
+        $old_table_comment['partition'] = isset($old_table_comment['partition']) ? $old_table_comment['partition'] : [];
+        $this->assign('old_partition', $old_table_comment['partition']);
+        //新信息
+        $table_desc = get_param('table_desc', ClFieldVerify::instance()->fetchVerifies(), '表注释', $old_table_comment['name']);
+        $this->assign('table_desc', $table_desc);
+        $engine = get_param('engine', ClFieldVerify::instance()->verifyInArray(['MyISAM', 'InnoDB'])->fetchVerifies(), '表引擎', $old_table_comment['engine']);
+        $this->assign('engine', $engine);
+        $api_functions = get_param('api_functions', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '创建的接口函数', $old_table_comment['create_api']);
+        $this->assign('api_functions', $api_functions);
+        $cache_seconds = get_param('cache_seconds', ClFieldVerify::instance()->fetchVerifies(), '缓存时间', $old_table_comment['is_cache']);
+        $this->assign('cache_seconds', $cache_seconds);
+        $ignore = get_param('ignore', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '是否忽略', $old_table_comment['ignore']);
+        $this->assign('ignore', $ignore);
         //分表信息
-        $partition = get_param('partition', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '分表规则', []);
+        $partition = get_param('partition', ClFieldVerify::instance()->verifyArray()->fetchVerifies(), '分表规则', $old_table_comment['partition']);
         $this->assign('partition', $partition);
-        $this->assign('old_partition', isset($old_table_comment['partition']) ? $old_table_comment['partition'] : []);
         $class_name    = $this->getClassName([$table_name, 'update']);
         $table_content = $this->fetch($this->getTemplateFilePath('migrate_table_update.tpl'));
         $file_path     = $this->getMigrateFilePath($class_name);
@@ -210,7 +222,7 @@ class TableController extends MigrateBaseController {
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name, $file_path, sprintf('update table %s', $table_name));
-        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+        return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
     /**
@@ -229,7 +241,7 @@ class TableController extends MigrateBaseController {
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name, $file_path, sprintf('rename table %s to %s', $table_name, $new_table_name));
-        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+        return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
     /**
@@ -274,7 +286,7 @@ class TableController extends MigrateBaseController {
         $file_path     = $this->getMigrateFilePath($class_name);
         //写入文件
         file_put_contents($file_path, "<?php\n" . $table_content);
-        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+        return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
     /**
@@ -331,7 +343,7 @@ class TableController extends MigrateBaseController {
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name, $file_path, sprintf('delete table %s index %s', $table_name, $this->getModelName(implode('_', array_merge(['index'], $fields)), false)));
-        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+        return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
     /**
@@ -369,7 +381,7 @@ class TableController extends MigrateBaseController {
         file_put_contents($file_path, "<?php\n" . $table_content);
         //执行
         $this->run($table_name, $file_path, sprintf('create table %s index %s', $table_name, $this->getModelName(implode('_', array_merge(['index'], $fields)), false)));
-        return $this->ar(1, ['file' => $this->getMigrateFileName($class_name)]);
+        return $this->ar(1, ['file_name' => $this->getMigrateFileName($class_name)]);
     }
 
     /**

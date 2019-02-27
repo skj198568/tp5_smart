@@ -357,6 +357,7 @@ class MigrateBaseController extends Controller {
         $table_comment = $query->query(sprintf("SELECT TABLE_COMMENT,ENGINE FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", config('database.database'), $table_name));
         $return        = [
             'name'       => '',
+            'ignore'     => 0,
             'is_cache'   => 'null',
             'engine'     => 'InnoDB',
             'create_api' => []
