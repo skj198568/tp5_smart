@@ -501,7 +501,7 @@ class MigrateBaseController extends Controller {
                     $cache_filed['field_limit'] = '-';
                     $cache_filed['field_scale'] = '-';
                     //类型
-                    if (strpos($each_field['Type'], 'decimal') !== false) {
+                    if (strpos($each_field['Type'], 'decimal') !== false || strpos($each_field['Type'], 'double') !== false) {
                         $cache_filed['field_type'] = 'decimal';
                         $field_detail              = '';
                         if (strpos($each_field['Type'], '(') !== false) {
