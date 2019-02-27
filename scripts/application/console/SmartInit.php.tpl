@@ -462,12 +462,17 @@ class SmartInit extends Command {
                 continue;
             }
             $table_name = ClString::replaceOnce($database_prefix, '', $table_name);
-            if ($table_name != 'migrations') {
-                //处理分表问题
-                $table_comment = json_encode($this->getTableComment($table_name), JSON_UNESCAPED_UNICODE);
-                if (!array_key_exists($table_comment, $table_names)) {
-                    $table_names[$table_comment] = $table_name;
-                }
+            if ($table_name == 'migrations' || $table_name == 'phinxlog') {
+                continue;
+            }
+            //处理分表问题
+            $table_comment = json_encode($this->getTableComment($table_name), JSON_UNESCAPED_UNICODE);
+            //忽略表
+            if ($table_comment['ignore']) {
+                continue;
+            }
+            if (!array_key_exists($table_comment, $table_names)) {
+                $table_names[$table_comment] = $table_name;
             }
         }
         return array_values($table_names);
