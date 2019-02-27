@@ -154,6 +154,18 @@ class BaseModel extends Query {
      * @return array
      */
     protected function preprocessDataBeforeExecute($data, $operate_type) {
+        return $data;
+    }
+
+    /**
+     * 默认处理数据
+     * @param $data
+     * @param $operate_type
+     * @return array
+     */
+    private function preprocessDataBeforeExecuteDefault($data, $operate_type) {
+        //调用预处理
+        $data = static::preprocessDataBeforeExecute($data, $operate_type);
         //非array数据，不进行处理
         if (!is_array($data)) {
             return $data;
@@ -270,7 +282,7 @@ class BaseModel extends Query {
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //预处理数据
-        $data   = static::preprocessDataBeforeExecute($data, 'insert');
+        $data   = static::preprocessDataBeforeExecuteDefault($data, 'insert');
         $result = parent::insert($data, $replace, $getLastInsID, $sequence);
         //执行
         if (!ClArray::isLinearArray($data)) {
@@ -298,7 +310,7 @@ class BaseModel extends Query {
         //校验参数
         foreach ($dataSet as $k_data => $data) {
             //预处理数据
-            $data = static::preprocessDataBeforeExecute($data, 'insert');
+            $data = static::preprocessDataBeforeExecuteDefault($data, 'insert');
             //替换数据
             $dataSet[$k_data] = $data;
         }
@@ -326,7 +338,7 @@ class BaseModel extends Query {
      */
     public function update(array $data = []) {
         //预处理数据
-        $data = static::preprocessDataBeforeExecute($data, 'update');
+        $data = static::preprocessDataBeforeExecuteDefault($data, 'update');
         return parent::update($data);
     }
 
