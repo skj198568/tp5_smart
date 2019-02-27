@@ -284,15 +284,19 @@ class MigrateBaseController extends Controller {
             $after_field = "'after' => '$after_field', ";
         }
         $field_info['after_field'] = $after_field;
+        //是否可为空
+        $field_info['field_null'] = '';
         //处理limit
         if (strpos($field_info['field_limit'], '-') !== false) {
 
             switch ($field_info['field_type']) {
                 case 'text':
                     $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_REGULAR, ";
+                    $field_info['field_null']  = "'null' => true, ";
                     break;
                 case 'text_long':
                     $field_info['field_limit'] = "'limit' => MysqlAdapter::TEXT_LONG, ";
+                    $field_info['field_null']  = "'null' => true, ";
                     break;
                 case 'timestamp':
                     $field_info['field_limit'] = '';
