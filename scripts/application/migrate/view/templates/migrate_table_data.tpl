@@ -12,10 +12,8 @@ class {$class_name} extends Cmd {
     public function up() {
         //释放数据表信息，防止表结构修改导致的错误错误
         {$model_name}::tableInfoFree();
-        //临时取消存储格式，防止数据变动
-        {$model_name}::$fields_store_format = [];
-        //临时取消校验
-        {$model_name}::$fields_verifies = [];
+        //设置状态
+        {$model_name}::$is_back_data = true;
         //清空
         {$model_name}::instance()->execute('TRUNCATE TABLE `' . config('database.prefix') . '{$table_name}`');
         //db存储文件
@@ -41,6 +39,8 @@ class {$class_name} extends Cmd {
             {$model_name}::instance()->insertAll($items);
         }
         fclose($f_handle);
+        //回复状态
+        {$model_name}::$is_back_data = false;
     }
 
 }
