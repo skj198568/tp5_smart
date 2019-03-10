@@ -120,6 +120,12 @@ class BaseModel extends Query {
     const V_OPERATE_TYPE_UPDATE = 'update';
 
     /**
+     * 是否在备份数据
+     * @var bool
+     */
+    public static $is_back_data = false;
+
+    /**
      * 构造函数
      * @access public
      * @param Connection $connection 数据库对象实例
@@ -164,6 +170,10 @@ class BaseModel extends Query {
      * @return array
      */
     private function preprocessDataBeforeExecuteDefault($data, $operate_type) {
+        //如果是备份数据，则忽略数据的处理及校验
+        if (static::$is_back_data) {
+            return $data;
+        }
         //调用预处理
         $data = static::preprocessDataBeforeExecute($data, $operate_type);
         //非array数据，不进行处理
