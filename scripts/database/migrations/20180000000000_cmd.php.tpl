@@ -168,7 +168,7 @@ class Cmd extends \think\migration\Migrator {
     protected function changeDirOwn() {
         //修改目录权限为www
         $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
-        exec($cmd);
+        pclose(popen($cmd, 'r'));
     }
 
     /**
