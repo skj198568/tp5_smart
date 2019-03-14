@@ -107,6 +107,9 @@
             //回调函数
             _opt.complete = function (XMLHttpRequest, textStatus) {
                 ajax_complete_call_back(XMLHttpRequest, textStatus);
+                //重置
+                ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                };
             };
             //设置post参数方式，解决空数组不提交问题
             if (_opt.type == 'post') {
