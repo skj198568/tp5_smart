@@ -624,11 +624,9 @@ class BaseModel extends Query {
             return [];
         }
         if (is_array($data)) {
-            if (!empty(static::$fields_store_format)) {
-                foreach ($data as $k => $each) {
-                    //预处理数据
-                    $data[$k] = $this->preprocessDataAfterQuery($each);
-                }
+            foreach ($data as $k => $each) {
+                //预处理数据
+                $data[$k] = $this->preprocessDataAfterQuery($each);
             }
         }
         return $data;
@@ -647,11 +645,8 @@ class BaseModel extends Query {
         if (empty($data)) {
             return [];
         }
-        if (!empty(static::$fields_store_format)) {
-            //预处理数据
-            $data = $this->preprocessDataAfterQuery($data);
-        }
-        return $data;
+        //预处理数据
+        return $this->preprocessDataAfterQuery($data);
     }
 
     /**
@@ -663,13 +658,10 @@ class BaseModel extends Query {
      */
     public function value($field, $default = null, $force = false) {
         $value = parent::value($field, $default, $force);
-        if (!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)) {
-            //转换成数组进行处理
-            $value = $this->preprocessDataAfterQuery([$field => $value]);
-            //取数据
-            $value = $value[$field];
-        }
-        return $value;
+        //转换成数组进行处理
+        $value = $this->preprocessDataAfterQuery([$field => $value]);
+        //取数据
+        return $value[$field];
     }
 
     /**
@@ -680,13 +672,11 @@ class BaseModel extends Query {
      */
     public function column($field, $key = '') {
         $data = parent::column($field, $key);
-        if (!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)) {
-            foreach ($data as $key => $value) {
-                //转换成数组进行处理
-                $value = $this->preprocessDataAfterQuery([$field => $value]);
-                //替换
-                $data[$key] = $value[$field];
-            }
+        foreach ($data as $key => $value) {
+            //转换成数组进行处理
+            $value = $this->preprocessDataAfterQuery([$field => $value]);
+            //替换
+            $data[$key] = $value[$field];
         }
         return $data;
     }
