@@ -198,6 +198,9 @@ class TaskMap extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getById($id, $exclude_fields = [], $duration = null) {
+        if (empty($id)) {
+            return null;
+        }
         if (is_numeric($duration)) {
             $info = static::instance()->cache([$id], $duration)->where([
                 static::F_ID => $id
@@ -236,6 +239,9 @@ class TaskMap extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getValueById($id, $field, $default = '', $is_convert_to_int = false, $duration = null) {
+        if (empty($id)) {
+            return null;
+        }
         if (is_numeric($duration)) {
             $info = static::getById($id, [], $duration);
             if (empty($info)) {
