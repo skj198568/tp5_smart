@@ -40,7 +40,7 @@ class BaseApiController extends Controller {
     public function _initialize() {
         parent::_initialize();
         if (App::$debug) {
-            log_info('$_REQUEST:', request()->request());
+            log_info('input:', input());
         }
     }
 
