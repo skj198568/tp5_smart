@@ -186,6 +186,9 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getById(${$table_comment['partition'][0]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+        if (empty($id)) {
+            return null;
+        }
         if (is_numeric($duration)) {
             $info = static::instance(${$table_comment['partition'][0]})->cache([${$table_comment['partition'][0]}, $id], $duration)->where([
                 <if condition="isset($table_comment['partition'][1])">static::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
@@ -215,6 +218,9 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
+        if (empty($id)) {
+            return null;
+        }
         if (is_numeric($duration)) {
             $info = static::instance()->cache([$id], $duration)->where([
                 static::F_ID => $id
@@ -269,6 +275,9 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getValueById(${$table_comment['partition'][0]}, $id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
+        if (empty($id)) {
+            return null;
+        }
         if (is_numeric($duration)) {
             $info = static::getById(${$table_comment['partition'][0]}, $id, [], $duration);
             if (empty($info)) {
@@ -302,6 +311,9 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getValueById($id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
+        if (empty($id)) {
+            return null;
+        }
         if (is_numeric($duration)) {
             $info = static::getById($id, [], $duration);
             if (empty($info)) {
