@@ -199,7 +199,7 @@ class TaskMap extends BaseModel {
      */
     public static function getById($id, $exclude_fields = [], $duration = null) {
         if (empty($id)) {
-            return null;
+            return [];
         }
         if (is_numeric($duration)) {
             $info = static::instance()->cache([$id], $duration)->where([
