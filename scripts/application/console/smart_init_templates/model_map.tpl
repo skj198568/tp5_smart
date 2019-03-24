@@ -187,7 +187,7 @@ class {$table_name_with_format}Map extends BaseModel {
      */
     public static function getById(${$table_comment['partition'][0]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (empty($id)) {
-            return null;
+            return [];
         }
         if (is_numeric($duration)) {
             $info = static::instance(${$table_comment['partition'][0]})->cache([${$table_comment['partition'][0]}, $id], $duration)->where([
@@ -219,7 +219,7 @@ class {$table_name_with_format}Map extends BaseModel {
      */
     public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
         if (empty($id)) {
-            return null;
+            return [];
         }
         if (is_numeric($duration)) {
             $info = static::instance()->cache([$id], $duration)->where([
