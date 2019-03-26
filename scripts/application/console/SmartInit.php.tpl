@@ -745,15 +745,11 @@ class SmartInit extends Command {
             if ($each['type'] == 'create') {
                 if ($is_svn) {
                     $cmd[] = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create', $each_file);
-                } else {
-                    $cmd[] = sprintf('cd %s && git add %s && git commit -m "%s" && git push', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create');
                 }
             } else {
                 if ($is_svn) {
                     $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update', $each_file);
-                } else {
-                    $cmd[] = sprintf('cd %s && git ci -m "%s" && git push', DOCUMENT_ROOT_PATH . '/../', 'update');
-                }
+                } 
             }
         }
         if (empty($cmd)) {

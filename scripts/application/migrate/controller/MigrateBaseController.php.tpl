@@ -437,9 +437,7 @@ class MigrateBaseController extends Controller {
         if (is_dir(DOCUMENT_ROOT_PATH . '/../.svn')) {
             //svn版本
             $cmd = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $svn_msg, $migrate_absolute_file);
-        } else {
-            $cmd = sprintf('cd %s && git add %s && git commit -m "%s" && git push', DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $svn_msg);
-        }
+        } 
         if (empty($cmd)) {
             return;
         }
