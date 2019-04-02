@@ -18,6 +18,10 @@ class TaskCommandUpdate20190221164512 extends Cmd {
             if (!$this->table($table)->hasColumn('command')) {
                 continue;
             }
+            //先删除索引
+            $this->table($table)
+                ->removeIndex(['command'])
+                ->update();
             //修改字段
             $this->table($table)
                 ->changeColumn('command', 'string', ['limit' => 10000, 'default' => '', 'comment' =>
@@ -46,6 +50,10 @@ class TaskCommandUpdate20190221164512 extends Cmd {
                         ->verifyIsRequire()
                         ->fetch('带有命名空间的任务调用地址')
                 ])
+                ->update();
+            //添加索引
+            $this->table($table)
+                ->addIndex(['command'], ['type' => \Phinx\Db\Table\Index::INDEX, 'unique' => false, 'name' => 'index_command'])
                 ->update();
         }
     }
