@@ -205,6 +205,8 @@ class BaseModel extends Query {
                 }
             }
         }
+        //校验参数
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, $operate_type, $this->is_divide_table ? null : static::instance());
         //存储格式处理
         if (!empty(static::$fields_store_format)) {
             foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
@@ -241,8 +243,6 @@ class BaseModel extends Query {
                 }
             }
         }
-        //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, $operate_type, $this->is_divide_table ? null : static::instance());
         return $data;
     }
 
