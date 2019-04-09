@@ -4,15 +4,15 @@
 <meta name="keywords" content="">
 <meta name="description" content="">
 <link rel="shortcut icon" href="/favicon.ico">
-<include file="index@include/bootstrap/css"/>
-<include file="index@include/font-awesome/css"/>
+<include file="index@include/bootstrap/css" />
+<include file="index@include/font-awesome/css" />
 <link href="/static/css/migrate/animate.min.css" rel="stylesheet">
 <link href="/static/css/migrate/style.min862f.css?v=4.1.0" rel="stylesheet">
-<include file="index@include/bootstrap-table/css"/>
-<include file="index@include/bootstrap-editable/css"/>
+<include file="index@include/bootstrap-table/css" />
+<include file="index@include/bootstrap-editable/css" />
 <style type="text/css">
-
-    html, body {
+    html,
+    body {
         font-size: 14px;
     }
 
@@ -34,26 +34,25 @@
         padding-bottom: 5px;
         margin-bottom: 10px;
     }
-
 </style>
 <!--[if lt IE 9]>
 <meta http-equiv="refresh" content="0;ie.html"/>
 <![endif]-->
-<include file="index@include/jquery/js"/>
-<include file="index@include/bootstrap/js"/>
-<include file="index@include/avalon/js"/>
-<include file="index@include/bootstrap-editable/js"/>
-<include file="index@include/bootstrap-table/js"/>
-<include file="index@include/bootstrap-table/js-zh-cn"/>
-<include file="index@include/bootstrap-table/js-editable"/>
-<include file="index@include/bootstrap-suggest/js"/>
-<include file="index@include/layer/js"/>
-<include file="index@include/ace/js"/>
-<include file="index@include/moment/js"/>
-<include file="index@include/moment/js-zh-cn"/>
-<include file="index@include/pace/js"/>
-<include file="index@include/jquery-slim-scroll/js"/>
-<include file="index@include/metis-menu/js"/>
+<include file="index@include/jquery/js" />
+<include file="index@include/bootstrap/js" />
+<include file="index@include/avalon/js" />
+<include file="index@include/bootstrap-editable/js" />
+<include file="index@include/bootstrap-table/js" />
+<include file="index@include/bootstrap-table/js-zh-cn" />
+<include file="index@include/bootstrap-table/js-editable" />
+<include file="index@include/bootstrap-suggest/js" />
+<include file="index@include/layer/js" />
+<include file="index@include/ace/js" />
+<include file="index@include/moment/js" />
+<include file="index@include/moment/js-zh-cn" />
+<include file="index@include/pace/js" />
+<include file="index@include/jquery-slim-scroll/js" />
+<include file="index@include/metis-menu/js" />
 <script src="/static/js/common.js"></script>
 <script src="/static/js/hplus.min.js"></script>
 <script src="/static/js/contabs.min.js"></script>
@@ -104,8 +103,13 @@
             if (!_opt.data.hasOwnProperty('migrate_token') && !jCommon.empty(token)) {
                 _opt.data.token = token;
             }
+            var old_callback = _opt.complete;
             //回调函数
             _opt.complete = function (XMLHttpRequest, textStatus) {
+                if (typeof old_callback == 'function') {
+                    //调用原有回调函数
+                    old_callback();
+                }
                 ajax_complete_call_back(XMLHttpRequest, textStatus);
                 //重置
                 ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
