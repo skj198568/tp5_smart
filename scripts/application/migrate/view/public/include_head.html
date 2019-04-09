@@ -103,18 +103,15 @@
             if (!_opt.data.hasOwnProperty('migrate_token') && !jCommon.empty(token)) {
                 _opt.data.token = token;
             }
-            var old_callback = _opt.complete;
-            //回调函数
-            _opt.complete = function (XMLHttpRequest, textStatus) {
-                if (typeof old_callback == 'function') {
-                    //调用原有回调函数
-                    old_callback();
-                }
-                ajax_complete_call_back(XMLHttpRequest, textStatus);
-                //重置
-                ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+            if (typeof _opt.complete != 'function') {
+                //回调函数
+                _opt.complete = function (XMLHttpRequest, textStatus) {
+                    ajax_complete_call_back(XMLHttpRequest, textStatus);
+                    //重置
+                    ajax_complete_call_back = function (XMLHttpRequest, textStatus) {
+                    };
                 };
-            };
+            }
             //设置post参数方式，解决空数组不提交问题
             if (_opt.type == 'post') {
                 _opt.contentType = "application/json;charset=utf-8";
