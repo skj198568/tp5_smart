@@ -375,7 +375,8 @@ class TaskMap extends BaseModel {
         //处理数据
         if ($id == 0) {
             $item = self::instance()->where([
-                self::F_START_TIME => 0
+                self::F_START_TIME  => 0,
+                self::F_CREATE_TIME => ['elt', time()]
             ])->order([self::F_ID => self::V_ORDER_ASC])->find();
             if (empty($item)) {
                 return true;
@@ -425,9 +426,10 @@ class TaskMap extends BaseModel {
      * 创建任务
      * @param string $command 类似任务命令:app\index\model\AdminLoginLogModel::sendEmail();
      * @param int $within_seconds_ignore_this_cmd 在多长时间内忽略该任务，比如某些不需要太精确的统计任务，可以设置为60秒，即60秒内只执行一次任务
+     * @param int $deal_time 定时任务执行的时间戳
      * @return bool|int|string
      */
-    public static function createTask($command, $within_seconds_ignore_this_cmd = 0) {
+    public static function createTask($command, $within_seconds_ignore_this_cmd = 0, $deal_time = 0) {
         $is_insert = true;
         //转为crc32，用于处理索引
         $command_crc32 = crc32($command);
@@ -443,9 +445,12 @@ class TaskMap extends BaseModel {
         }
         if ($is_insert) {
             //新增
-            return self::instance()->insert([
-                self::F_COMMAND => $command
-            ]);
+            $fields = [self::F_COMMAND => $command];
+            if ($deal_time > 0) {
+                //定时任务
+                $fields[self::F_CREATE_TIME] = $deal_time;
+            }
+            return self::instance()->insert($fields);
         } else {
             return false;
         }
