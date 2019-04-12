@@ -32,10 +32,15 @@
                         <label>选择字段</label>
                         <div ms-each="fields">
                             <label style="cursor: pointer;margin-right: 2em;" ms-click="$check(el.field_name)">
-                                <i class="fa fa-check-square-o" ms-visible="$isChecked(el.field_name)"></i>
-                                <i class="fa fa-square-o" ms-visible="!$isChecked(el.field_name)"></i>
-                                <span ms-class-1="text-danger:!$isChecked(el.field_name)"
-                                      ms-class="text-success:$isChecked(el.field_name)">{{el.field_name}}-{{el.field_desc}}</span>
+                                <i class="fa fa-check-square-o"
+                                   ms-visible="el.field_limit <= 191 && $isChecked(el.field_name)"></i>
+                                <i class="fa fa-square-o"
+                                   ms-visible="el.field_limit <= 191 && !$isChecked(el.field_name)"></i>
+                                <i class="fa fa-remove" ms-if="el.field_limit > 191"></i>
+                                <span ms-class-1="text-warning:!$isChecked(el.field_name)"
+                                      ms-class="text-success:$isChecked(el.field_name)">{{el.field_name}}-{{el.field_desc}}</span><span
+                                    class="text-danger"
+                                    ms-if="el.field_limit > 191">(不可选，长度{{el.field_limit}}大于191)</span>
                             </label>
                         </div>
                     </div>
@@ -82,6 +87,17 @@
             return index.fields_checked.contains(field_name);
         },
         $check: function (field_name) {
+            //如果长度大于191，则不可选中
+            var field_length = 0;
+            $.each(index.fields, function (k, v) {
+                if (field_name == v.field_name) {
+                    field_length = v.field_limit;
+                    return false;
+                }
+            });
+            if (field_length > 191) {
+                return false;
+            }
             if (index.$isChecked(field_name)) {
                 return index.fields_checked.remove(field_name);
             } else {
