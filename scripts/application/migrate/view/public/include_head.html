@@ -4,12 +4,12 @@
 <meta name="keywords" content="">
 <meta name="description" content="">
 <link rel="shortcut icon" href="/favicon.ico">
-<include file="index@include/bootstrap/css" />
-<include file="index@include/font-awesome/css" />
+<include file="index@include/bootstrap/css"/>
+<include file="index@include/font-awesome/css"/>
 <link href="/static/css/migrate/animate.min.css" rel="stylesheet">
 <link href="/static/css/migrate/style.min862f.css?v=4.1.0" rel="stylesheet">
-<include file="index@include/bootstrap-table/css" />
-<include file="index@include/bootstrap-editable/css" />
+<include file="index@include/bootstrap-table/css"/>
+<include file="index@include/bootstrap-editable/css"/>
 <style type="text/css">
     html,
     body {
@@ -38,21 +38,21 @@
 <!--[if lt IE 9]>
 <meta http-equiv="refresh" content="0;ie.html"/>
 <![endif]-->
-<include file="index@include/jquery/js" />
-<include file="index@include/bootstrap/js" />
-<include file="index@include/avalon/js" />
-<include file="index@include/bootstrap-editable/js" />
-<include file="index@include/bootstrap-table/js" />
-<include file="index@include/bootstrap-table/js-zh-cn" />
-<include file="index@include/bootstrap-table/js-editable" />
-<include file="index@include/bootstrap-suggest/js" />
-<include file="index@include/layer/js" />
-<include file="index@include/ace/js" />
-<include file="index@include/moment/js" />
-<include file="index@include/moment/js-zh-cn" />
-<include file="index@include/pace/js" />
-<include file="index@include/jquery-slim-scroll/js" />
-<include file="index@include/metis-menu/js" />
+<include file="index@include/jquery/js"/>
+<include file="index@include/bootstrap/js"/>
+<include file="index@include/avalon/js"/>
+<include file="index@include/bootstrap-editable/js"/>
+<include file="index@include/bootstrap-table/js"/>
+<include file="index@include/bootstrap-table/js-zh-cn"/>
+<include file="index@include/bootstrap-table/js-editable"/>
+<include file="index@include/bootstrap-suggest/js"/>
+<include file="index@include/layer/js"/>
+<include file="index@include/ace/js"/>
+<include file="index@include/moment/js"/>
+<include file="index@include/moment/js-zh-cn"/>
+<include file="index@include/pace/js"/>
+<include file="index@include/jquery-slim-scroll/js"/>
+<include file="index@include/metis-menu/js"/>
 <script src="/static/js/common.js"></script>
 <script src="/static/js/hplus.min.js"></script>
 <script src="/static/js/contabs.min.js"></script>
@@ -89,6 +89,10 @@
                     } else if (data.status === -2) {
                         //session超时
                         window.location.href = '{:url("index/index")}';
+                    } else if (data.status_code != 1) {
+                        layer.msg(data.msg, function () {
+
+                        });
                     } else {
                         //执行原先请求
                         _success(data, textStatus);
