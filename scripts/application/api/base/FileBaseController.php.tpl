@@ -42,7 +42,7 @@ class FileBaseController extends ApiController {
             //自动截取图片
             ClImage::centerCut($result['file'], $image_width, $image_height);
         }
-        $png2jpg = get_param('png2jpg', ClFieldVerify::instance()->verifyInArray([0, 1])->fetchVerifies(), '是否转换png为jpg，默认1', 1);
+        $png2jpg = get_param('png2jpg', ClFieldVerify::instance()->verifyInArray([0, 1])->fetchVerifies(), '是否转换png为jpg，默认1', 0);
         //png转jpg
         if ($png2jpg) {
             $result['file'] = ClImage::png2jpg($result['file']);
@@ -64,7 +64,7 @@ class FileBaseController extends ApiController {
             //自动截取图片
             ClImage::centerCut(DOCUMENT_ROOT_PATH . $img_url, $image_width, $image_height);
         }
-        $png2jpg = get_param('png2jpg', ClFieldVerify::instance()->verifyInArray([0, 1])->fetchVerifies(), '是否转换png为jpg，默认1', 1);
+        $png2jpg = get_param('png2jpg', ClFieldVerify::instance()->verifyInArray([0, 1])->fetchVerifies(), '是否转换png为jpg，默认1', 0);
         //png转jpg
         if ($png2jpg) {
             $img_url = ClImage::png2jpg(DOCUMENT_ROOT_PATH . $img_url);
