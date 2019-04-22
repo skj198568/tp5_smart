@@ -951,12 +951,25 @@ var jCommon = {
     hrefGetAnchorParams: function (name) {
         var url = window.location.href;
         var default_value = arguments.length === 2 ? arguments[1] : null;
-        var anchor = jCommon.hrefGetAnchor();
-        //删除锚点
-        url = url.replace('#' + anchor, '');
-        //将-转换为/
-        url = url.replace(/(-)/g, '/');
-        return jCommon.hrefGetParams(name, default_value, url);
+        if (url.indexOf('#') === -1) {
+            return default_value;
+        }
+        url = url.substring(url.indexOf('#') + 1);
+        //分割为数组
+        var params = url.split('/');
+        //翻转数组
+        params.reverse();
+        var return_params = {};
+        for (var i = 0; i <= params.length; i += 2) {
+            if (params.hasOwnProperty(i) && params.hasOwnProperty(i + 1)) {
+                return_params[params[i + 1]] = params[i];
+            }
+        }
+        if (return_params.hasOwnProperty(name)) {
+            return decodeURI(return_params[name]);
+        } else {
+            return default_value;
+        }
     },
 
     /**
