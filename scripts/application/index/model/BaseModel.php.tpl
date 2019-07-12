@@ -744,4 +744,16 @@ class BaseModel extends Query {
         self::$info = [];
     }
 
+    /**
+     * 清空表
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function tableTruncate() {
+        if ($this->tableIsExist($this->table)) {
+            //清空表
+            $this->execute("TRUNCATE TABLE `$this->table`");
+        }
+    }
+
 }
