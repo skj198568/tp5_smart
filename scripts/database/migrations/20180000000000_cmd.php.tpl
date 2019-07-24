@@ -1,5 +1,7 @@
 <?php
 
+use ClassLibrary\ClSystem;
+
 /**
  * Cmd基础类
  * Class Cmd
@@ -167,8 +169,10 @@ class Cmd extends \think\migration\Migrator {
      */
     protected function changeDirOwn() {
         //修改目录权限为www
-        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
-        pclose(popen($cmd, 'r'));
+        if (!ClSystem::isWin()) {
+            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+            pclose(popen($cmd, 'r'));
+        }
     }
 
     /**

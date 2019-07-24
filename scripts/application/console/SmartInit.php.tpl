@@ -101,8 +101,10 @@ class SmartInit extends Command {
         //处理api doc
         $this->dealApiDoc($output);
         //修改目录权限为www
-        $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
-        exec($cmd);
+        if (!ClSystem::isWin()) {
+            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+            exec($cmd);
+        }
         $output->highlight('finished');
         return true;
     }
@@ -749,7 +751,7 @@ class SmartInit extends Command {
             } else {
                 if ($is_svn) {
                     $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update', $each_file);
-                } 
+                }
             }
         }
         if (empty($cmd)) {
