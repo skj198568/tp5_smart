@@ -44,18 +44,26 @@ foreach ($files as $file) {
             $str_params = \ClassLibrary\ClString::getBetween($str, '[', ']');
             if ($str_params == '[]') {
                 //直接添加
-                $str_target = str_replace($str_params, "['app\\common\\behavior\\MergeResource', 'app\\common\\behavior\\BrowserSyncJsMerge']", $str);
+                $str_target = str_replace($str_params, "['app\\common\\behavior\\BrowserSyncJsMerge']", $str);
                 //替换
                 $file_content = str_replace($str, $str_target, $file_content);
                 //回写
                 file_put_contents($target_file, $file_content);
                 echo 'modify file: ' . $target_file . PHP_EOL;
             } else {
-                if (strpos($str_params, 'MergeResource') === false && strpos($str_params, 'BrowserSyncJsMerge') === false) {
+                //拼接
+                if (strpos($str_params, 'BrowserSyncJsMerge') === false) {
                     //拼接添加
-                    $str_target = str_replace($str_params, trim($str_params, ']') . ", 'app\\common\\behavior\\MergeResource', 'app\\common\\behavior\\BrowserSyncJsMerge']", $str);
+                    $str_target = str_replace($str_params, trim($str_params, ']') . ", 'app\\common\\behavior\\BrowserSyncJsMerge']", $str);
                     //替换
                     $file_content = str_replace($str, $str_target, $file_content);
+                    //回写
+                    file_put_contents($target_file, $file_content);
+                    echo 'modify file: ' . $target_file . PHP_EOL;
+                }
+                //删除
+                if (strpos($str_params, 'MergeResource') !== false) {
+                    $file_content = str_replace("'app\\common\\behavior\\MergeResource'", '', $file_content);
                     //回写
                     file_put_contents($target_file, $file_content);
                     echo 'modify file: ' . $target_file . PHP_EOL;
