@@ -27,7 +27,7 @@ class Cmd extends \think\migration\Migrator {
             //获取当前链接数
             if (!is_numeric(cache('migrate_max_connections'))) {
                 $query           = new \think\db\Query();
-                $max_connections = $query->query("show variables like '%max_connections%';");
+                $max_connections = $query->query("show variables like 'max_connections';");
                 cache('migrate_max_connections', $max_connections[0]['Value']);
                 //设置最大连接数
                 $query->query('set GLOBAL max_connections = 16384;');
