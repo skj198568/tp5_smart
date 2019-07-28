@@ -54,10 +54,6 @@ class SmartInit extends Command {
      * @return bool|int|null
      */
     protected function execute(Input $input, Output $output) {
-        if (ClSystem::isWin()) {
-            $output->error('请在Linux环境下执行');
-            return false;
-        }
         try {
             return $this->doExecute($input, $output);
         } catch (Exception $exception) {
