@@ -137,7 +137,6 @@ foreach ($files as $file) {
             //复制文件
             echo 'copy file: ' . $target_file . PHP_EOL;
         }
-        var_dump('$target_file:', $file, $target_file);
         copy($file, $target_file);
     }
 }
