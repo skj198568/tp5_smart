@@ -23,7 +23,7 @@ foreach ($files as $file) {
     //替换文件名
     $target_file = str_replace('.php.tpl', '.php', $target_file);
     //如果目标文件不存在，则新建
-    \ClassLibrary\ClFile::dirCreate($target_file);
+    \ClassLibrary\ClFile::dirCreate($target_file, is_file($file));
     //不可直接覆盖的文件特殊处理
     if (strpos($target_file, 'task_run.ini') !== false) {
         if (!is_file($target_file)) {
@@ -137,6 +137,7 @@ foreach ($files as $file) {
             //复制文件
             echo 'copy file: ' . $target_file . PHP_EOL;
         }
+        var_dump('$target_file:', $file, $target_file);
         copy($file, $target_file);
     }
 }
