@@ -379,7 +379,7 @@ class SmartInit extends Command {
         file_put_contents($map_file, $content);
         if ($content != $old_content) {
             if (empty($old_content)) {
-                $output->info('[Map]:create ' . $map_file . " ok");
+                $output->highlight('[Map]:create ' . $map_file . " ok");
                 $this->undo_files[] = [
                     'file' => $map_file,
                     'type' => 'create'
@@ -419,7 +419,7 @@ class SmartInit extends Command {
                 //写入文件
                 file_put_contents($model_name_file, $model_content);
                 //输出
-                $output->highlight('[Model]:modify model name ' . $model_name_file);
+                $output->info('[Model]:modify model name ' . $model_name_file);
                 $this->undo_files[] = [
                     'file' => $model_name_file,
                     'type' => 'update'
@@ -658,7 +658,7 @@ class SmartInit extends Command {
             file_put_contents($base_name_file, $content);
             if ($old_content != $content) {
                 if (empty($old_content)) {
-                    $output->info('[Base]:create ' . $base_name_file . " ok");
+                    $output->highlight('[Base]:create ' . $base_name_file . " ok");
                     $this->undo_files[] = [
                         'file' => $base_name_file,
                         'type' => 'create'
@@ -699,7 +699,7 @@ class SmartInit extends Command {
                 //写入文件
                 file_put_contents($api_controller_file, $controller_content);
                 //输出
-                $output->highlight('[Api]:modify controller name ' . $api_controller_file);
+                $output->info('[Api]:modify controller name ' . $api_controller_file);
                 $this->undo_files[] = [
                     'file' => $api_controller_file,
                     'type' => 'update'
@@ -719,7 +719,7 @@ class SmartInit extends Command {
         if (!empty($content)) {
             //写入
             file_put_contents($api_controller_file, $content);
-            $output->info('[Api]:create ' . $api_controller_file . " ok");
+            $output->highlight('[Api]:create ' . $api_controller_file . " ok");
             $this->undo_files[] = [
                 'file' => $api_controller_file,
                 'type' => 'create'
@@ -761,7 +761,7 @@ class SmartInit extends Command {
         //执行文件
         $cmd = sprintf('chmod 777 %s && %s', $file, $file);
         exec($cmd);
-        $output->highlight('exec ' . $file);
+        $output->info('exec ' . $file);
         //删除
         unlink($file);
         $output->highlight('unlink ' . $file);
@@ -782,9 +782,7 @@ class SmartInit extends Command {
             $output->info('exec ' . $file);
             //删除
             unlink($file);
-            //分割
-            $output->info('');
-            $output->info('unlink ' . $file);
+            $output->highlight('unlink ' . $file);
         }
     }
 
