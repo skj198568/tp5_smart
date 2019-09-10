@@ -17,6 +17,9 @@ class {$class_name} extends Cmd {
             if(!$this->table($table)->hasColumn('{$old_name}')){
                 continue;
             }
+            if($this->table($table)->hasColumn('{$new_name}')){
+                continue;
+            }
             //修改字段名
             $this->table($table)
                 ->renameColumn('{$old_name}', '{$new_name}')
@@ -36,6 +39,9 @@ class {$class_name} extends Cmd {
                 continue;
             }
             if(!$this->table($table)->hasColumn('{$new_name}')){
+                continue;
+            }
+            if($this->table($table)->hasColumn('{$old_name}')){
                 continue;
             }
             //修改字段名
