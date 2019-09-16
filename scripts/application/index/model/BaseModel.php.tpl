@@ -164,6 +164,15 @@ class BaseModel extends Query {
     }
 
     /**
+     * 在操作数据库之后处理数据
+     * @param array $data
+     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     */
+    protected function preprocessDataAfterExecute($data, $operate_type) {
+
+    }
+
+    /**
      * 默认处理数据
      * @param $data
      * @param $operate_type
@@ -295,6 +304,8 @@ class BaseModel extends Query {
         //预处理数据
         $data   = static::preprocessDataBeforeExecuteDefault($data, 'insert');
         $result = parent::insert($data, $replace, $getLastInsID, $sequence);
+        //处理数据
+        static::preprocessDataAfterExecute($data, 'insert');
         //执行
         if (!ClArray::isLinearArray($data)) {
             //多维数组
@@ -326,6 +337,11 @@ class BaseModel extends Query {
             $dataSet[$k_data] = $data;
         }
         $result = parent::insertAll($dataSet, $replace, $limit);
+        //校验参数
+        foreach ($dataSet as $k_data => $data) {
+            //处理数据
+            static::preprocessDataAfterExecute($data, 'insert');
+        }
         //执行
         if (!ClArray::isLinearArray($dataSet)) {
             //多维数组
@@ -349,8 +365,11 @@ class BaseModel extends Query {
      */
     public function update(array $data = []) {
         //预处理数据
-        $data = static::preprocessDataBeforeExecuteDefault($data, 'update');
-        return parent::update($data);
+        $data   = static::preprocessDataBeforeExecuteDefault($data, 'update');
+        $result = parent::update($data);
+        //处理数据
+        static::preprocessDataAfterExecute($data, 'update');
+        return $result;
     }
 
     /**

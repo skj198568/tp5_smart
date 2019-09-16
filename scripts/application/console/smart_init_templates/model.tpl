@@ -36,6 +36,15 @@ class {$table_name}Model extends {$table_name}Map {
     }
 
     /**
+     * 在操作数据库之后处理数据
+     * @param array $data
+     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     */
+    protected function preprocessDataAfterExecute($data, $operate_type) {
+
+    }
+
+    /**
      * 查询之后预处理数据
      * @param array $data
      * @return array
