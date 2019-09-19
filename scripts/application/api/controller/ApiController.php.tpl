@@ -75,6 +75,9 @@ class ApiController extends BaseApiController {
         if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && App::$debug) {
             $api_doc_dir = DOCUMENT_ROOT_PATH . '/../doc/api';
             $api_files   = ClFile::dirGetFiles($api_doc_dir, ['.html']);
+            if (empty($api_files)) {
+                return '<h1 style="text-align: center;font-size: 5em;">暂无接口文档</h1>';
+            }
             foreach ($api_files as $k => $each) {
                 $api_files[$k] = ClFile::getName($each, true);
             }
