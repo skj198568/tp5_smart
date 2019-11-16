@@ -21,12 +21,6 @@ class {$table_name_with_format}Map extends BaseModel {
      * @var array
      */
     protected static $instances_array = [];
-
-    /**
-     * 当前数据表名称（含前缀）
-     * @var string
-     */
-    protected $table = '';
 {$const_fields}
 
     /**
