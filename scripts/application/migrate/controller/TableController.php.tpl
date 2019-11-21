@@ -55,6 +55,7 @@ class TableController extends MigrateBaseController {
                 //添加
                 $tables[$fields] = [
                     'name'                       => $table,
+                    'desc'                       => isset($comment['name']) ? ($comment['name']) : '',
                     'need_to_convert_null_value' => !empty($this->alterFieldDefaultValueGetFields($table)),
                     'ignore'                     => $ignore
                 ];
