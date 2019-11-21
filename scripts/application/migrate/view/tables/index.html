@@ -150,13 +150,13 @@
                                 btn.push('<i class="fa fa-recycle" style="color: red;margin-right: 0.5em;"></i><s style="color: red;">' + value + '</s>');
                                 btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 0)"><i class="fa fa-check"></i> 启用</button>');
                             } else {
-                                btn.push('<span style="color:green;">'+value+'</span>'+' • <span style="color:red;">'+row.desc+'</span>');
+                                btn.push('<span style="color:blue;">' + value + '</span>' + ' • <span style="color:black;">' + row.desc + '</span>');
                                 btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
                                 btn.push('<button class="btn btn-info btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
                                 btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                                 btn.push('<button class="btn btn-warning btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
-                                btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIndex(\'' + value + '\')"><i class="fa fa-key"></i> 索引</button>');
-                                btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 1)"><i class="fa fa-recycle"></i> 废弃</button>');
+                                btn.push('<button class="btn btn-danger btn-xs" style="background-color:#0d3349;border-color: #0d3349;" onclick="tables.$dealIndex(\'' + value + '\')"><i class="fa fa-link"></i> 索引</button>');
+                                btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 1)"><i class="fa fa-recycle"></i> 废弃</button>');
                             }
                             return btn.join(' ');
                         }
