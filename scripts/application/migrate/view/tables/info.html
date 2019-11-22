@@ -825,7 +825,7 @@
                             btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                             if (!table_info.is_add) {
                                 //编辑
-                                btn.push('<button class="btn btn-info btn-xs" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
+                                btn.push('<button class="btn btn-info btn-xs" style="background-color: #0d3349;border-color: #0d3349;" onclick="table_info.$changePosition(\'' + value + '\')"><i class="fa fa-arrows-v"></i> 调整位置</button>');
                             } else {
                                 //新增
                                 if (index > 0) {
