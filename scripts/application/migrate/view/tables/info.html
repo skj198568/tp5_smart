@@ -786,10 +786,10 @@
                             width: '400px',
                             formatter: function (value, row, index) {
                                 var btn = [value];
+                                btn.push('<button class="btn btn-primary btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-wrench"></i> 编辑</button>');
                                 if (!table_info.is_add) {
-                                    btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
+                                    btn.push('<button class="btn btn-warning btn-xs" onclick="table_info.$fieldRename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
                                 }
-                                btn.push('<button class="btn btn-success btn-xs" onclick="table_info.$edit(\'' + value + '\')"><i class="fa fa-pencil"></i> 编辑</button>');
                                 btn.push('<button class="btn btn-danger btn-xs" onclick="table_info.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                                 if (!table_info.is_add) {
                                     //编辑

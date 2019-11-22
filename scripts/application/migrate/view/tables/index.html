@@ -151,7 +151,7 @@
                                 btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 0)"><i class="fa fa-check"></i> 启用</button>');
                             } else {
                                 btn.push('<span style="color:blue;">' + value + '</span>' + '<span style="color: red;"> • </span><span style="color:black;">' + row.desc + '</span>');
-                                btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-wrench"></i> 设置</button>');
+                                btn.push('<button class="btn btn-primary btn-xs" onclick="tables.$edit(\'' + value + '\')"><i class="fa fa-wrench"></i> 编辑</button>');
                                 btn.push('<button class="btn btn-warning btn-xs" onclick="tables.$rename(\'' + value + '\')"><i class="fa fa-edit"></i> 重命名</button>');
                                 btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                                 btn.push('<button class="btn btn-info btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
