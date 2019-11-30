@@ -25,12 +25,6 @@ class TaskMap extends BaseModel {
     protected static $instances_array = [];
 
     /**
-     * 当前数据表名称（含前缀）
-     * @var string
-     */
-    protected $table = '';
-
-    /**
      * 带有命名空间的任务调用地址
      * Type: varchar(10000)
      * Default: ''

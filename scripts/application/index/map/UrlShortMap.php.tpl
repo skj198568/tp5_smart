@@ -26,12 +26,6 @@ class UrlShortMap extends BaseModel {
     protected static $instances_array = [];
 
     /**
-     * 当前数据表名称（含前缀）
-     * @var string
-     */
-    protected $table = '';
-
-    /**
      * 短连接
      * Type: varchar(255)
      * Default: ''
