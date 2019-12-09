@@ -10,6 +10,7 @@
 namespace app\api\base;
 
 use app\index\model\BaseModel;
+use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
@@ -109,16 +110,29 @@ class BaseApiController extends Controller {
             ->select();
         //总数
         if (empty($total)) {
-            //上次sql
-            $last_sql = $model_instance->getLastSql();
-            //拼接total sql
-            $total_sql = 'SELECT COUNT(*) FROM ' . ClString::getBetween($last_sql, 'FROM ', ' ORDER', false);
-            //获取总数
-            $total_count = $model_instance->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)->query($total_sql);
-            if (empty($total_count)) {
-                $total_count = 0;
-            } else {
-                $total_count = $total_count[0]['COUNT(*)'];
+            $total_key   = '';
+            $total_count = null;
+            if ($duration > 0) {
+                //尝试从缓存中获取
+                $total_key   = ClCache::createKeyByParams($where, $exclude_fields, $order, $offset, $limit, 'total');
+                $total_count = cache($total_key);
+            }
+            if ($total_count == null) {
+                //上次sql
+                $last_sql = $model_instance->getLastSql();
+                //拼接total sql
+                $total_sql = 'SELECT COUNT(*) FROM ' . ClString::getBetween($last_sql, 'FROM ', ' ORDER', false);
+                //获取总数
+                $total_count = $model_instance->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)->query($total_sql);
+                if (empty($total_count)) {
+                    $total_count = 0;
+                } else {
+                    $total_count = $total_count[0]['COUNT(*)'];
+                }
+                if ($duration > 0) {
+                    //存储，多加10秒进行时间差保障
+                    cache($total_key, $total_count, $duration + 10);
+                }
             }
             $return['total'] = $total_count;
         }
