@@ -675,7 +675,6 @@
             //类型处理
             table_info.is_add = table_info.is_add == 0 ? false : true;
             table_info.$getTableInfo();
-            table_info.$initTable();
         },
         table_name: '{:input("table_name")}',
         is_add: '{:empty(input("table_name")) ? 1 : 0}',
@@ -712,6 +711,7 @@
                 } else {
                     table_info.is_partition = 0;
                 }
+                table_info.$initTable();
             });
         },
         $apiIsChecked: function (function_name) {
