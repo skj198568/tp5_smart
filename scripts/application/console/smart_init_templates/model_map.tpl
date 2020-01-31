@@ -24,6 +24,12 @@ class {$table_name_with_format}Map extends BaseModel {
 {$const_fields}
 
     /**
+     * 上次插入id
+     * @var int
+     */
+    protected static $last_insert_id = 0;
+
+    /**
      * 字段校验，用于字段内容判断
      * @var array
      */

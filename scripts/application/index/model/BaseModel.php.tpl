@@ -132,6 +132,12 @@ class BaseModel extends Query {
     private static $trigger_items = [];
 
     /**
+     * 上次插入id
+     * @var int
+     */
+    protected static $last_insert_id = 0;
+
+    /**
      * 构造函数
      * @access public
      * @param Connection $connection 数据库对象实例
@@ -346,10 +352,11 @@ class BaseModel extends Query {
      * @param null $sequence
      * @return int|string
      */
-    public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
+    public function insert(array $data = [], $replace = false, $getLastInsID = true, $sequence = null) {
         //预处理数据
-        $data    = $this->getDataBeforeExecute($data, 'insert');
-        $last_id = parent::insert($data, $replace, true, $sequence);
+        $data                   = $this->getDataBeforeExecute($data, 'insert');
+        $last_id                = parent::insert($data, $replace, true, $sequence);
+        static::$last_insert_id = $last_id;
         //处理数据
         static::triggerAfterInsert($last_id);
         //清缓存
@@ -357,6 +364,20 @@ class BaseModel extends Query {
         //清除缓存后执行
         ClCache::removeAfter();
         return $last_id;
+    }
+
+    /**
+     * 获取最近插入的ID
+     * @access public
+     * @param string $sequence 自增序列名
+     * @return string
+     */
+    public function getLastInsID($sequence = null) {
+        $id = $this->connection->getLastInsID($sequence);
+        if (empty($id)) {
+            $id = static::$last_insert_id;
+        }
+        return $id;
     }
 
     /**
@@ -624,7 +645,7 @@ class BaseModel extends Query {
             //存储
             self::$trigger_items[$trigger_key] = $items;
             return $items;
-        } elseif (is_int($ids)) {
+        } elseif (is_numeric($ids)) {
             $info  = $this->where([
                 'id' => $ids
             ])->find();
