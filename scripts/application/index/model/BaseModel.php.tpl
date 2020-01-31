@@ -126,6 +126,12 @@ class BaseModel extends Query {
     public static $is_back_data = false;
 
     /**
+     * 回调数据items
+     * @var array
+     */
+    private static $trigger_items = [];
+
+    /**
      * 构造函数
      * @access public
      * @param Connection $connection 数据库对象实例
@@ -154,21 +160,52 @@ class BaseModel extends Query {
     }
 
     /**
-     * 在操作数据库之前预处理数据
-     * @param array $data
-     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     * 在插入之前处理数据
+     * @param array $info
      * @return array
      */
-    protected function preprocessDataBeforeExecute($data, $operate_type) {
-        return $data;
+    protected function triggerBeforeInsert($info) {
+        return $info;
     }
 
     /**
-     * 在操作数据库之后处理数据
-     * @param array $data
-     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     * 在插入之后处理数据
+     * @param int|array $insert_id_or_ids
      */
-    protected function preprocessDataAfterExecute($data, $operate_type) {
+    protected function triggerAfterInsert($insert_id_or_ids) {
+
+    }
+
+    /**
+     * 在更新之前处理数据
+     * @param array $info
+     * @return array
+     */
+    protected function triggerBeforeUpdate($info) {
+        return $info;
+    }
+
+    /**
+     * 在更新之后处理数据
+     * @param string $sql
+     */
+    protected function triggerAfterUpdate($sql) {
+
+    }
+
+    /**
+     * 在删除数据之前处理数据
+     * @param array $items
+     */
+    protected function triggerBeforeDelete($items) {
+
+    }
+
+    /**
+     * 在删除数据之后处理数据
+     * @param array $items
+     */
+    protected function triggerAfterDelete($items) {
 
     }
 
@@ -178,13 +215,17 @@ class BaseModel extends Query {
      * @param $operate_type
      * @return array
      */
-    private function preprocessDataBeforeExecuteDefault($data, $operate_type) {
+    private function getDataBeforeExecute($data, $operate_type) {
         //如果是备份数据，则忽略数据的处理及校验
         if (static::$is_back_data) {
             return $data;
         }
         //调用预处理
-        $data = static::preprocessDataBeforeExecute($data, $operate_type);
+        if ($operate_type == 'insert') {
+            $data = static::triggerBeforeInsert($data);
+        } else if ($operate_type == 'update') {
+            $data = static::triggerBeforeUpdate($data);
+        }
         //非array数据，不进行处理
         if (!is_array($data)) {
             return $data;
@@ -265,26 +306,31 @@ class BaseModel extends Query {
      * @throws \think\exception\PDOException
      */
     public function execute($sql, $bind = []) {
-        if (strpos($sql, 'UPDATE') === 0 || strpos($sql, 'DELETE') === 0) {
+        //清空数据
+        self::$trigger_items = [];
+        $is_update           = strpos($sql, 'UPDATE') === 0;
+        $is_delete           = strpos($sql, 'DELETE') === 0;
+        if ($is_update || $is_delete) {
             //先查询，后执行
             $last_sql    = $this->connection->getRealSql($sql, $bind);
             $table_name  = substr($last_sql, strpos($last_sql, '`') + 1);
             $table_name  = substr($table_name, 0, strpos($table_name, '`'));
             $trigger_sql = sprintf('SELECT * FROM `%s` %s', $table_name, substr($last_sql, strpos($last_sql, 'WHERE')));
-            $items       = $this->query($trigger_sql);
-            $result      = parent::execute($sql, $bind);
-            if (!empty($items)) {
-                if (!ClArray::isLinearArray($items)) {
-                    //多维数组
-                    foreach ($items as $each) {
-                        $this->cacheRemoveTrigger($each);
-                    }
-                } else {
-                    $this->cacheRemoveTrigger($items);
-                }
-                //清除缓存后执行
-                ClCache::removeAfter();
+            $items       = [];
+            if ($is_delete) {
+                $items = $this->query($trigger_sql);
+                static::triggerBeforeDelete($items);
             }
+            $result = parent::execute($sql, $bind);
+            if ($is_delete) {
+                static::triggerRemoveCache('', [], $items);
+                static::triggerAfterDelete($items);
+            } elseif ($is_update) {
+                static::triggerRemoveCache($trigger_sql);
+                static::triggerAfterUpdate($trigger_sql);
+            }
+            //清除缓存后执行
+            ClCache::removeAfter();
         } else {
             //查询
             $result = parent::execute($sql, $bind);
@@ -302,22 +348,15 @@ class BaseModel extends Query {
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null) {
         //预处理数据
-        $data   = static::preprocessDataBeforeExecuteDefault($data, 'insert');
-        $result = parent::insert($data, $replace, $getLastInsID, $sequence);
+        $data    = $this->getDataBeforeExecute($data, 'insert');
+        $last_id = parent::insert($data, $replace, true, $sequence);
         //处理数据
-        static::preprocessDataAfterExecute($data, 'insert');
-        //执行
-        if (!ClArray::isLinearArray($data)) {
-            //多维数组
-            foreach ($data as $each) {
-                $this->cacheRemoveTrigger($each);
-            }
-        } else {
-            $this->cacheRemoveTrigger($data);
-        }
+        static::triggerAfterInsert($last_id);
+        //清缓存
+        static::triggerRemoveCache('', $last_id);
         //清除缓存后执行
         ClCache::removeAfter();
-        return $result;
+        return $last_id;
     }
 
     /**
@@ -332,25 +371,22 @@ class BaseModel extends Query {
         //校验参数
         foreach ($dataSet as $k_data => $data) {
             //预处理数据
-            $data = static::preprocessDataBeforeExecuteDefault($data, 'insert');
+            $data = $this->getDataBeforeExecute($data, 'insert');
             //替换数据
             $dataSet[$k_data] = $data;
         }
-        $result = parent::insertAll($dataSet, $replace, $limit);
-        //校验参数
-        foreach ($dataSet as $k_data => $data) {
-            //处理数据
-            static::preprocessDataAfterExecute($data, 'insert');
-        }
-        //执行
-        if (!ClArray::isLinearArray($dataSet)) {
-            //多维数组
-            foreach ($dataSet as $each) {
-                $this->cacheRemoveTrigger($each);
+        $result         = parent::insertAll($dataSet, $replace, $limit);
+        $insert_ids     = [];
+        $last_insert_id = $this->getLastInsID();
+        if ($last_insert_id) {
+            for ($i = $last_insert_id - count($dataSet); $i < $last_insert_id; $i++) {
+                $insert_ids[] = $i;
             }
-        } else {
-            $this->cacheRemoveTrigger($dataSet);
         }
+        //处理数据
+        static::triggerAfterInsert($insert_ids);
+        //清缓存
+        static::triggerRemoveCache('', $insert_ids);
         //清除缓存后执行
         ClCache::removeAfter();
         return $result;
@@ -365,11 +401,8 @@ class BaseModel extends Query {
      */
     public function update(array $data = []) {
         //预处理数据
-        $data   = static::preprocessDataBeforeExecuteDefault($data, 'update');
-        $result = parent::update($data);
-        //处理数据
-        static::preprocessDataAfterExecute($data, 'update');
-        return $result;
+        $data = $this->getDataBeforeExecute($data, 'update');
+        return parent::update($data);
     }
 
     /**
@@ -547,11 +580,61 @@ class BaseModel extends Query {
     }
 
     /**
-     * 缓存清除触发器
-     * @param $item
+     * 缓存清除器
+     * @param string $sql 查询sql
+     * @param array $ids id数组
+     * @param array $items 数据数组
      */
-    protected function cacheRemoveTrigger($item) {
+    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
 
+    }
+
+    /**
+     * 触发事件获取数据
+     * @param string $sql
+     * @param array $ids
+     * @param array $items
+     * @return array|false|mixed|\PDOStatement|string|\think\Collection|null
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    protected function triggerGetItems($sql = '', $ids = [], $items = []) {
+        $trigger_key = md5($sql . json_encode($ids) . json_encode($items));
+        if (isset(self::$trigger_items[$trigger_key])) {
+            return self::$trigger_items[$trigger_key];
+        }
+        $default = [];
+        if (count($items) > 0) {
+            return $items;
+        } elseif ($sql != '') {
+            $items = $this->query($sql);
+            //存储
+            self::$trigger_items[$trigger_key] = $items;
+            return $items;
+        } elseif (is_array($ids)) {
+            if (empty($ids)) {
+                return $default;
+            }
+            $items = $this->where([
+                'id' => ['in', $ids]
+            ])->select();
+            //存储
+            self::$trigger_items[$trigger_key] = $items;
+            return $items;
+        } elseif (is_int($ids)) {
+            $info  = $this->where([
+                'id' => $ids
+            ])->find();
+            $items = [$info];
+            //存储
+            self::$trigger_items[$trigger_key] = $items;
+            return $items;
+        } else {
+            return $default;
+        }
     }
 
     /**
@@ -586,38 +669,38 @@ class BaseModel extends Query {
     }
 
     /**
-     * 查询之后预处理数据
-     * @param $data
+     * 查询之后处理数据
+     * @param array $info
      * @return array
      */
-    protected function preprocessDataAfterQuery($data) {
+    protected function triggerAfterQuery($info) {
         //不进行处理
-        if (!is_array($data) || empty($data)) {
-            return $data;
+        if (!is_array($info) || empty($info)) {
+            return $info;
         }
         //存储格式处理
         if (!empty(static::$fields_store_format)) {
             foreach (static::$fields_store_format as $k_field => $each_field_store_format) {
-                if (isset($data[$k_field])) {
+                if (isset($info[$k_field])) {
                     if (is_string($each_field_store_format)) {
                         switch ($each_field_store_format) {
                             case 'json':
-                                if (empty($data[$k_field])) {
-                                    $data[$k_field] = [];
+                                if (empty($info[$k_field])) {
+                                    $info[$k_field] = [];
                                 } else {
-                                    $data[$k_field] = json_decode($data[$k_field], true);
-                                    if (is_null($data[$k_field])) {
-                                        $data[$k_field] = [];
+                                    $info[$k_field] = json_decode($info[$k_field], true);
+                                    if (is_null($info[$k_field])) {
+                                        $info[$k_field] = [];
                                     }
                                 }
                                 break;
                             case 'base64':
-                                if (empty($data[$k_field])) {
-                                    $data[$k_field] = '';
+                                if (empty($info[$k_field])) {
+                                    $info[$k_field] = '';
                                 } else {
-                                    $data[$k_field] = base64_decode($data[$k_field]);
-                                    if ($data[$k_field] == false) {
-                                        $data[$k_field] = '';
+                                    $info[$k_field] = base64_decode($info[$k_field]);
+                                    if ($info[$k_field] == false) {
+                                        $info[$k_field] = '';
                                     }
                                 }
                                 break;
@@ -626,7 +709,7 @@ class BaseModel extends Query {
                 }
             }
         }
-        return $data;
+        return $info;
     }
 
     /**
@@ -645,7 +728,7 @@ class BaseModel extends Query {
         if (is_array($data)) {
             foreach ($data as $k => $each) {
                 //预处理数据
-                $data[$k] = $this->preprocessDataAfterQuery($each);
+                $data[$k] = $this->triggerAfterQuery($each);
             }
         }
         return $data;
@@ -665,7 +748,7 @@ class BaseModel extends Query {
             return [];
         }
         //预处理数据
-        return $this->preprocessDataAfterQuery($data);
+        return $this->triggerAfterQuery($data);
     }
 
     /**
@@ -678,7 +761,7 @@ class BaseModel extends Query {
     public function value($field, $default = null, $force = false) {
         $value = parent::value($field, $default, $force);
         //转换成数组进行处理
-        $value = $this->preprocessDataAfterQuery([$field => $value]);
+        $value = $this->triggerAfterQuery([$field => $value]);
         //取数据
         return $value[$field];
     }
@@ -693,7 +776,7 @@ class BaseModel extends Query {
         $data = parent::column($field, $key);
         foreach ($data as $key => $value) {
             //转换成数组进行处理
-            $value = $this->preprocessDataAfterQuery([$field => $value]);
+            $value = $this->triggerAfterQuery([$field => $value]);
             //替换
             $data[$key] = $value[$field];
         }

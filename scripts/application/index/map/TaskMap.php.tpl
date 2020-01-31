@@ -172,12 +172,25 @@ class TaskMap extends BaseModel {
     }
 
     /**
-     * 缓存清除触发器
-     * @param $item
+     * 缓存清除器
+     * @param string $sql 查询sql
+     * @param array $ids id数组
+     * @param array $items 数据数组
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    protected function cacheRemoveTrigger($item) {
-        if (is_numeric(null) && isset($item[static::F_ID])) {
-            static::getByIdRc($item[static::F_ID]);
+    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
+        parent::triggerRemoveCache($sql, $ids, $items);
+        if(is_numeric(null)){
+            $items = $this->triggerGetItems($sql, $ids, $items);
+            foreach($items as $item){
+                if(isset($item[static::F_ID])){
+                    static::getByIdRc($item[static::F_ID]);
+                }
+            }
         }
     }
 
@@ -344,17 +357,16 @@ class TaskMap extends BaseModel {
     }
 
     /**
-     * 在操作数据库之前预处理数据
-     * @param array $data
-     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     * 在插入之前处理数据
+     * @param array $info
      * @return array
      */
-    protected function preprocessDataBeforeExecute($data, $operate_type) {
-        $data = parent::preprocessDataBeforeExecute($data, $operate_type);
-        if (isset($data[self::F_COMMAND])) {
-            $data[self::F_COMMAND_CRC32] = crc32($data[self::F_COMMAND]);
+    protected function triggerBeforeInsert($info) {
+        $info = parent::triggerBeforeInsert($info);
+        if (isset($info[self::F_COMMAND]) && !isset($info[self::F_COMMAND_CRC32])) {
+            $info[self::F_COMMAND_CRC32] = crc32($info[self::F_COMMAND]);
         }
-        return $data;
+        return $info;
     }
 
     /**

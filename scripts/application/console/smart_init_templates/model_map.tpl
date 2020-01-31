@@ -146,23 +146,48 @@ class {$table_name_with_format}Map extends BaseModel {
 <present name="table_comment['partition']">
 
     /**
-     * 缓存清除触发器
-     * @param $item
+     * 缓存清除器
+     * @param string $sql 查询sql
+     * @param array $ids id数组
+     * @param array $items 数据数组
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    protected function cacheRemoveTrigger($item) {
-        if (is_numeric({$table_comment['is_cache']}) && isset($item['{$table_comment['partition'][0]}']) && isset($item[static::F_ID])) {
-            static::getByIdRc($item['{$table_comment['partition'][0]}'], $item[static::F_ID]);
+    protected function triggerRemoveCache($sql = '', $ids = [], $items = []){
+        if(is_numeric({$table_comment['is_cache']})){
+            $items = $this->triggerGetItems($sql, $ids, $items);
+            foreach($items as $item){
+                if(isset($item['{$table_comment['partition'][0]}']) && isset($item[static::F_ID])){
+                    static::getByIdRc($item['{$table_comment['partition'][0]}'], $item[static::F_ID]);
+                }
+            }
         }{$cache_remove_trigger_content}
     }
     <else/>
 
     /**
-     * 缓存清除触发器
-     * @param $item
+     * 缓存清除器
+     * @param string $sql 查询sql
+     * @param array $ids id数组
+     * @param array $items 数据数组
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    protected function cacheRemoveTrigger($item) {
-        if (is_numeric({$table_comment['is_cache']}) && isset($item[static::F_ID])) {
-            static::getByIdRc($item[static::F_ID]);
+    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
+        parent::triggerRemoveCache($sql, $ids, $items);
+        if(is_numeric({$table_comment['is_cache']})){
+            $items = $this->triggerGetItems($sql, $ids, $items);
+            foreach($items as $item){
+                if(isset($item[static::F_ID])){
+                    static::getByIdRc($item[static::F_ID]);
+                }
+            }
         }{$cache_remove_trigger_content}
     }
 </present>

@@ -1,15 +1,14 @@
     /**
-     * 在操作数据库之前预处理数据
-     * @param array $data
-     * @param string $operate_type 操作类型self::V_OPERATE_TYPE_INSERT/self::V_OPERATE_TYPE_UPDATE
+     * 在插入之前处理数据
+     * @param array $info
      * @return array
      */
-    protected function preprocessDataBeforeExecute($data, $operate_type) {
-        $data = parent::preprocessDataBeforeExecute($data, $operate_type);
-        if (isset($data[self::F_COMMAND])) {
-            $data[self::F_COMMAND_CRC32] = crc32($data[self::F_COMMAND]);
+    protected function triggerBeforeInsert($info) {
+        $info = parent::triggerBeforeInsert($info);
+        if (isset($info[self::F_COMMAND]) && !isset($info[self::F_COMMAND_CRC32])) {
+            $info[self::F_COMMAND_CRC32] = crc32($info[self::F_COMMAND]);
         }
-        return $data;
+        return $info;
     }
 
     /**

@@ -153,15 +153,31 @@ class UrlShortMap extends BaseModel {
     }
 
     /**
-     * 缓存清除触发器
-     * @param $item
+     * 缓存清除器
+     * @param string $sql 查询sql
+     * @param array $ids id数组
+     * @param array $items 数据数组
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    protected function cacheRemoveTrigger($item) {
-        if (is_numeric(600) && isset($item[static::F_ID])) {
-            static::getByIdRc($item[static::F_ID]);
+    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
+        parent::triggerRemoveCache($sql, $ids, $items);
+        if(is_numeric(600)){
+            $items = $this->triggerGetItems($sql, $ids, $items);
+            foreach($items as $item){
+                if(isset($item[static::F_ID])){
+                    static::getByIdRc($item[static::F_ID]);
+                }
+            }
         }
-        if (isset($item[self::F_SHORT_URL])) {
-            self::getByShortUrlRc($item[self::F_SHORT_URL]);
+        $items = $this->triggerGetItems($sql, $ids, $items);
+        foreach($items as $item){
+            if (isset($item[self::F_SHORT_URL])) {
+                self::getByShortUrlRc($item[self::F_SHORT_URL]);
+            }
         }
     }
 
