@@ -80,7 +80,7 @@ var jCommon = {
      * @returns {boolean}
      */
     isMobile: function isMobile(mobile) {
-        var regex = /^1(3|4|5|8)\d{9}$/;
+        var regex = /^1(3|4|5|6|7|8|9)\d{9}$/;
         if (regex.test(mobile)) {
             return true;
         } else {
