@@ -14,8 +14,7 @@
         "skj198568/class_library": "1.0.*",
         "workerman/workerman": "^3.5",
         "php-ai/php-ml": "^0.6.2",
-        "facebook/webdriver": "^1.5",
-        "phpoffice/phpspreadsheet": "1.8.0"
+        "facebook/webdriver": "^1.5"
     },
     "repositories": [
         {
