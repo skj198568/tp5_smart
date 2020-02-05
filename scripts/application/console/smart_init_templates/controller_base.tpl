@@ -66,7 +66,7 @@ class {$table_name}BaseApiController extends ApiController {
     }
 
     /**
-     * 单个信息
+     * 获取
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -93,7 +93,7 @@ class {$table_name}BaseApiController extends ApiController {
     }
 
     /**
-     * 多个信息
+     * 批量获取
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -210,7 +210,6 @@ class {$table_name}BaseApiController extends ApiController {
         ])->setField($fields);
         </present>return $this->ar(1, '更新成功', static::updateByIdsReturnExample());
     }
-
 </if>
 <if condition="!empty($create_api) && in_array('delete', $create_api)">
 
