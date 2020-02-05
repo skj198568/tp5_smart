@@ -613,6 +613,11 @@ class SmartInit extends Command {
             'status_code' => 1,
             'info'        => $info
         ];
+        $ar_update_ids_json = [
+            'status'      => strtolower(sprintf('api/%s/updateByIds/1', $table_name)),
+            'status_code' => 1,
+            'ids'         => '主键ids'
+        ];
         $ar_delete_json     = [
             'status'      => strtolower(sprintf('api/%s/delete/1', $table_name)),
             'status_code' => 1,
@@ -639,6 +644,7 @@ class SmartInit extends Command {
                 'ar_get_by_ids_json' => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
                 'ar_create_json'     => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
                 'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_ids_json' => json_encode($ar_update_ids_json, JSON_UNESCAPED_UNICODE),
                 'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
                 'create_api'         => $table_comment['create_api'],
                 'fields_config'      => $fields_config,
@@ -802,4 +808,3 @@ class SmartInit extends Command {
     }
 
 }
-

@@ -182,6 +182,35 @@ class {$table_name}BaseApiController extends ApiController {
         $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], static::updateReturnExample());
     }
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function updateByIdsReturnExample() {
+        return '{$ar_update_ids_json}';
+    }
+
+    /**
+     * 批量更新
+     * @return \think\response\Json|\think\response\Jsonp
+     */
+    public function updateByIds() {
+        $ids    = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键ids数组');
+        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
+        <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
+        //更新
+        {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
+            <if condition="isset($table_comment['partition'][1])">{$table_name}Model::F_{:strtoupper($table_comment['partition'][0])} => ${$table_comment['partition'][0]},
+            </if>{$table_name}Model::F_ID => ['in', $ids]
+        ])->setField($fields);
+        <else/>//更新
+        {$table_name}Model::instance()->where([
+            {$table_name}Model::F_ID => ['in', $ids]
+        ])->setField($fields);
+        </present>return $this->ar(1, '更新成功', static::updateByIdsReturnExample());
+    }
+
 </if>
 <if condition="!empty($create_api) && in_array('delete', $create_api)">
 
