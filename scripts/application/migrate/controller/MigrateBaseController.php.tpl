@@ -59,6 +59,12 @@ class MigrateBaseController extends Controller {
         if (App::$debug) {
             log_info('$_REQUEST:', request()->request());
         }
+        foreach (['exec', 'popen'] as $function_name) {
+            if (!function_exists($function_name)) {
+                echo '<h1 style="text-align: center;">' . $function_name . '() has been disabled.</h1>';
+                exit;
+            }
+        }
         parent::_initialize();
         $token = '';
         if (!ClArray::inArrayIgnoreCase(request()->controller() . '/' . request()->action(), $this->uncheck_request)) {
@@ -437,7 +443,7 @@ class MigrateBaseController extends Controller {
         if (is_dir(DOCUMENT_ROOT_PATH . '/../.svn')) {
             //svn版本
             $cmd = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $svn_msg, $migrate_absolute_file);
-        } 
+        }
         if (empty($cmd)) {
             return;
         }
@@ -568,7 +574,11 @@ class MigrateBaseController extends Controller {
      * @throws \think\exception\PDOException
      */
     protected function getAllFields($table_name) {
-        return $this->query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
+        if ($this->tableIsExist($table_name)) {
+            return $this->query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
+        } else {
+            return [];
+        }
     }
 
     /**
