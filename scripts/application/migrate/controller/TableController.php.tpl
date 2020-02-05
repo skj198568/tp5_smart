@@ -34,8 +34,12 @@ class TableController extends MigrateBaseController {
         $tables        = [];
         foreach ($tables_select as $k => $table) {
             $table = array_pop($table);
-            if (!empty(config('database.prefix')) && strpos($table, config('database.prefix')) === 0) {
-                $table = substr($table, strlen(config('database.prefix')));
+            if (!empty(config('database.prefix'))) {
+                if (strpos($table, config('database.prefix')) === 0) {
+                    $table = substr($table, strlen(config('database.prefix')));
+                } else {
+                    continue;
+                }
             }
             if ($table == 'migrations' || $table == 'phinxlog') {
                 continue;
