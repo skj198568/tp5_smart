@@ -14,7 +14,7 @@
         "skj198568/class_library": "1.0.*",
         "workerman/workerman": "*",
         "php-ai/php-ml": "*",
-        "facebook/webdriver": "*"
+        "php-webdriver/webdriver": "*"
     },
     "repositories": [
         {
