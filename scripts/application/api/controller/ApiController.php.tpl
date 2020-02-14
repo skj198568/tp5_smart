@@ -73,18 +73,34 @@ class ApiController extends BaseApiController {
      */
     public function _empty() {
         if (strtolower(request()->controller() . DS . request()->action()) == 'index' . DS . 'index' && App::$debug) {
-            $api_doc_dir = DOCUMENT_ROOT_PATH . '/../doc/api';
-            $api_files   = ClFile::dirGetFiles($api_doc_dir, ['.html']);
-            if (empty($api_files)) {
-                return '<h1 style="text-align: center;font-size: 5em;">暂无接口文档</h1>';
+            $t = get_param('t', [], '时间戳', 0);
+            if ($t == 0 || $t < time() - 3) {
+                $this->redirect('/api?t=' . time());
             }
-            foreach ($api_files as $k => $each) {
-                $api_files[$k] = ClFile::getName($each, true);
+            $api_file             = DOCUMENT_ROOT_PATH . '/../doc/api/index.html';
+            $api_file_create_time = 0;
+            if (is_file($api_file)) {
+                $api_file_create_time = filectime($api_file);
             }
-            //倒序
-            rsort($api_files);
-            $newest_api_file = $api_files[0];
-            return $this->fetch($api_doc_dir . '/' . $newest_api_file);
+            //获取所有controller文件
+            $controller_files       = ClFile::dirGetFiles(__DIR__, [], ['ApiController.php']);
+            $max_modify_create_time = 0;
+            foreach ($controller_files as $controller_file) {
+                $file_create_time = filectime($controller_file);
+                if ($file_create_time > $max_modify_create_time) {
+                    $max_modify_create_time = $file_create_time;
+                }
+            }
+            if ($max_modify_create_time > $api_file_create_time) {
+                if (!function_exists('exec')) {
+                    return 'function "exec" is not exist';
+                }
+                //重新生成api文档
+                $cmd = sprintf('cd %s && php think api_doc', DOCUMENT_ROOT_PATH . '/../');
+                exec($cmd);
+            }
+            //直接输出
+            return $this->fetch($api_file);
         } else {
             return '<h1 style="text-align: center;font-size: 5em;">404</h1>';
         }

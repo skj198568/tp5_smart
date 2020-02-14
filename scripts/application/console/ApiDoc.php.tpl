@@ -19,8 +19,6 @@ use think\console\Command;
 use think\console\Input;
 use think\console\Output;
 use think\Exception;
-use think\exception\ErrorException;
-use think\exception\ThrowableError;
 use think\View;
 
 /**
@@ -45,6 +43,7 @@ class ApiDoc extends Command {
      * @param Input $input
      * @param Output $output
      * @return bool|int|null
+     * @throws \ReflectionException
      */
     protected function execute(Input $input, Output $output) {
         try {
@@ -67,6 +66,7 @@ class ApiDoc extends Command {
      * @param Output $output
      * @return bool
      * @throws Exception
+     * @throws \ReflectionException
      */
     private function doExecute(Input $input, Output $output) {
         //设置view
@@ -77,63 +77,50 @@ class ApiDoc extends Command {
         $api      = [];
 //        echo_info('$files:', $files);
         foreach ($files as $each_file) {
-//            if (strpos($each_file, '/GroupC') === false) {
+//            if (strpos($each_file, '/DeviceRecords') === false) {
 //                continue;
 //            }
             $output->info($each_file);
             //获取所有函数，包括所有继承的父类
-            $functions = $this->getAllFunctions($each_file);
-//            echo_info('$functions:', $functions);
-            foreach ($functions as $key => $each_function) {
-                $functions[$key] = [$each_file, $each_function];
-            }
-            $each_file_temp = 'each_file_temp';
-            while (!empty($each_file_temp)) {
-                if ($each_file_temp == 'each_file_temp') {
-                    $each_file_temp = $each_file;
-                }
-                $each_file_temp = $this->getFatherFileAbsoluteUrl($each_file_temp);
-                if (!empty($each_file_temp)) {
-                    $functions_temp = $this->getAllFunctions($each_file_temp);
-                    foreach ($functions_temp as $function_name => $each_function) {
-                        if (!array_key_exists($function_name, $functions)) {
-                            $functions[$function_name] = [$each_file_temp, $each_function];
-                        }
-                    }
-                }
-            }
-            $class_desc = $this->getClassDesc($each_file);
-//            echo_info('$class_desc:', $class_desc);
-            foreach ($functions as $k => $each_function) {
-                list($each_file_temp, $each_function) = $each_function;
-                //忽略的函数
-                $ignore = false;
-                foreach (['public function _empty'] as $each_ignore_function) {
-                    if (strpos($each_function, $each_ignore_function) !== false) {
-                        $ignore = true;
-                        break;
-                    }
-                }
-                if ($ignore) {
-                    continue;
-                }
-
-//                if(strpos($each_file_temp, 'UserFocusController') === false){
+            $methods = $this->getAllMethods($each_file);
+//            echo_info($methods);
+//            foreach ($functions as $key => $each_method) {
+//                $functions[$key] = [$each_file, $each_method];
+//            }
+//            $each_file_temp = 'each_file_temp';
+//            while (!empty($each_file_temp)) {
+//                if ($each_file_temp == 'each_file_temp') {
+//                    $each_file_temp = $each_file;
+//                }
+//                $each_file_temp = $this->getFatherFileAbsoluteUrl($each_file_temp);
+//                if (!empty($each_file_temp)) {
+//                    $functions_temp = $this->getAllMethods($each_file_temp);
+//                    foreach ($functions_temp as $method_name => $each_method) {
+//                        if (!array_key_exists($method_name, $functions)) {
+//                            $functions[$method_name] = [$each_file_temp, $each_method];
+//                        }
+//                    }
+//                }
+//            }
+            $class_doc = $this->getClassDoc($each_file);
+//            echo_info('$class_doc:', $class_doc);
+            foreach ($methods as $each_method) {
+//                if ($each_method->name !== 'getList') {
 //                    continue;
 //                }
-//                if ($k !== 'getList') {
-//                    continue;
-//                }
-//                echo_info($k);
-//                echo_info($each_file_temp, $each_function);
-                $desc              = $this->getDescByFunctionContent($each_function);
-                $params            = $this->getParamsByFunctionContent($each_file_temp, $each_function);
-                $ar_items          = $this->getAjaxReturnByFunctionContent($each_function, $each_file);
+//                echo_info($each_method->name, $each_method->class);
+                $method_doc = $this->getMethodDoc($each_method);
+//                echo_info($each_method->name, $each_method->class, $method_doc, APP_PATH . str_replace('\\', '/', $each_method->class) . '.php');
+                $params = $this->getParamsByFunctionContent(APP_PATH . str_replace(['\\', 'app/'], ['/', ''], $each_method->class) . '.php', $each_method);
+//                echo_info($params);
+                $ar_items = $this->getAjaxReturnByFunctionContent($each_method);
+//                echo_info('$ar_items', $ar_items);
                 $ajax_return_items = [];
                 foreach ($ar_items as $status => $content) {
                     $ajax_return_items[sprintf('api-%s-%s', $this->getClassName($each_file), $status)] = $content;
                 }
-                $api[sprintf('/api/%s/%s', $this->formatRequestControllerName($this->getClassName($each_file)), $this->getFunctionName($each_function))] = [sprintf('%s / %s', $class_desc, $desc), $params, $ajax_return_items];
+//                echo_info($ajax_return_items);
+                $api[sprintf('/api/%s/%s', $this->formatRequestControllerName($this->getClassName($each_file)), strtolower($each_method->name))] = [sprintf('%s / %s', $class_doc, $method_doc), $params, $ajax_return_items];
             }
         }
 //        echo_info($api);
@@ -171,7 +158,7 @@ class ApiDoc extends Command {
                 'url'        => str_replace('/', '<span style="color: blue;">/</span>', $request_url),
                 'params'     => $each_content[1],
                 'ar_returns' => $each_content[2],
-                'a_name'     => $a_name,
+                'a_name'     => $a_name . '_' . time(),
                 'item_index' => $item_index
             ]);
             $item_index++;
@@ -212,22 +199,27 @@ class ApiDoc extends Command {
     /**
      * 获取类库定义
      * @param $file_absolute_url
-     * @return string
+     * @return false|string
+     * @throws \ReflectionException
      */
-    private function getClassDesc($file_absolute_url) {
-        $file_content = file_get_contents($file_absolute_url);
-        $file_content = ClString::getBetween($file_content, 'namespace', 'class ', true);
-        $file_content = ClString::getBetween($file_content, '/**', 'class', false);
-        $file_content = explode('*', $file_content);
-        $class_desc   = '';
-        foreach ($file_content as $line) {
+    private function getClassDoc($file_absolute_url) {
+        $class_name       = ClFile::getName($file_absolute_url);
+        $reflection_class = new \ReflectionClass('\app\api\controller\\' . $class_name);
+        $doc              = $reflection_class->getDocComment();
+        if ($doc === false) {
+            return '';
+        }
+        $doc       = ClString::getBetween($doc, '/**', '*/', false);
+        $doc_array = explode('*', $doc);
+        $doc       = '';
+        foreach ($doc_array as $line) {
             $line = trim($line);
             if (!empty($line)) {
-                $class_desc = $line;
+                $doc = $line;
                 break;
             }
         }
-        return $class_desc;
+        return $doc;
     }
 
     /**
@@ -251,87 +243,61 @@ class ApiDoc extends Command {
     /**
      * 获取类库方法
      * @param string $file_absolute_url 类库文件，绝对地址
-     * @param string $function_name 单独获取某一个方法
-     * @param array $function_types 方法类型，默认取public公共方法
-     * @return array|mixed
+     * @param string $method_name 单独获取某一个方法
+     * @param array $function_types 方法类型数组，值可为public,protected,private
+     * @return array|void
+     * @throws \ReflectionException
      */
-    private function getAllFunctions($file_absolute_url, $function_name = '', $function_types = ['public']) {
-//        if(strpos($file_absolute_url, 'AreaBase') === false){
-//            return [];
-//        }
-        if (empty($file_absolute_url)) {
-            return [];
+    private function getAllMethods($file_absolute_url, $method_name = '', $function_types = ['public']) {
+        if (!is_file($file_absolute_url)) {
+            $this->output->error('file not exist:' . $file_absolute_url);
+            return;
         }
-        if (empty($function_types)) {
-            $function_types = ['public', 'protected', 'private'];
-        }
-        $content = file_get_contents($file_absolute_url);
-//        echo_info('$content:', $content);
-        $return        = [];
-        $all_functions = [];
-        foreach ($function_types as $function_type) {
-            $all_functions = array_merge($all_functions, ClString::parseToArray($content, sprintf('%s ', $function_type), ')'));
-        }
-        $lines = explode("\n", $content);
-        $temp  = '';
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (strpos($line, 'class ') === 0) {
-                //类名
-                //新的函数
-                $temp = '';
-                continue;
-            }
-            if (strpos($line, ' function ') !== false && !empty(trim(ClString::getBetween($line, 'function', '(', false)))) {
-                if (!empty($temp)) {
-                    foreach ($all_functions as $each_function) {
-                        if (strpos($temp, $each_function) !== false) {
-                            //去除所有注释
-                            if (strpos($temp, '/**') !== false) {
-                                $temp = str_replace(ClString::getBetween($temp, '/**', '*/'), '', $temp);
-                            }
-                            $return[trim(ClString::getBetween($each_function, 'function', '(', false))] = $this->getFunctionDesc($file_absolute_url, $temp) . $temp;
-                        }
-                    }
-                    //新的函数
-                    $temp = '';
-                } else {
-                    $temp = $line . "\n";
+        $class_name       = ClFile::getName($file_absolute_url);
+        $new_class_name   = ClString::getBetween($file_absolute_url, 'application', '.php', false);
+        $new_class_name   = '\app' . str_replace('/', '\\', $new_class_name);
+        $base_class_name  = str_replace('Controller', '', $class_name);
+        $reflection_class = new \ReflectionClass($new_class_name);
+        $methods          = $reflection_class->getMethods();
+        $return_methods   = [];
+        foreach ($methods as $each_method) {
+            if (!empty($method_name)) {
+                if ($each_method->name === $method_name) {
+                    $return_methods[] = $each_method;
                 }
-            }
-            $temp .= $line . "\n";
-        }
-        if (!empty($temp)) {
-            foreach ($all_functions as $each_function) {
-                if (strpos($temp, $each_function) !== false) {
-//                    //去除多余的最后一个}
-//                    $temp_array = explode("\n", trim($temp));
-//                    array_pop($temp_array);
-//                    $temp = implode("\n", $temp_array);
-                    //去除所有注释
-                    if (strpos($temp, '/**') !== false) {
-                        $temp = str_replace(ClString::getBetween($temp, '/**', '*/'), '', $temp);
-                    }
-                    $return[trim(ClString::getBetween($each_function, 'function', '(', false))] = $this->getFunctionDesc($file_absolute_url, $temp) . $temp;
-                }
-            }
-        }
-        if (empty($function_name)) {
-            //去除默认执行函数
-            foreach ($return as $k => $each_function) {
-                if (strpos($each_function, ' _initialize') !== false || strpos($each_function, ' __destruct') !== false) {
-                    unset($return[$k]);
+            } else {
+                if (strpos($each_method->class, $base_class_name) === false) {
+                    //忽略非当前Controller和父类Controller
                     continue;
                 }
+                if (strpos($each_method->name, '_') === 0) {
+                    //忽略构造函数等特殊函数
+                    continue;
+                }
+                if (!empty($function_types)) {
+                    if (in_array('public', $function_types)) {
+                        if (!$each_method->isPublic()) {
+                            //忽略非public
+                            continue;
+                        }
+                    }
+                    if (in_array('protected', $function_types)) {
+                        if (!$each_method->isProtected()) {
+                            //忽略非protected
+                            continue;
+                        }
+                    }
+                    if (in_array('private', $function_types)) {
+                        if (!$each_method->isPrivate()) {
+                            //忽略非private
+                            continue;
+                        }
+                    }
+                }
+                $return_methods[] = $each_method;
             }
-            return $return;
-        } else {
-            while (!isset($return[$function_name]) && !empty($file_absolute_url)) {
-                $file_absolute_url = $this->getFatherFileAbsoluteUrl($file_absolute_url);
-                $return            = $this->getAllFunctions($file_absolute_url, '', $function_types);
-            }
-            return isset($return[$function_name]) ? $return[$function_name] : '';
         }
+        return $return_methods;
     }
 
     /**
@@ -342,47 +308,54 @@ class ApiDoc extends Command {
      */
     private function getFunctionDesc($file_absolute_url, $function_content) {
         $function_content_array = explode("\n", $function_content);
-        $function_name_line     = '';
+        $method_name_line       = '';
         foreach ($function_content_array as $line) {
             if (strpos($line, ' function ') !== false) {
-                $function_name_line = $line;
+                $method_name_line = $line;
                 break;
             }
         }
         $content = file_get_contents($file_absolute_url);
-        $desc    = ClString::getBetween($content, '/**', $function_name_line);
-        return str_replace($function_name_line, '', $desc);
+        $desc    = ClString::getBetween($content, '/**', $method_name_line);
+        return str_replace($method_name_line, '', $desc);
     }
 
     /**
      * 获取函数描述
-     * @param $function_content
-     * @return string
+     * @param \ReflectionMethod $method
+     * @return false|string
      */
-    private function getDescByFunctionContent($function_content) {
-        $desc       = ClString::getBetween($function_content, '/**', '*/');
-        $desc       = str_replace(['/**', '* ', '*/'], ['', '', ''], $desc);
-        $desc       = explode("\n", trim($desc));
-        $desc_array = [];
-        foreach ($desc as $line) {
+    private function getMethodDoc(\ReflectionMethod $method) {
+        $doc = $method->getDocComment();
+        if ($doc === false) {
+            return '';
+        }
+        $doc       = ClString::getBetween($doc, '/**', '*/', false);
+        $doc_array = explode('*', $doc);
+        $doc       = '';
+        foreach ($doc_array as $line) {
             $line = trim($line);
-            if (strpos($line, '@') === 0) {
-                continue;
-            } else {
-                $desc_array[] = $line;
+            if (!empty($line)) {
+                $doc = $line;
+                break;
             }
         }
-        return empty($desc_array) ? '-' : implode('; ', $desc_array);
+        return $doc;
     }
 
     /**
      * 获取方法的参数
      * @param $class_file_absolute_url
-     * @param $function_content
-     * @return array
+     * @param \ReflectionMethod $method
+     * @return array|void
+     * @throws \ReflectionException
      */
-    private function getParamsByFunctionContent($class_file_absolute_url, $function_content) {
-        $return_array = [];
+    private function getParamsByFunctionContent($class_file_absolute_url, \ReflectionMethod $method) {
+        if (!is_file($class_file_absolute_url)) {
+            return [];
+        }
+        $return_array     = [];
+        $function_content = $this->getMethodContentWithReflection($method);
         //获取get_param方式参数
         $params = ClString::parseToArray($function_content, 'get_param', ');', false);
 //        echo_info($params);
@@ -596,10 +569,12 @@ class ApiDoc extends Command {
             if (strpos($v, ',') !== false || strpos($v, ';') !== false) {
                 continue;
             }
-            $function         = trim(trim(trim($v, '$this->'), '('));
-            $function_content = $this->getAllFunctions($class_file_absolute_url, $function, ['public', 'protected']);
-            //本类内存在该方法
-            $return_array = array_merge($return_array, $this->getParamsByFunctionContent($class_file_absolute_url, $function_content));
+            $function = trim(trim(trim($v, '$this->'), '('));
+            $methods  = $this->getAllMethods($class_file_absolute_url, $function, ['public', 'protected']);
+            if (!empty($methods)) {
+                //本类内存在该方法
+                $return_array = array_merge($return_array, $this->getParamsByFunctionContent(APP_PATH . str_replace(['\\', 'app/'], ['/', ''], $methods[0]->class) . '.php', $methods[0]));
+            }
         }
         //去重，避免多继承函数参数的重复问题
         $true_return = [];
@@ -698,15 +673,30 @@ class ApiDoc extends Command {
     }
 
     /**
-     * 获取返回值
-     * @param $function_content
-     * @param $file_absolute_url
-     * @return array
+     * 获取函数内容
+     * @param \ReflectionMethod $method
+     * @return array|string
      */
-    private function getAjaxReturnByFunctionContent($function_content, $file_absolute_url) {
-        $ar_functions  = ClString::parseToArray($function_content, '->ar', "}'");
-        $ar_return     = [];
-        $function_name = $this->getFunctionName($function_content);
+    private function getMethodContentWithReflection(\ReflectionMethod $method) {
+        $class               = $method->getDeclaringClass();
+        $class_content       = file_get_contents($class->getFileName());
+        $class_content_array = explode("\n", $class_content);
+        $method_content      = array_slice($class_content_array, $method->getStartLine() - 1, $method->getEndLine() - $method->getStartLine() + 1);
+        $method_content      = implode("\n", $method_content);
+        return $method_content;
+    }
+
+    /**
+     * 获取返回值
+     * @param \ReflectionMethod $method
+     * @return array
+     * @throws \ReflectionException
+     */
+    private function getAjaxReturnByFunctionContent(\ReflectionMethod $method) {
+        $function_content = $this->getMethodContentWithReflection($method);
+        $ar_functions     = ClString::parseToArray($function_content, '->ar', "}'");
+        $ar_return        = [];
+        $method_name      = $method->name;
         foreach ($ar_functions as $each) {
             $each     = ClString::spaceTrim($each);
             $each     = rtrim($each, ';');
@@ -718,30 +708,24 @@ class ApiDoc extends Command {
                 $json_str = trim($json_str, '"');
                 $json_str = ClString::jsonFormat($json_str, true);
             }
-            $ar_return[sprintf('%s-%s', $function_name, ClString::getBetween($each, '(', ',', false))] = $json_str;
+            $ar_return[sprintf('%s-%s', $method_name, ClString::getBetween($each, '(', ',', false))] = $json_str;
         }
         //拼接扩展返回
         $ar_functions = ClString::parseToArray($function_content, 'static::', 'ReturnExample');
         foreach ($ar_functions as $each) {
-            $each_function_name                                        = ClString::getBetween($each, '::', '', false);
-            $function_content                                          = $this->getAllFunctions($file_absolute_url, $each_function_name, []);
-            $function_content                                          = ClString::getBetween($function_content, "'{", "}'");
-            $function_content                                          = trim($function_content, "'");
-            $status_code                                               = json_decode($function_content, true);
-            $status_code                                               = $status_code['status_code'];
-            $ar_return[sprintf('%s-%s', $function_name, $status_code)] = $json_str = ClString::jsonFormat($function_content, true);
+            $each_method_name = ClString::getBetween($each, '::', '', false);
+            $ar_method        = $this->getAllMethods($method->getDeclaringClass()->getFileName(), $each_method_name, []);
+            if (empty($ar_method)) {
+                continue;
+            }
+            $ar_function_content                                     = $this->getMethodContentWithReflection($ar_method[0]);
+            $function_content                                        = ClString::getBetween($ar_function_content, "'{", "}'");
+            $function_content                                        = trim($function_content, "'");
+            $status_code                                             = json_decode($function_content, true);
+            $status_code                                             = $status_code['status_code'];
+            $ar_return[sprintf('%s-%s', $method_name, $status_code)] = $json_str = ClString::jsonFormat($function_content, true);
         }
         return $ar_return;
-    }
-
-    /**
-     * 获取函数名称
-     * @param $function_content
-     * @return string
-     */
-    private function getFunctionName($function_content) {
-        $function_name = ClString::getBetween($function_content, 'function', '(', false);
-        return strtolower(trim($function_name));
     }
 
     /**
