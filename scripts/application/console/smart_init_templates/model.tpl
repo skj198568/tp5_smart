@@ -34,11 +34,11 @@ class {$table_name}Model extends {$table_name}Map {
     }
 
     /**
-     * 在插入之后处理数据，调用父类triggerGetItems获取数据
-     * @param array|int $insert_id_or_ids
+     * 在插入之后处理数据
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      */
-    protected function triggerAfterInsert($insert_id_or_ids) {
-        parent::triggerAfterInsert($insert_id_or_ids);
+    protected function triggerAfterInsert() {
+        parent::triggerAfterInsert();
     }
 
     /**
@@ -51,11 +51,11 @@ class {$table_name}Model extends {$table_name}Map {
     }
 
     /**
-     * 在更新之后处理数据，调用父类triggerGetItems获取数据
-     * @param string $sql
+     * 在更新之后处理数据
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      */
-    protected function triggerAfterUpdate($sql) {
-        parent::triggerAfterUpdate($sql);
+    protected function triggerAfterUpdate() {
+        parent::triggerAfterUpdate();
     }
 
     /**
@@ -76,17 +76,15 @@ class {$table_name}Model extends {$table_name}Map {
 
     /**
      * 缓存清除器
-     * @param string $sql 查询sql
-     * @param array $ids id数组
-     * @param array $items 数据数组
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      * @throws \think\db\exception\BindParamException
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
-        parent::triggerRemoveCache($sql, $ids, $items);
+    protected function triggerRemoveCache() {
+        parent::triggerRemoveCache();
     }
 
 }

@@ -15,6 +15,36 @@ use ClassLibrary\ClCache;{$use_content}
  * @package app\index\map
  */
 class {$table_name_with_format}Map extends BaseModel {
+    
+    /**
+     * 上次插入id
+     * @var int
+     */
+    protected static $last_insert_id = 0;
+
+    /**
+     * 回调sql
+     * @var string
+     */
+    protected static $trigger_sql = '';
+
+    /**
+     * 回调ids
+     * @var array
+     */
+    protected static $trigger_id_or_ids = [];
+
+    /**
+     * 回调数据items
+     * @var array
+     */
+    protected static $trigger_items = [];
+
+    /**
+     * 回调结果items
+     * @var array
+     */
+    protected static $trigger_result_items = [];
 
     /**
      * 实例对象存放数组
@@ -22,12 +52,6 @@ class {$table_name_with_format}Map extends BaseModel {
      */
     protected static $instances_array = [];
 {$const_fields}
-
-    /**
-     * 上次插入id
-     * @var int
-     */
-    protected static $last_insert_id = 0;
 
     /**
      * 字段校验，用于字段内容判断
@@ -153,18 +177,17 @@ class {$table_name_with_format}Map extends BaseModel {
 
     /**
      * 缓存清除器
-     * @param string $sql 查询sql
-     * @param array $ids id数组
-     * @param array $items 数据数组
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      * @throws \think\db\exception\BindParamException
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    protected function triggerRemoveCache($sql = '', $ids = [], $items = []){
+    protected function triggerRemoveCache(){
+        parent::triggerRemoveCache();
         if(is_numeric({$table_comment['is_cache']})){
-            $items = $this->triggerGetItems($sql, $ids, $items);
+            $items = $this->triggerGetItems();
             foreach($items as $item){
                 if(isset($item['{$table_comment['partition'][0]}']) && isset($item[static::F_ID])){
                     static::getByIdRc($item['{$table_comment['partition'][0]}'], $item[static::F_ID]);
@@ -176,19 +199,17 @@ class {$table_name_with_format}Map extends BaseModel {
 
     /**
      * 缓存清除器
-     * @param string $sql 查询sql
-     * @param array $ids id数组
-     * @param array $items 数据数组
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      * @throws \think\db\exception\BindParamException
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
-        parent::triggerRemoveCache($sql, $ids, $items);
+    protected function triggerRemoveCache() {
+        parent::triggerRemoveCache();
         if(is_numeric({$table_comment['is_cache']})){
-            $items = $this->triggerGetItems($sql, $ids, $items);
+            $items = $this->triggerGetItems();
             foreach($items as $item){
                 if(isset($item[static::F_ID])){
                     static::getByIdRc($item[static::F_ID]);

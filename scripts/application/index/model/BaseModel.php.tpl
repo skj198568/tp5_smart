@@ -126,16 +126,34 @@ class BaseModel extends Query {
     public static $is_back_data = false;
 
     /**
-     * 回调数据items
-     * @var array
-     */
-    private static $trigger_items = [];
-
-    /**
      * 上次插入id
      * @var int
      */
     protected static $last_insert_id = 0;
+
+    /**
+     * 回调sql
+     * @var string
+     */
+    protected static $trigger_sql = '';
+
+    /**
+     * 回调ids
+     * @var array
+     */
+    protected static $trigger_id_or_ids = [];
+
+    /**
+     * 回调数据items
+     * @var array
+     */
+    protected static $trigger_items = [];
+
+    /**
+     * 回调结果items
+     * @var array
+     */
+    protected static $trigger_result_items = [];
 
     /**
      * 构造函数
@@ -154,6 +172,18 @@ class BaseModel extends Query {
      */
     public function initialize() {
 
+    }
+
+    /**
+     * 回调设置数据
+     * @param string $sql
+     * @param array $ids
+     * @param array $items
+     */
+    private function triggerSet($sql = '', $ids = [], $items = []) {
+        static::$trigger_sql       = $sql;
+        static::$trigger_id_or_ids = $ids;
+        static::$trigger_items     = $items;
     }
 
     /**
@@ -176,9 +206,9 @@ class BaseModel extends Query {
 
     /**
      * 在插入之后处理数据
-     * @param int|array $insert_id_or_ids
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      */
-    protected function triggerAfterInsert($insert_id_or_ids) {
+    protected function triggerAfterInsert() {
 
     }
 
@@ -193,9 +223,9 @@ class BaseModel extends Query {
 
     /**
      * 在更新之后处理数据
-     * @param string $sql
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      */
-    protected function triggerAfterUpdate($sql) {
+    protected function triggerAfterUpdate() {
 
     }
 
@@ -329,11 +359,15 @@ class BaseModel extends Query {
             }
             $result = parent::execute($sql, $bind);
             if ($is_delete) {
-                static::triggerRemoveCache('', [], $items);
+                //设置数据
+                $this->triggerSet('', [], $items);
+                static::triggerRemoveCache();
                 static::triggerAfterDelete($items);
             } elseif ($is_update) {
-                static::triggerRemoveCache($trigger_sql);
-                static::triggerAfterUpdate($trigger_sql);
+                //设置数据
+                $this->triggerSet($trigger_sql);
+                static::triggerRemoveCache();
+                static::triggerAfterUpdate();
             }
             //清除缓存后执行
             ClCache::removeAfter();
@@ -357,10 +391,12 @@ class BaseModel extends Query {
         $data                   = $this->getDataBeforeExecute($data, 'insert');
         $last_id                = parent::insert($data, $replace, true, $sequence);
         static::$last_insert_id = $last_id;
+        //设置数据
+        $this->triggerSet('', $last_id);
         //处理数据
-        static::triggerAfterInsert($last_id);
+        static::triggerAfterInsert();
         //清缓存
-        static::triggerRemoveCache('', $last_id);
+        static::triggerRemoveCache();
         //清除缓存后执行
         ClCache::removeAfter();
         return $last_id;
@@ -404,10 +440,11 @@ class BaseModel extends Query {
                 $insert_ids[] = $i;
             }
         }
+        $this->triggerSet('', $insert_ids);
         //处理数据
-        static::triggerAfterInsert($insert_ids);
+        static::triggerAfterInsert();
         //清缓存
-        static::triggerRemoveCache('', $insert_ids);
+        static::triggerRemoveCache();
         //清除缓存后执行
         ClCache::removeAfter();
         return $result;
@@ -602,11 +639,9 @@ class BaseModel extends Query {
 
     /**
      * 缓存清除器
-     * @param string $sql 查询sql
-     * @param array $ids id数组
-     * @param array $items 数据数组
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
      */
-    protected function triggerRemoveCache($sql = '', $ids = [], $items = []) {
+    protected function triggerRemoveCache() {
 
     }
 
@@ -622,36 +657,36 @@ class BaseModel extends Query {
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    protected function triggerGetItems($sql = '', $ids = [], $items = []) {
-        $trigger_key = md5($sql . json_encode($ids) . json_encode($items));
-        if (isset(self::$trigger_items[$trigger_key])) {
-            return self::$trigger_items[$trigger_key];
+    protected function triggerGetItems() {
+        $trigger_key = md5(static::$trigger_sql . json_encode(static::$trigger_id_or_ids) . json_encode(static::$trigger_items));
+        if (isset(self::$trigger_result_items[$trigger_key])) {
+            return self::$trigger_result_items[$trigger_key];
         }
         $default = [];
-        if (count($items) > 0) {
-            return $items;
-        } elseif ($sql != '') {
-            $items = $this->query($sql);
+        if (count(static::$trigger_items) > 0) {
+            return static::$trigger_items;
+        } elseif (static::$trigger_sql != '') {
+            $items = $this->query(static::$trigger_sql);
             //存储
-            self::$trigger_items[$trigger_key] = $items;
+            self::$trigger_result_items[$trigger_key] = $items;
             return $items;
-        } elseif (is_array($ids)) {
-            if (empty($ids)) {
+        } elseif (is_array(static::$trigger_id_or_ids)) {
+            if (empty(static::$trigger_id_or_ids)) {
                 return $default;
             }
             $items = $this->where([
-                'id' => ['in', $ids]
+                'id' => ['in', static::$trigger_id_or_ids]
             ])->select();
             //存储
-            self::$trigger_items[$trigger_key] = $items;
+            self::$trigger_result_items[$trigger_key] = $items;
             return $items;
-        } elseif (is_numeric($ids)) {
+        } elseif (is_numeric(static::$trigger_id_or_ids)) {
             $info  = $this->where([
-                'id' => $ids
+                'id' => static::$trigger_id_or_ids
             ])->find();
             $items = [$info];
             //存储
-            self::$trigger_items[$trigger_key] = $items;
+            self::$trigger_result_items[$trigger_key] = $items;
             return $items;
         } else {
             return $default;
