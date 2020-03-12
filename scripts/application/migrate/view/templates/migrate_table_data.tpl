@@ -10,7 +10,7 @@ class {$class_name} extends Cmd {
      * @throws \think\exception\PDOException
      */
     public function up() {
-        //释放数据表信息，防止表结构修改导致的错误错误
+        //释放数据表信息，防止表结构修改导致的错误
         {$model_name}::tableInfoFree();
         //设置状态
         {$model_name}::$is_back_data = true;
@@ -39,7 +39,7 @@ class {$class_name} extends Cmd {
             {$model_name}::instance()->insertAll($items);
         }
         fclose($f_handle);
-        //回复状态
+        //恢复状态
         {$model_name}::$is_back_data = false;
     }
 
