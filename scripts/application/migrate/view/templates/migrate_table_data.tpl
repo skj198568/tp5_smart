@@ -29,9 +29,11 @@ class {$class_name} extends Cmd {
             }
             $items[]      = $line_content;
             if (strlen(json_encode($items)) > $max_length) {
+                //删除最后一个
+                array_pop($items);
                 //批量插入
                 {$model_name}::instance()->insertAll($items);
-                $items = [];
+                $items = [$line_content];
             }
         }
         if(!empty($items)){
