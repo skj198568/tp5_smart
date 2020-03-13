@@ -173,7 +173,7 @@ class BaseApiController extends Controller {
                 $api_file_create_time = filectime($api_file);
             }
             //获取所有controller文件
-            $controller_files       = ClFile::dirGetFiles(__DIR__, [], ['ApiController.php']);
+            $controller_files       = ClFile::dirGetFiles(__DIR__ . '/../controller', [], ['ApiController.php']);
             $max_modify_create_time = 0;
             foreach ($controller_files as $controller_file) {
                 $file_create_time = filectime($controller_file);
