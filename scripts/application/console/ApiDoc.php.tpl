@@ -158,7 +158,7 @@ class ApiDoc extends Command {
                 'url'        => str_replace('/', '<span style="color: blue;">/</span>', $request_url),
                 'params'     => $each_content[1],
                 'ar_returns' => $each_content[2],
-                'a_name'     => $a_name . '_' . time(),
+                'a_name'     => $a_name,
                 'item_index' => $item_index
             ]);
             $item_index++;
