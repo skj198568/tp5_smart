@@ -31,7 +31,13 @@ foreach ($files as $file) {
             echo 'copy file: ' . $target_file . PHP_EOL;
             copy($file, $target_file);
         }
-    } else if (strpos($target_file, 'tags.php') !== false) {
+    } else if(strpos($target_file, 'BaseModel.php') !== false){
+        if(!is_file($target_file)){
+            //如果文件不存在，则覆盖文件，存在则忽略
+            echo 'copy file: ' . $target_file . PHP_EOL;
+            copy($file, $target_file);
+        }
+    }else if (strpos($target_file, 'tags.php') !== false) {
         if (!is_file($target_file)) {
             //直接复制
             echo 'copy file: ' . $target_file . PHP_EOL;
