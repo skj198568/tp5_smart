@@ -66,7 +66,7 @@ class BaseMap extends Query {
      * 只读的字段，仅仅是创建的时候添加，其他地方均不可修改
      * @var array
      */
-    protected static $fields_read_only = [];
+    public static $fields_read_only = [];
 
     /**
      * 不可见字段，去掉view层或接口中的字段
