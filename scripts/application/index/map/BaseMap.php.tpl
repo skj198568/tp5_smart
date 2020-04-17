@@ -284,9 +284,12 @@ class BaseMap extends Query {
             }
             //去除只读字段
             if (!empty(static::$fields_read_only)) {
-                foreach (static::$fields_read_only as $each_field) {
-                    if (isset($data[$each_field])) {
-                        unset($data[$each_field]);
+                //默认更新接口，需要判断字段是否只读
+                if (request()->action() === 'update' || request()->action() === 'create') {
+                    foreach (static::$fields_read_only as $each_field) {
+                        if (isset($data[$each_field])) {
+                            unset($data[$each_field]);
+                        }
                     }
                 }
             }

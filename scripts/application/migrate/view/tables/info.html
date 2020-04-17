@@ -261,7 +261,12 @@
                         </div>
                         <p class="form-control-static">备注: visible / <span class="text-danger">可见</span>，sortable /
                             <span class="text-danger">排序</span>，searchable / <span class="text-danger">检索</span>，read_only
-                            / <span class="text-danger">只读，新增之后，不可修改。</span></p>
+                            / <span class="text-danger">只读</span><i class="fa fa-question-circle"
+                                                                    style="margin-left: 0.5em;cursor: pointer;"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="top"
+                                                                    title="不可在接口的create方法中创建也不可在update方法中修改，只可在其他后台方法内处理"></i>
+                        </p>
                     </div>
                     <div class="form-group">
                         <label class="text-warning">校验器-常规</label>
@@ -672,6 +677,9 @@
     var table_info = avalon.define({
         $id: 'avalon_controller',
         $init: function () {
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
             //类型处理
             table_info.is_add = table_info.is_add == 0 ? false : true;
             table_info.$getTableInfo();

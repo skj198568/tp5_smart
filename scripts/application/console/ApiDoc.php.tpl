@@ -522,6 +522,20 @@ class ApiDoc extends Command {
 //                echo_info($fields_verifies);
                 eval(sprintf('$fields_verifies=%s;', $fields_verifies));
 //                echo_info($params);
+                //忽略只读参数
+                $fields_read_only = sprintf('%s::$fields_read_only', $class_name_with_namespace);
+                eval(sprintf('$fields_read_only=%s;', $fields_read_only));
+//                if (!empty($fields_read_only)) {
+//                    echo_info($fields_read_only);
+//                }
+                if (!empty($fields_read_only)) {
+                    foreach ($params as $each_param) {
+                        if (in_array($method->name, ['create', 'update']) && in_array($each_param, $fields_read_only)) {
+                            //忽略只读参数
+                            continue;
+                        }
+                    }
+                }
                 foreach ($class_const_content as $each_const_param) {
                     foreach ($params as $each_param) {
                         if (strpos($each_const_param, sprintf("'%s'", $each_param)) !== false) {

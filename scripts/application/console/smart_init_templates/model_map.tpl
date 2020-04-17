@@ -60,10 +60,10 @@ class {$table_name_with_format}Map extends BaseModel {
     public static $fields_verifies = [{$fields_verifies}];
 
     /**
-     * 只读的字段，仅仅是创建的时候添加，其他地方均不可修改
+     * 只读的字段，不可在接口的create方法中创建也不可在update方法中修改，可在其他后台方法内处理
      * @var array
      */
-    protected static $fields_read_only = [{$fields_read_only}];
+    public static $fields_read_only = [{$fields_read_only}];
 
     /**
      * 不可见字段，去掉view层或接口中的字段
