@@ -196,7 +196,7 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在插入之前处理数据
+     * 在插入之前处理数据，如果想阻断插入，请return [];
      * @param array $info
      * @return array
      */
@@ -213,7 +213,7 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在更新之前处理数据
+     * 在更新之前处理数据，如果想阻断更新，请return [];
      * @param array $info
      * @return array
      */
@@ -263,7 +263,7 @@ class BaseMap extends Query {
             $data = static::triggerBeforeUpdate($data);
         }
         //非array数据，不进行处理
-        if (!is_array($data)) {
+        if (!is_array($data) || empty($data)) {
             return $data;
         }
         if ($operate_type == self::V_OPERATE_TYPE_INSERT) {

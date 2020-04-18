@@ -140,8 +140,12 @@ class {$table_name}BaseApiController extends ApiController {
         //获取
         $info = {$table_name}Model::getById({$table_name}Model::instance()->getLastInsID());
         </present>//拼接额外字段 & 格式化相关字段
-        $info = {$table_name}Model::forShow($info);
-        return $this->ar(1, ['info' => $info], static::createReturnExample());
+        if (empty($info)) {
+            return $this->ar(2, '数据已存在');
+        } else {
+            $info = {$table_name}Model::forShow($info);
+            return $this->ar(1, ['info' => $info], static::createReturnExample());
+        }
     }
 </if>
 <if condition="!empty($create_api) && in_array('update', $create_api)">

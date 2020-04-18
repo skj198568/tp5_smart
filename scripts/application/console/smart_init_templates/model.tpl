@@ -25,7 +25,7 @@ class {$table_name}Model extends {$table_name}Map {
     }
 
     /**
-     * 在插入之前处理数据
+     * 在插入之前处理数据，如果想阻断插入，请return [];
      * @param array $info
      * @return array
      */
@@ -42,7 +42,7 @@ class {$table_name}Model extends {$table_name}Map {
     }
 
     /**
-     * 在更新之前处理数据
+     * 在更新之前处理数据，如果想阻断更新，请return [];
      * @param array $info
      * @return array
      */
