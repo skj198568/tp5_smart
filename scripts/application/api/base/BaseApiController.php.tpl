@@ -92,21 +92,28 @@ class BaseApiController extends Controller {
         $total  = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
         $offset = get_param('offset', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '偏移数量，默认0', 0);
         $order  = get_param('order', ClFieldVerify::instance()->verifyInArray(['asc', 'desc'])->fetchVerifies(), '排序， ["asc"， "desc"]任选其一，默认为asc', 'asc');
-        $sort   = get_param('sort', ClFieldVerify::instance()->verifyAlphaNumDash()->fetchVerifies(), '排序值，默认为表的主键id', $model_instance->getPk());
+        $sort   = get_param('sort', ClFieldVerify::instance()->fetchVerifies(), '排序值，默认为表的主键id，如果多个字段排序请用英文逗号分隔', $model_instance->getPk());
         //默认返回值
-        $return = [
+        $return      = [
             'limit'  => $limit,
             'offset' => $offset,
             'total'  => $total
         ];
+        $order_array = [];
+        if (strpos($sort, ',') !== false) {
+            $sorts = explode(',', $sort);
+        } else {
+            $sorts = [$sort];
+        }
+        foreach ($sorts as $sort) {
+            $order_array[$sort] = $order;
+        }
         //列表
         $return['items'] = $model_instance
             ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
             ->where($where)
             ->field($model_instance::getAllFields($exclude_fields))
-            ->order([
-                $sort => $order
-            ])
+            ->order($order_array)
             ->limit($offset, $limit)
             ->select();
         //总数
