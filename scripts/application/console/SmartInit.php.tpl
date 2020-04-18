@@ -466,14 +466,16 @@ class SmartInit extends Command {
                 continue;
             }
             //comment
-            $comment       = $this->getTableComment($table_name);
-            $table_comment = json_encode($comment, JSON_UNESCAPED_UNICODE);
+            $comment = $this->getTableComment($table_name);
             //忽略表
-            if (isset($table_comment['ignore']) && $table_comment['ignore']) {
+            if (isset($comment['ignore']) && $comment['ignore']) {
                 continue;
             }
+            $table_comment = json_encode($comment, JSON_UNESCAPED_UNICODE);
             if (!array_key_exists($table_comment, $table_names)) {
                 $table_names[$table_comment] = $table_name;
+            } else {
+                $this->output->error('table_comment:' . $table_comment . ' is exist');
             }
         }
         return array_values($table_names);
