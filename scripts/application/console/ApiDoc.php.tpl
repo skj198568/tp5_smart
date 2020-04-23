@@ -529,10 +529,12 @@ class ApiDoc extends Command {
 //                    echo_info($fields_read_only);
 //                }
                 if (!empty($fields_read_only)) {
-                    foreach ($params as $each_param) {
-                        if (in_array($method->name, ['create', 'update']) && in_array($each_param, $fields_read_only)) {
+                    if (in_array($method->name, ['create', 'update'])) {
+                        foreach ($params as $k_each => $each_param) {
                             //忽略只读参数
-                            continue;
+                            if (in_array($each_param, (array)$fields_read_only)) {
+                                unset($params[$k_each]);
+                            }
                         }
                     }
                 }
