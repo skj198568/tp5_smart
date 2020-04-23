@@ -46,11 +46,6 @@ ClMigrateField::instance()
         </foreach>
     </notempty>
 </present>
-<present name="field_info['is_read_only']">
-    <if condition="$field_info['is_read_only']">
-        ->isReadOnly()
-    </if>
-</present>
 <present name="field_info['store_format']">
     <if condition="$field_info['store_format'] eq 'json'">
         ->storageFormatJson()
