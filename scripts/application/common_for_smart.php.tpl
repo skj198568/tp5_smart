@@ -111,6 +111,10 @@ const PAGES_NUM = 15;
  * @return \think\response\Json|\think\response\Jsonp
  */
 function json_return($data, $is_log = false) {
+    //添加请求时间戳
+    if (!isset($data['request_time'])) {
+        $data['request_time'] = time();
+    }
     //调试模式下，记录信息
     if (\think\App::$debug || $is_log) {
         //将请求地址加入返回数组中，用于区别请求内容

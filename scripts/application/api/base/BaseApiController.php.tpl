@@ -68,9 +68,8 @@ class BaseApiController extends Controller {
         $status = str_replace('/_', '/', $status);
         $data   = is_array($data) ? $data : ['message' => $data];
         return json_return(array_merge([
-            'status'       => $status,
-            'status_code'  => $code,
-            'request_time' => time()
+            'status'      => $status,
+            'status_code' => $code
         ], $data), $is_log);
     }
 
