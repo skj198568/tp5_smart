@@ -77,17 +77,8 @@ class MigrateBaseController extends Controller {
                     //本机请求
                     $this->account = $token;
                 } else {
-                    $msg = json_encode([
-                        'status'  => -1,
-                        'message' => '无效token'
-                    ], JSON_UNESCAPED_UNICODE);
-                    if (request()->isAjax()) {
-                        //输出结果并退出
-                        header('Content-Type:application/json; charset=utf-8');
-                        echo($msg);
-                    } else {
-                        echo($msg . PHP_EOL);
-                    }
+                    $response = $this->ar(-2, '无效token');
+                    $response->send();
                     exit;
                 }
             }
