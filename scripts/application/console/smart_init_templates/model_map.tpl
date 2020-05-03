@@ -607,6 +607,57 @@ class {$table_name_with_format}Map extends BaseModel {
             $this->tableCopy($source_table_name, $this->table);
         }
     }
-</present>{$functions_content}
+</present>
+
+    /**
+     * 在插入之前处理数据，如果想阻断插入，请return [];
+     * @param array $info
+     * @return array
+     */
+    protected function triggerBeforeInsert($info) {
+        return parent::triggerBeforeInsert($info);
+    }
+
+    /**
+     * 在插入之后处理数据
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
+     */
+    protected function triggerAfterInsert() {
+        parent::triggerAfterInsert();
+    }
+
+    /**
+     * 在更新之前处理数据，如果想阻断更新，请return [];
+     * @param array $info
+     * @return array
+     */
+    protected function triggerBeforeUpdate($info) {
+        return parent::triggerBeforeUpdate($info);
+    }
+
+    /**
+     * 在更新之后处理数据
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
+     * @param $info
+     */
+    protected function triggerAfterUpdate($info) {
+        parent::triggerAfterUpdate($info);
+    }
+
+    /**
+     * 在删除数据之前处理数据
+     * @param array $items
+     */
+    protected function triggerBeforeDelete($items) {
+        parent::triggerBeforeDelete($items);
+    }
+
+    /**
+     * 在删除数据之后处理数据
+     * @param array $items
+     */
+    protected function triggerAfterDelete($items) {
+        parent::triggerAfterDelete($items);
+    }{$functions_content}
 
 }

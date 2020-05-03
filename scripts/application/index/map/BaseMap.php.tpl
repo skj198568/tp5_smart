@@ -156,6 +156,14 @@ class BaseMap extends Query {
     protected static $trigger_result_items = [];
 
     /**
+     * 回调更新信息
+     * @var array
+     * @author SongKeJing qq:597481334 mobile:159-5107-8050
+     * @date 2020/5/3 21:30
+     */
+    protected static $trigger_update_info = [];
+
+    /**
      * 构造函数
      * @access public
      * @param Connection $connection 数据库对象实例
@@ -224,8 +232,11 @@ class BaseMap extends Query {
     /**
      * 在更新之后处理数据
      * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
+     * @param $info
+     * @author SongKeJing qq:597481334 mobile:159-5107-8050
+     * @date 2020/5/3 21:32
      */
-    protected function triggerAfterUpdate() {
+    protected function triggerAfterUpdate($info) {
 
     }
 
@@ -261,6 +272,8 @@ class BaseMap extends Query {
             $data = static::triggerBeforeInsert($data);
         } else if ($operate_type == 'update') {
             $data = static::triggerBeforeUpdate($data);
+            //赋值
+            static::$trigger_update_info = $data;
         }
         //非array数据，不进行处理
         if (!is_array($data) || empty($data)) {
@@ -370,7 +383,9 @@ class BaseMap extends Query {
                 //设置数据
                 $this->triggerSet($trigger_sql);
                 static::triggerRemoveCache();
-                static::triggerAfterUpdate();
+                static::triggerAfterUpdate(static::$trigger_update_info);
+                //清除更新数据
+                static::$trigger_update_info = [];
             }
             //清除缓存后执行
             ClCache::removeAfter();
