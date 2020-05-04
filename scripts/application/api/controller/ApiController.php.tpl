@@ -11,6 +11,7 @@ namespace app\api\controller;
 
 
 use app\api\base\BaseApiController;
+use app\index\model\BaseModel;
 use ClassLibrary\ClArray;
 use ClassLibrary\ClCrypt;
 use ClassLibrary\ClFieldVerify;
@@ -59,6 +60,8 @@ class ApiController extends BaseApiController {
                     exit;
                 }
             }
+            //赋值
+            BaseModel::$uid = $this->id;
         }
     }
 
