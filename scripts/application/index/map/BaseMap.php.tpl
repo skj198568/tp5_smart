@@ -158,8 +158,6 @@ class BaseMap extends Query {
     /**
      * 回调更新信息
      * @var array
-     * @author SongKeJing qq:597481334 mobile:159-5107-8050
-     * @date 2020/5/3 21:30
      */
     protected static $trigger_update_info = [];
 

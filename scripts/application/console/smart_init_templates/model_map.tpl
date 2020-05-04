@@ -41,6 +41,12 @@ class {$table_name_with_format}Map extends BaseModel {
     protected static $trigger_items = [];
 
     /**
+     * 回调更新信息
+     * @var array
+     */
+    protected static $trigger_update_info = [];
+
+    /**
      * 回调结果items
      * @var array
      */
