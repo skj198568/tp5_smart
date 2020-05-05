@@ -25,12 +25,6 @@ use ClassLibrary\ClVerify;
 class ApiController extends BaseApiController {
 
     /**
-     * 用户uid
-     * @var int
-     */
-    protected $id = 0;
-
-    /**
      * 不校验的请求
      * @var array
      */
@@ -47,21 +41,23 @@ class ApiController extends BaseApiController {
         $this->uncheck_request = array_merge($this->default_uncheck_request, $this->uncheck_request);
         if (!ClArray::inArrayIgnoreCase(request()->controller() . '/' . request()->action(), $this->uncheck_request)) {
             $token = get_param('token', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '校验token');
+        } else {
+            $token = get_param('token', ClFieldVerify::instance()->fetchVerifies(), '校验token', '');
         }
         if (!empty($token)) {
-            $this->id = ClCrypt::decrypt($token, CRYPT_KEY);
-            if (empty($this->id)) {
+            $uid = ClCrypt::decrypt($token, CRYPT_KEY);
+            if (empty($uid)) {
                 if (ClVerify::isLocalIp(request()->ip()) && is_numeric($token)) {
                     //本机请求
-                    $this->id = $token;
+                    $uid = $token;
                 } else {
                     $response = $this->ar(-2, '无效token');
                     $response->send();
                     exit;
                 }
             }
-            //赋值
-            BaseModel::$uid = $this->id;
+            //设置uid
+            setUid($uid);
         }
     }
 

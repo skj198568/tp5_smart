@@ -162,12 +162,6 @@ class BaseMap extends Query {
     protected static $trigger_update_info = [];
 
     /**
-     * 用户uid
-     * @var int
-     */
-    public static $uid = 0;
-
-    /**
      * 构造函数
      * @access public
      * @param Connection $connection 数据库对象实例

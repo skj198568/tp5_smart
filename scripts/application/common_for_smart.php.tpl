@@ -775,3 +775,20 @@ if (!function_exists('mime_content_type')) {
     }
 
 }
+
+/**
+ * 设置uid
+ * @param $uid
+ * @return mixed
+ */
+function setUid($uid) {
+    return session('current_user_id', $uid);
+}
+
+/**
+ * 获取uid
+ * @return mixed
+ */
+function getUid() {
+    return session('current_user_id');
+}
