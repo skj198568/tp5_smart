@@ -202,7 +202,7 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在插入之前处理数据，如果想阻断插入，请return [];
+     * 在插入之前，预处理插入的字段数据，如果想阻断插入，请return [];
      * @param array $info
      * @return array
      */
@@ -211,15 +211,15 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在插入之后处理数据
-     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
+     * 在插入之后，处理其他业务
+     * 如需获取影响的数据:$items = $this->triggerGetItems();
      */
     protected function triggerAfterInsert() {
 
     }
 
     /**
-     * 在更新之前处理数据，如果想阻断更新，请return [];
+     * 在更新之前，预处理更新的字段数据，如果想阻断更新，请return [];
      * @param array $info
      * @return array
      */
@@ -228,26 +228,16 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在更新之后处理数据
-     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
-     * @param $info
-     * @author SongKeJing qq:597481334 mobile:159-5107-8050
-     * @date 2020/5/3 21:32
+     * 在更新之后，处理其他业务
+     * 如需获取影响的数据:$items = $this->triggerGetItems();
+     * @param array $info 更改的字段数据
      */
     protected function triggerAfterUpdate($info) {
 
     }
 
     /**
-     * 在删除数据之前处理数据
-     * @param array $items
-     */
-    protected function triggerBeforeDelete($items) {
-
-    }
-
-    /**
-     * 在删除数据之后处理数据
+     * 在删除之后，处理其他业务
      * @param array $items
      */
     protected function triggerAfterDelete($items) {
@@ -369,7 +359,6 @@ class BaseMap extends Query {
             $items       = [];
             if ($is_delete) {
                 $items = $this->query($trigger_sql);
-                static::triggerBeforeDelete($items);
             }
             $result = parent::execute($sql, $bind);
             if ($is_delete) {

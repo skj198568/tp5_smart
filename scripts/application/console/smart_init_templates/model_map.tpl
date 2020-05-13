@@ -616,7 +616,7 @@ class {$table_name_with_format}Map extends BaseModel {
 </present>
 
     /**
-     * 在插入之前处理数据，如果想阻断插入，请return [];
+     * 在插入之前，预处理插入的字段数据，如果想阻断插入，请return [];
      * @param array $info
      * @return array
      */
@@ -625,15 +625,15 @@ class {$table_name_with_format}Map extends BaseModel {
     }
 
     /**
-     * 在插入之后处理数据
-     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
+     * 在插入之后，处理其他业务
+     * 如需获取影响的数据:$items = $this->triggerGetItems();
      */
     protected function triggerAfterInsert() {
         parent::triggerAfterInsert();
     }
 
     /**
-     * 在更新之前处理数据，如果想阻断更新，请return [];
+     * 在更新之前，预处理更新的字段数据，如果想阻断更新，请return [];
      * @param array $info
      * @return array
      */
@@ -642,24 +642,16 @@ class {$table_name_with_format}Map extends BaseModel {
     }
 
     /**
-     * 在更新之后处理数据
-     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
-     * @param $info
+     * 在更新之后，处理其他业务
+     * 如需获取影响的数据:$items = $this->triggerGetItems();
+     * @param array $info 更改的字段数据
      */
     protected function triggerAfterUpdate($info) {
         parent::triggerAfterUpdate($info);
     }
 
     /**
-     * 在删除数据之前处理数据
-     * @param array $items
-     */
-    protected function triggerBeforeDelete($items) {
-        parent::triggerBeforeDelete($items);
-    }
-
-    /**
-     * 在删除数据之后处理数据
+     * 在删除之后，处理其他业务
      * @param array $items
      */
     protected function triggerAfterDelete($items) {
