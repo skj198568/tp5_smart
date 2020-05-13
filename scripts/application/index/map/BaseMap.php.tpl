@@ -211,7 +211,7 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在插入之后，处理其他业务
+     * 在插入之后，处理其他关联业务
      * 如需获取影响的数据:$items = $this->triggerGetItems();
      */
     protected function triggerAfterInsert() {
@@ -228,7 +228,7 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在更新之后，处理其他业务
+     * 在更新之后，处理其他关联业务
      * 如需获取影响的数据:$items = $this->triggerGetItems();
      * @param array $info 更改的字段数据
      */
@@ -237,7 +237,7 @@ class BaseMap extends Query {
     }
 
     /**
-     * 在删除之后，处理其他业务
+     * 在删除之后，处理其他关联业务
      * @param array $items
      */
     protected function triggerAfterDelete($items) {
