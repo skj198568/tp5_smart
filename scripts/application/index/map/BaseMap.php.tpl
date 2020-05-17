@@ -723,10 +723,24 @@ class BaseMap extends Query {
     /**
      * 拼接额外字段 & 格式化字段
      * @param $items
-     * @return array|mixed
+     * @param BaseMap|null $model_instance
+     * @param null $duration
+     * @return array|array[]|mixed
      */
-    public static function forShow($items) {
-        return self::showFormat(self::showInvisible(self::showMapFields($items)));
+    public static function forShow($items, BaseMap $model_instance = null, $duration = null) {
+        if (is_numeric($duration)) {
+            $key         = ClCache::getKey([$model_instance->getTable(), 'for_show', $items]);
+            $cache_items = cache($key);
+            if ($cache_items === false) {
+                $cache_items = self::showFormat(self::showInvisible(self::showMapFields($items)));
+                //缓存
+                cache($key, $cache_items, $duration);
+            }
+            $items = $cache_items;
+        } else {
+            $items = self::showFormat(self::showInvisible(self::showMapFields($items)));
+        }
+        return $items;
     }
 
     /**
