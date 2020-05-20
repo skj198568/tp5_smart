@@ -165,6 +165,21 @@ class Cmd extends \think\migration\Migrator {
     }
 
     /**
+     * 判断表是否存在
+     * @param $table_name
+     * @return bool
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    protected function tableIsExit($table_name) {
+        $database = config('database.database');
+        $query    = new \think\db\Query();
+        $tables   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
+        $tables   = array_column($tables, 'table_name');
+        return in_array($table_name, $tables);
+    }
+
+    /**
      * 修改目录权限
      */
     protected function changeDirOwn() {
