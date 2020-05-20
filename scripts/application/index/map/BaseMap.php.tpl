@@ -356,12 +356,9 @@ class BaseMap extends Query {
             $table_name  = substr($last_sql, strpos($last_sql, '`') + 1);
             $table_name  = substr($table_name, 0, strpos($table_name, '`'));
             $trigger_sql = sprintf('SELECT * FROM `%s` %s', $table_name, substr($last_sql, strpos($last_sql, 'WHERE')));
-            $items       = [];
+            $result      = parent::execute($sql, $bind);
             if ($is_delete) {
                 $items = $this->query($trigger_sql);
-            }
-            $result = parent::execute($sql, $bind);
-            if ($is_delete) {
                 //设置数据
                 $this->triggerSet('', [], $items);
                 static::triggerRemoveCache();
