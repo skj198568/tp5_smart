@@ -44,15 +44,25 @@ class TableController extends MigrateBaseController {
             if ($table == 'migrations' || $table == 'phinxlog') {
                 continue;
             }
-            $fields = $this->getTableFieldsAfterFormat($table);
-            $fields = array_column($fields, 'field_name');
+            $fields      = $this->getTableFieldsAfterFormat($table);
+            $comment     = $this->getTableComment($table);
+            $fields_temp = [
+                $comment['name']
+            ];
+            foreach ($fields as $each_field) {
+                $fields_temp[] = $each_field['field_name'] . $each_field['field_desc'];
+            }
+            $fields = $fields_temp;
             sort($fields);
             $fields = implode('_', $fields);
+            $is_add = false;
             if (!isset($tables[$fields])) {
+                $is_add = true;
+            }
+            if ($is_add) {
                 //生成待转换的migrate
                 $this->alterFieldDefaultValue($table);
-                $comment = $this->getTableComment($table);
-                $ignore  = 0;
+                $ignore = 0;
                 if (isset($comment['ignore'])) {
                     $ignore = $comment['ignore'];
                 }
@@ -65,6 +75,7 @@ class TableController extends MigrateBaseController {
                 ];
             }
         }
+
         $tables       = array_values($tables);
         $tables_names = array_column($tables, 'name');
         //排序
