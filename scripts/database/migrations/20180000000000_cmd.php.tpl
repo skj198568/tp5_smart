@@ -165,18 +165,18 @@ class Cmd extends \think\migration\Migrator {
     }
 
     /**
-     * 判断表是否存在
-     * @param $table_name
+     * 是否包含表
+     * @param $table_name_with_prefix
      * @return bool
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    protected function tableIsExit($table_name) {
+    protected function hasTableWithPrefix($table_name_with_prefix) {
         $database = config('database.database');
         $query    = new \think\db\Query();
         $tables   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
         $tables   = array_column($tables, 'table_name');
-        return in_array($table_name, $tables);
+        return in_array($table_name_with_prefix, $tables);
     }
 
     /**
