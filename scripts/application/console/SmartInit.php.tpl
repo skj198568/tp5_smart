@@ -748,13 +748,14 @@ class SmartInit extends Command {
         $is_svn = is_dir(DOCUMENT_ROOT_PATH . '/../.svn');
         foreach ($this->undo_files as $each) {
             $each_file = str_replace(DOCUMENT_ROOT_PATH . '/../', '', $each['file']);
+            $file_name = ClFile::getName($each_file, true);
             if ($each['type'] == 'create') {
                 if ($is_svn) {
-                    $cmd[] = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create', $each_file);
+                    $cmd[] = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create ' . $file_name, $each_file);
                 }
             } else {
                 if ($is_svn) {
-                    $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update', $each_file);
+                    $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update ' . $file_name, $each_file);
                 }
             }
         }
