@@ -341,31 +341,37 @@ class SmartInit extends Command {
         if (is_file($cache_remove_trigger_file)) {
             $cache_remove_trigger_content = "\n" . file_get_contents($cache_remove_trigger_file) . "\n";
         }
+        $trigger_before_insert_file    = __DIR__ . '/smart_init_templates/model_map_extra/' . $table_name . '_trigger_before_insert.tpl';
+        $before_insert_trigger_content = '';
+        if (is_file($trigger_before_insert_file)) {
+            $before_insert_trigger_content = file_get_contents($trigger_before_insert_file) . "\n";
+        }
         $content     = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date'                         => date('Y/m/d') . "\n",
-                'time'                         => date('H:i:s') . "\n",
-                'table_comment'                => $this->getTableComment($table_name),
-                'table_name'                   => $table_name,
-                'table_name_with_format'       => $this->tableNameFormat($table_name),
-                'table_name_with_prefix'       => $this->getTableNameWithPrefix($table_name),
-                'const_fields'                 => $const_fields,
-                'fields_verifies'              => empty($fields_verifies_string) ? '' : trim($fields_verifies_string, ',') . "\n    ",
-                'fields_read_only'             => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
-                'all_fields_str'               => implode(', ', $all_fields),
-                'fields_show_map_fields'       => $fields_show_map_fields,
-                'fields_show_map_fields_keys'  => array_keys($fields_show_map_fields),
-                'fields_show_format'           => $fields_show_format,
-                'fields_show_format_keys'      => array_keys($fields_show_format),
-                'fields_store_format'          => $fields_store_format,
-                'fields_store_format_keys'     => array_keys($fields_store_format),
-                'fields_invisible'             => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
-                'fields_names'                 => $fields_names,
-                'fields_names_keys'            => array_keys($fields_names),
-                'fields_default_values'        => $fields_default_values,
-                'fields_default_values_keys'   => array_keys($fields_default_values),
-                'use_content'                  => $use_content,
-                'functions_content'            => $functions_content,
-                'cache_remove_trigger_content' => $cache_remove_trigger_content
+                'date'                          => date('Y/m/d') . "\n",
+                'time'                          => date('H:i:s') . "\n",
+                'table_comment'                 => $this->getTableComment($table_name),
+                'table_name'                    => $table_name,
+                'table_name_with_format'        => $this->tableNameFormat($table_name),
+                'table_name_with_prefix'        => $this->getTableNameWithPrefix($table_name),
+                'const_fields'                  => $const_fields,
+                'fields_verifies'               => empty($fields_verifies_string) ? '' : trim($fields_verifies_string, ',') . "\n    ",
+                'fields_read_only'              => empty($fields_read_only) ? '' : implode(', ', $fields_read_only),
+                'all_fields_str'                => implode(', ', $all_fields),
+                'fields_show_map_fields'        => $fields_show_map_fields,
+                'fields_show_map_fields_keys'   => array_keys($fields_show_map_fields),
+                'fields_show_format'            => $fields_show_format,
+                'fields_show_format_keys'       => array_keys($fields_show_format),
+                'fields_store_format'           => $fields_store_format,
+                'fields_store_format_keys'      => array_keys($fields_store_format),
+                'fields_invisible'              => empty($fields_invisible) ? '' : implode(', ', $fields_invisible),
+                'fields_names'                  => $fields_names,
+                'fields_names_keys'             => array_keys($fields_names),
+                'fields_default_values'         => $fields_default_values,
+                'fields_default_values_keys'    => array_keys($fields_default_values),
+                'use_content'                   => $use_content,
+                'functions_content'             => $functions_content,
+                'cache_remove_trigger_content'  => $cache_remove_trigger_content,
+                'before_insert_trigger_content' => $before_insert_trigger_content,
             ]);
         $map_file    = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         $old_content = '';

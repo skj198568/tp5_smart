@@ -15,7 +15,7 @@ use ClassLibrary\ClCache;{$use_content}
  * @package app\index\map
  */
 class {$table_name_with_format}Map extends BaseModel {
-    
+
     /**
      * 上次插入id
      * @var int
@@ -621,7 +621,9 @@ class {$table_name_with_format}Map extends BaseModel {
      * @return array
      */
     protected function triggerBeforeInsert($info) {
-        return parent::triggerBeforeInsert($info);
+        $info = parent::triggerBeforeInsert($info);
+{$before_insert_trigger_content}
+        return $info;
     }
 
     /**

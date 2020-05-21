@@ -1,17 +1,4 @@
     /**
-     * 在插入之前处理数据
-     * @param array $info
-     * @return array
-     */
-    protected function triggerBeforeInsert($info) {
-        $info = parent::triggerBeforeInsert($info);
-        if (isset($info[self::F_COMMAND]) && !isset($info[self::F_COMMAND_CRC32])) {
-            $info[self::F_COMMAND_CRC32] = crc32($info[self::F_COMMAND]);
-        }
-        return $info;
-    }
-
-    /**
      * 处理任务
      * @param int $id 执行的id
      * @return bool
