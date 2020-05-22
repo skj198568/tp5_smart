@@ -82,6 +82,8 @@ class SmartInit extends Command {
         ClMysql::init(config('database.hostname'), config('database.hostport'), config('database.username'), config('database.password'), config('database.database'));
         //分割
         $output->highlight('');
+        //定义换行
+        $this->view->assign('wrap_str', "\n");
         //初始化Model
         $this->initModel($input, $output);
         //分割
@@ -520,6 +522,9 @@ class SmartInit extends Command {
      * @throws \think\Exception
      */
     private function dealControllerApiBase($table_name, Output $output) {
+        if ($table_name != 'user') {
+            return;
+        }
         //如果不创建api，则忽略
         $table_comment = $this->getTableComment($table_name);
         $table_info    = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
@@ -530,7 +535,8 @@ class SmartInit extends Command {
         $table_name_format = $this->tableNameFormat($table_name);
         $info              = [];
         //字段配置
-        $fields_config = [];
+        $fields_config       = [];
+        $fields_update_ready = [];
         foreach ($table_info as $k => $each) {
             if (empty($each['Comment'])) {
                 $comment = [];
@@ -547,6 +553,7 @@ class SmartInit extends Command {
             $info[$each['Field']] = empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'];
             //静态变量
             $const_str = '';
+            //添加get配置方法
             if (isset($comment['const_values'])) {
                 $json_return = [];
                 foreach ($comment['const_values'] as $each_const_value) {
@@ -559,24 +566,51 @@ class SmartInit extends Command {
                 if (!empty($const_str)) {
                     $info[$each['Field']] .= sprintf(':%s', $const_str);
                 }
-                $class_name = $each['Field'];
-                if (strpos($class_name, '_') !== false) {
-                    $class_name = explode('_', $class_name);
-                    array_walk($class_name, function (&$each) {
+                $function_name = $each['Field'];
+                if (strpos($function_name, '_') !== false) {
+                    $function_name = explode('_', $function_name);
+                    array_walk($function_name, function (&$each) {
                         $each = ucfirst($each);
                     });
-                    $class_name = implode('', $class_name);
+                    $function_name = implode('', $function_name);
                 } else {
-                    $class_name = ucfirst($class_name);
+                    $function_name = ucfirst($function_name);
                 }
                 $fields_config[] = [
                     'function_desc' => empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'],
-                    'class_name'    => $class_name,
+                    'function_name' => $function_name,
                     'field_name'    => $each['Field'],
                     'json_return'   => json_encode([
-                        "status"      => 'api/' . $table_name . '/getfieldconfig' . strtolower($class_name) . "/1",
+                        "status"      => 'api/' . $table_name . '/getfieldconfig' . strtolower($function_name) . "/1",
                         "status_code" => 1,
                         "items"       => $json_return
+                    ], JSON_UNESCAPED_UNICODE)
+                ];
+            }
+            //添加update只读字段方法
+            if (isset($comment['is_read_only'])) {
+                $function_name = $each['Field'];
+                if (strpos($function_name, '_') !== false) {
+                    $function_name = explode('_', $function_name);
+                    array_walk($function_name, function (&$each) {
+                        $each = ucfirst($each);
+                    });
+                    $function_name = implode('', $function_name);
+                } else {
+                    $function_name = ucfirst($function_name);
+                }
+                $field_comment         = (empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name']);
+                $fields_update_ready[] = [
+                    'function_desc' => '更新字段-' . $field_comment . '（' . $each['Field'] . '）',
+                    'function_name' => $function_name,
+                    'field_name'    => $each['Field'],
+                    'json_return'   => json_encode([
+                        "status"      => 'api/' . $table_name . '/updateField' . strtolower($function_name) . "/1",
+                        "status_code" => 1,
+                        "info"        => [
+                            'id'           => '主键id',
+                            $each['Field'] => $field_comment
+                        ]
                     ], JSON_UNESCAPED_UNICODE)
                 ];
             }
@@ -643,21 +677,22 @@ class SmartInit extends Command {
             $functions_content = "\n" . file_get_contents($functions_content_file) . "\n\n";
         }
         $content = "<?php\n" . $this->view->fetch($map_template_file, [
-                'date'               => date('Y/m/d') . "\n",
-                'time'               => date('H:i:s') . "\n",
-                'table_name'         => $table_name_format,
-                'table_comment'      => $this->getTableComment($table_name),
-                'ar_get_list_json'   => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_json'        => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_by_ids_json' => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
-                'ar_create_json'     => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
-                'ar_update_json'     => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
-                'ar_update_ids_json' => json_encode($ar_update_ids_json, JSON_UNESCAPED_UNICODE),
-                'ar_delete_json'     => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
-                'create_api'         => $table_comment['create_api'],
-                'fields_config'      => $fields_config,
-                'use_content'        => $use_content,
-                'functions_content'  => $functions_content
+                'date'                => date('Y/m/d') . "\n",
+                'time'                => date('H:i:s') . "\n",
+                'table_name'          => $table_name_format,
+                'table_comment'       => $this->getTableComment($table_name),
+                'ar_get_list_json'    => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_json'         => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
+                'ar_get_by_ids_json'  => json_encode($ar_get_by_ids_json, JSON_UNESCAPED_UNICODE),
+                'ar_create_json'      => json_encode($ar_create_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_json'      => json_encode($ar_update_json, JSON_UNESCAPED_UNICODE),
+                'ar_update_ids_json'  => json_encode($ar_update_ids_json, JSON_UNESCAPED_UNICODE),
+                'ar_delete_json'      => json_encode($ar_delete_json, JSON_UNESCAPED_UNICODE),
+                'create_api'          => $table_comment['create_api'],
+                'fields_config'       => $fields_config,
+                'use_content'         => $use_content,
+                'functions_content'   => $functions_content,
+                'fields_update_ready' => $fields_update_ready
             ]);
         if (!empty($content)) {
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';

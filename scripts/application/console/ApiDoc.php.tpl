@@ -77,7 +77,7 @@ class ApiDoc extends Command {
         $api      = [];
 //        echo_info('$files:', $files);
         foreach ($files as $each_file) {
-//            if (strpos($each_file, '/DeviceRecords') === false) {
+//            if (strpos($each_file, '/UserC') === false) {
 //                continue;
 //            }
             $output->info($each_file);
@@ -105,7 +105,7 @@ class ApiDoc extends Command {
             $class_doc = $this->getClassDoc($each_file);
 //            echo_info('$class_doc:', $class_doc);
             foreach ($methods as $each_method) {
-//                if ($each_method->name !== 'getList') {
+//                if ($each_method->name !== 'updatePid') {
 //                    continue;
 //                }
 //                echo_info($each_method->name, $each_method->class);
@@ -360,7 +360,7 @@ class ApiDoc extends Command {
         $params = ClString::parseToArray($function_content, 'get_param', ');', false);
 //        echo_info($params);
         foreach ($params as $param) {
-//            if (strpos($param, 'not_allow_subject_ids') === false) {
+//            if (strpos($param, 'pid') === false) {
 //                continue;
 //            }
             $param = ClString::spaceTrim($param);
@@ -384,7 +384,7 @@ class ApiDoc extends Command {
             $param       = trim($param, ',');
             $param_temp  = [];
             $param_array = explode('","', trim($param, '"'));
-//            echo_info($param_array);
+//            echo_info('$param_array:', $param_array);
             foreach ($param_array as $each) {
                 if (strpos($each, ',') !== false) {
                     foreach (explode(',', $each) as $each_param) {
@@ -394,12 +394,13 @@ class ApiDoc extends Command {
                     $param_temp[] = $each;
                 }
             }
-//            echo_info($param_temp);
+//            echo_info('$param_temp:', $param_temp);
             //参数名
             $name = $param_temp[0];
             if (strpos($name, '"') !== false) {
                 $name = ClString::getBetween($name, '', '"', false);
             }
+//            echo_info('name:', $name);
             if (strpos($name, "'") === 0) {
                 //参数定义
                 $name = trim($name, "'");
@@ -415,6 +416,7 @@ class ApiDoc extends Command {
 //            if ($name == 'not_allow_subject_ids') {
 //                echo_info($name, $filters);
 //            }
+//            echo_info('$filters:', $filters);
             //过滤器
             if (!empty($filters)) {
                 $sub_filters = ClString::getBetween($filters, 'instance', 'fetchVerifies', false);
@@ -462,6 +464,20 @@ class ApiDoc extends Command {
 //                if ($name == 'not_allow_subject_ids') {
 //                    echo_info($name, $filters);
 //                }
+            } else if (isset($param_temp[1])) {
+                $filters = $param_temp[1];
+//                echo_info('$filters:', $filters);
+                if (strpos($filters, '::') !== false) {
+                    $class_name                = ClString::getBetween($filters, '', '::', false);
+                    $class_name_with_namespace = $this->getWithNameSpace($class_file_absolute_url, $class_name);
+//                    echo_info($class_name_with_namespace);
+                    $filters = str_replace($class_name, $class_name_with_namespace, $filters);
+                    $filters = '$filters = ' . $filters . ";";
+                    eval($filters);
+//                    echo_info($filters);
+                } else {
+                    $filters = [];
+                }
             } else {
                 $filters = [];
             }
@@ -469,10 +485,17 @@ class ApiDoc extends Command {
             $remark = '';
             if (isset($param_temp[$desc_index])) {
                 $remark = trim($param_temp[$desc_index], '"');
+//                echo_info('$remark:', $remark);
                 if (strpos($remark, '->getPk')) {
                     $remark = '主键';
-                } elseif (strpos($remark, 'sprintf') !== false) {
+                } else if (strpos($remark, 'sprintf') !== false) {
                     $remark = '';
+                } else if (strpos($remark, '::') !== false) {
+                    $class_name                = ClString::getBetween($remark, '', '::', false);
+                    $class_name_with_namespace = $this->getWithNameSpace($class_file_absolute_url, $class_name);
+                    $remark                    = str_replace($class_name, $class_name_with_namespace, $remark);
+                    $remark                    = '$remark = ' . $remark . ";";
+                    eval($remark);
                 }
             }
             $return_array[] = [

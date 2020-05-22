@@ -195,6 +195,35 @@ class {$table_name}BaseApiController extends ApiController {
         return '{$ar_update_ids_json}';
     }
 
+<foreach name="fields_update_ready" item="each_update_field">
+
+    /**
+     * {$each_update_field['function_desc']}
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function updateField{$each_update_field['function_name']}() {
+        $id  = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
+        ${$each_update_field['field_name']} = get_param('{$each_update_field['field_name']}', {$table_name}Model::$fields_verifies['{$each_update_field['field_name']}'], {$table_name}Model::$fields_names['{$each_update_field['field_name']}']);
+        //更新
+        {$table_name}Model::instance()->where([
+            {$table_name}Model::F_ID => $id
+        ])->setField([
+            '{$each_update_field['field_name']}' => ${$each_update_field['field_name']}{$wrap_str}
+        ]);
+        //获取
+        $info = [
+            'id'  => $id,
+            '{$each_update_field['field_name']}' => {$table_name}Model::getValueById($id, '{$each_update_field['field_name']}')
+        ];
+        //拼接额外字段 & 格式化相关字段
+        $info = {$table_name}Model::forShow($info);
+        return $this->ar(1, ['info' => $info], '{$each_update_field['json_return']}');
+    }
+</foreach>
+
     /**
      * 批量更新
      * @return \think\response\Json|\think\response\Jsonp
@@ -252,7 +281,7 @@ class {$table_name}BaseApiController extends ApiController {
      * 获取字段{$each_config['field_name']}配置
      * @return \think\response\Json|\think\response\Jsonp
      */
-    public function getFieldConfig{$each_config['class_name']}() {
+    public function getFieldConfig{$each_config['function_name']}() {
         $items = [];
         foreach ({$table_name}Model::C_{:strtoupper($each_config['field_name'])} as $value => $text) {
             $items[] = [
