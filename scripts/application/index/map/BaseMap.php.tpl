@@ -165,73 +165,73 @@ class BaseMap extends Query {
      * before insert 限制次数，0为不限制次数
      * @var int
      */
-    public static $trigger_before_insert_limit_times = 1;
+    private static $trigger_before_insert_called_limit_times = 1;
 
     /**
      * before insert 当前调用次数
      * @var int
      */
-    private static $trigger_before_insert_current_times = 0;
+    private static $trigger_before_insert_called_current_times = 0;
 
     /**
      * after insert 限制次数，0为不限制次数
      * @var int
      */
-    public static $trigger_after_insert_limit_times = 1;
+    private static $trigger_after_insert_called_limit_times = 1;
 
     /**
      * after insert 当前调用次数
      * @var int
      */
-    private static $trigger_after_insert_current_times = 0;
+    private static $trigger_after_insert_called_current_times = 0;
 
     /**
      * before update 限制次数，0为不限制次数
      * @var int
      */
-    public static $trigger_before_update_limit_times = 1;
+    private static $trigger_before_update_called_limit_times = 1;
 
     /**
      * before update 当前调用次数
      * @var int
      */
-    private static $trigger_before_update_current_times = 0;
+    private static $trigger_before_update_called_current_times = 0;
 
     /**
      * after update 限制次数，0为不限制次数
      * @var int
      */
-    public static $trigger_after_update_limit_times = 1;
+    private static $trigger_after_update_called_limit_times = 1;
 
     /**
      * after update 当前调用次数
      * @var int
      */
-    private static $trigger_after_update_current_times = 0;
+    private static $trigger_after_update_called_current_times = 0;
 
     /**
      * after delete 限制次数，0为不限制次数
      * @var int
      */
-    public static $trigger_after_delete_limit_times = 1;
+    private static $trigger_after_delete_called_limit_times = 1;
 
     /**
      * after delete 当前调用次数
      * @var int
      */
-    private static $trigger_after_delete_current_times = 0;
+    private static $trigger_after_delete_called_current_times = 0;
 
     /**
      * remove cache 限制次数，0为不限制次数
      * @var int
      */
-    public static $trigger_remove_cache_limit_times = 1;
+    private static $trigger_remove_cache_called_limit_times = 1;
 
     /**
      * remove cache 当前调用次数
      * @var int
      */
-    private static $trigger_remove_cache_current_times = 0;
+    private static $trigger_remove_cache_called_current_times = 0;
 
     /**
      * 构造函数
@@ -283,11 +283,27 @@ class BaseMap extends Query {
     }
 
     /**
+     * 设置triggerBeforeInsert被调用次数
+     * @param int $limit_times 0/不限制
+     */
+    public function triggerBeforeInsertSetCalledLimitTimes($limit_times = 1) {
+        self::$trigger_before_insert_called_limit_times = $limit_times;
+    }
+
+    /**
      * 在插入之后，处理其他关联业务
      * 如需获取影响的数据:$items = $this->triggerGetItems();
      */
     protected function triggerAfterInsert() {
 
+    }
+
+    /**
+     * 设置triggerAfterInsert被调用次数
+     * @param int $limit_times 0/不限制
+     */
+    public function triggerAfterInsertSetCalledLimitTimes($limit_times = 1) {
+        self::$trigger_after_insert_called_limit_times = $limit_times;
     }
 
     /**
@@ -300,6 +316,14 @@ class BaseMap extends Query {
     }
 
     /**
+     * 设置triggerBeforeUpdate被调用次数
+     * @param int $limit_times 0/不限制
+     */
+    public function triggerBeforeUpdateSetCalledLimitTimes($limit_times = 1) {
+        self::$trigger_before_update_called_limit_times = $limit_times;
+    }
+
+    /**
      * 在更新之后，处理其他关联业务
      * 如需获取影响的数据:$items = $this->triggerGetItems();
      * @param array $info 更改的字段数据
@@ -309,11 +333,101 @@ class BaseMap extends Query {
     }
 
     /**
+     * 设置triggerAfterUpdate被调用次数
+     * @param int $limit_times 0/不限制
+     */
+    public function triggerAfterUpdateSetLimitCalledTimes($limit_times = 1) {
+        self::$trigger_after_update_called_limit_times = $limit_times;
+    }
+
+    /**
      * 在删除之后，处理其他关联业务
      * @param array $items
      */
     protected function triggerAfterDelete($items) {
 
+    }
+
+    /**
+     * 设置triggerAfterDelete被调用次数
+     * @param int $limit_times 0/不限制
+     */
+    public function triggerAfterDeleteSetLimitCalledTimes($limit_times = 1) {
+        self::$trigger_after_delete_called_limit_times = $limit_times;
+    }
+
+    /**
+     * 缓存清除器
+     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
+     */
+    protected function triggerRemoveCache() {
+
+    }
+
+    /**
+     * 设置triggerRemoveCache被调用次数
+     * @param int $limit_times 0/不限制
+     */
+    protected function triggerRemoveCacheSetCalledLimitTimes($limit_times = 1) {
+        self::$trigger_remove_cache_called_limit_times = $limit_times;
+    }
+
+    /**
+     * 缓存清除器调用
+     */
+    private function triggerRemoveCacheCall() {
+        if (static::$trigger_remove_cache_called_limit_times == 0 || self::$trigger_remove_cache_called_current_times < static::$trigger_remove_cache_called_limit_times) {
+            static::triggerRemoveCache();
+            self::$trigger_remove_cache_called_current_times++;
+        }
+    }
+
+    /**
+     * 触发事件获取数据
+     * @param string $sql
+     * @param array $ids
+     * @param array $items
+     * @return array|false|mixed|\PDOStatement|string|\think\Collection|null
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    protected function triggerGetItems() {
+        $trigger_key = md5(static::$trigger_sql . json_encode(static::$trigger_id_or_ids) . json_encode(static::$trigger_items));
+        if (isset(self::$trigger_result_items[$trigger_key])) {
+            return self::$trigger_result_items[$trigger_key];
+        }
+        $default = [];
+        if (count(static::$trigger_items) > 0) {
+            return static::$trigger_items;
+        } elseif (static::$trigger_sql != '') {
+            $items = $this->query(static::$trigger_sql);
+            //存储
+            self::$trigger_result_items[$trigger_key] = $items;
+            return $items;
+        } elseif (is_array(static::$trigger_id_or_ids)) {
+            if (empty(static::$trigger_id_or_ids)) {
+                return $default;
+            }
+            $items = $this->where([
+                'id' => ['in', static::$trigger_id_or_ids]
+            ])->select();
+            //存储
+            self::$trigger_result_items[$trigger_key] = $items;
+            return $items;
+        } elseif (is_numeric(static::$trigger_id_or_ids)) {
+            $info  = $this->where([
+                'id' => static::$trigger_id_or_ids
+            ])->find();
+            $items = [$info];
+            //存储
+            self::$trigger_result_items[$trigger_key] = $items;
+            return $items;
+        } else {
+            return $default;
+        }
     }
 
     /**
@@ -329,16 +443,16 @@ class BaseMap extends Query {
         }
         //调用预处理
         if ($operate_type == 'insert') {
-            if (static::$trigger_before_insert_limit_times == 0 || self::$trigger_before_insert_current_times < static::$trigger_before_insert_limit_times) {
+            if (static::$trigger_before_insert_called_limit_times == 0 || self::$trigger_before_insert_called_current_times < static::$trigger_before_insert_called_limit_times) {
                 $data = static::triggerBeforeInsert($data);
                 //+1
-                self::$trigger_before_insert_current_times++;
+                self::$trigger_before_insert_called_current_times++;
             }
         } else if ($operate_type == 'update') {
-            if (static::$trigger_before_update_limit_times == 0 || self::$trigger_before_update_current_times < static::$trigger_before_update_limit_times) {
+            if (static::$trigger_before_update_called_limit_times == 0 || self::$trigger_before_update_called_current_times < static::$trigger_before_update_called_limit_times) {
                 $data = static::triggerBeforeUpdate($data);
                 //+1
-                self::$trigger_before_update_current_times++;
+                self::$trigger_before_update_called_current_times++;
             }
             //赋值
             static::$trigger_update_info = $data;
@@ -442,17 +556,17 @@ class BaseMap extends Query {
                 //设置数据
                 $this->triggerSet('', [], $items);
                 $this->triggerRemoveCacheCall();
-                if (static::$trigger_after_delete_limit_times == 0 || self::$trigger_after_delete_current_times < static::$trigger_after_delete_limit_times) {
+                if (static::$trigger_after_delete_called_limit_times == 0 || self::$trigger_after_delete_called_current_times < static::$trigger_after_delete_called_limit_times) {
                     static::triggerAfterDelete($items);
-                    self::$trigger_after_delete_current_times++;
+                    self::$trigger_after_delete_called_current_times++;
                 }
             } elseif ($is_update) {
                 //设置数据
                 $this->triggerSet($trigger_sql);
                 $this->triggerRemoveCacheCall();
-                if (static::$trigger_after_update_limit_times == 0 || self::$trigger_after_update_current_times < static::$trigger_after_update_limit_times) {
+                if (static::$trigger_after_update_called_limit_times == 0 || self::$trigger_after_update_called_current_times < static::$trigger_after_update_called_limit_times) {
                     static::triggerAfterUpdate(static::$trigger_update_info);
-                    self::$trigger_after_update_current_times++;
+                    self::$trigger_after_update_called_current_times++;
                 }
                 //清除更新数据
                 static::$trigger_update_info = [];
@@ -482,9 +596,9 @@ class BaseMap extends Query {
         //设置数据
         $this->triggerSet('', $last_id);
         //处理数据
-        if (static::$trigger_after_insert_limit_times == 0 || self::$trigger_after_insert_current_times < static::$trigger_after_insert_limit_times) {
+        if (static::$trigger_after_insert_called_limit_times == 0 || self::$trigger_after_insert_called_current_times < static::$trigger_after_insert_called_limit_times) {
             static::triggerAfterInsert();
-            self::$trigger_after_insert_limit_times++;
+            self::$trigger_after_insert_called_limit_times++;
         }
         //清缓存
         $this->triggerRemoveCacheCall();
@@ -533,9 +647,9 @@ class BaseMap extends Query {
         }
         $this->triggerSet('', $insert_ids);
         //处理数据
-        if (static::$trigger_after_insert_limit_times == 0 || self::$trigger_after_insert_current_times < static::$trigger_after_insert_limit_times) {
+        if (static::$trigger_after_insert_called_limit_times == 0 || self::$trigger_after_insert_called_current_times < static::$trigger_after_insert_called_limit_times) {
             static::triggerAfterInsert();
-            self::$trigger_after_insert_current_times++;
+            self::$trigger_after_insert_called_current_times++;
         }
         //清缓存
         $this->triggerRemoveCacheCall();
@@ -728,72 +842,6 @@ class BaseMap extends Query {
             return $items[0];
         } else {
             return $items;
-        }
-    }
-
-    /**
-     * 缓存清除器
-     * 采用$items = $this->triggerGetItems();方式获取所有影响的数据
-     */
-    protected function triggerRemoveCache() {
-
-    }
-
-    /**
-     * 缓存清除器调用
-     */
-    private function triggerRemoveCacheCall() {
-        if (static::$trigger_remove_cache_limit_times == 0 || self::$trigger_remove_cache_current_times < static::$trigger_remove_cache_limit_times) {
-            static::triggerRemoveCache();
-            self::$trigger_remove_cache_current_times++;
-        }
-    }
-
-    /**
-     * 触发事件获取数据
-     * @param string $sql
-     * @param array $ids
-     * @param array $items
-     * @return array|false|mixed|\PDOStatement|string|\think\Collection|null
-     * @throws \think\db\exception\BindParamException
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     * @throws \think\exception\PDOException
-     */
-    protected function triggerGetItems() {
-        $trigger_key = md5(static::$trigger_sql . json_encode(static::$trigger_id_or_ids) . json_encode(static::$trigger_items));
-        if (isset(self::$trigger_result_items[$trigger_key])) {
-            return self::$trigger_result_items[$trigger_key];
-        }
-        $default = [];
-        if (count(static::$trigger_items) > 0) {
-            return static::$trigger_items;
-        } elseif (static::$trigger_sql != '') {
-            $items = $this->query(static::$trigger_sql);
-            //存储
-            self::$trigger_result_items[$trigger_key] = $items;
-            return $items;
-        } elseif (is_array(static::$trigger_id_or_ids)) {
-            if (empty(static::$trigger_id_or_ids)) {
-                return $default;
-            }
-            $items = $this->where([
-                'id' => ['in', static::$trigger_id_or_ids]
-            ])->select();
-            //存储
-            self::$trigger_result_items[$trigger_key] = $items;
-            return $items;
-        } elseif (is_numeric(static::$trigger_id_or_ids)) {
-            $info  = $this->where([
-                'id' => static::$trigger_id_or_ids
-            ])->find();
-            $items = [$info];
-            //存储
-            self::$trigger_result_items[$trigger_key] = $items;
-            return $items;
-        } else {
-            return $default;
         }
     }
 
