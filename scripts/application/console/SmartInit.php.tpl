@@ -757,11 +757,11 @@ class SmartInit extends Command {
             $file_name = ClFile::getName($each_file, true);
             if ($each['type'] == 'create') {
                 if ($is_svn) {
-                    $cmd[] = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $each_file, 'create ' . $file_name, $each_file);
+                    $cmd[] = sprintf('cd %s && svn add %s && svn ci %s -m "%s"', DOCUMENT_ROOT_PATH . '/../', $each_file, $each_file, 'create ' . $file_name);
                 }
             } else {
                 if ($is_svn) {
-                    $cmd[] = sprintf('cd %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', 'update ' . $file_name, $each_file);
+                    $cmd[] = sprintf('cd %s && svn ci %s -m "%s"', DOCUMENT_ROOT_PATH . '/../', $each_file, 'update ' . $file_name);
                 }
             }
         }

@@ -433,7 +433,7 @@ class MigrateBaseController extends Controller {
         $migrate_absolute_file = str_replace(DOCUMENT_ROOT_PATH . '/../', '', $migrate_absolute_file);
         if (is_dir(DOCUMENT_ROOT_PATH . '/../.svn')) {
             //svn版本
-            $cmd = sprintf('cd %s && svn add %s && svn ci -m "%s" %s', DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $svn_msg, $migrate_absolute_file);
+            $cmd = sprintf('cd %s && svn add %s && svn ci %s -m "%s"', DOCUMENT_ROOT_PATH . '/../', $migrate_absolute_file, $migrate_absolute_file, $svn_msg);
         }
         if (empty($cmd)) {
             return;
