@@ -376,7 +376,7 @@ class BaseMap extends Query {
      * 缓存清除器调用
      */
     private function triggerRemoveCacheCall() {
-        if (static::$trigger_remove_cache_called_limit_times == 0 || self::$trigger_remove_cache_called_current_times < static::$trigger_remove_cache_called_limit_times) {
+        if (self::$trigger_remove_cache_called_limit_times == 0 || self::$trigger_remove_cache_called_current_times < self::$trigger_remove_cache_called_limit_times) {
             static::triggerRemoveCache();
             self::$trigger_remove_cache_called_current_times++;
         }
@@ -443,13 +443,13 @@ class BaseMap extends Query {
         }
         //调用预处理
         if ($operate_type == 'insert') {
-            if (static::$trigger_before_insert_called_limit_times == 0 || self::$trigger_before_insert_called_current_times < static::$trigger_before_insert_called_limit_times) {
+            if (self::$trigger_before_insert_called_limit_times == 0 || self::$trigger_before_insert_called_current_times < self::$trigger_before_insert_called_limit_times) {
                 $data = static::triggerBeforeInsert($data);
                 //+1
                 self::$trigger_before_insert_called_current_times++;
             }
         } else if ($operate_type == 'update') {
-            if (static::$trigger_before_update_called_limit_times == 0 || self::$trigger_before_update_called_current_times < static::$trigger_before_update_called_limit_times) {
+            if (self::$trigger_before_update_called_limit_times == 0 || self::$trigger_before_update_called_current_times < self::$trigger_before_update_called_limit_times) {
                 $data = static::triggerBeforeUpdate($data);
                 //+1
                 self::$trigger_before_update_called_current_times++;
@@ -556,7 +556,7 @@ class BaseMap extends Query {
                 //设置数据
                 $this->triggerSet('', [], $items);
                 $this->triggerRemoveCacheCall();
-                if (static::$trigger_after_delete_called_limit_times == 0 || self::$trigger_after_delete_called_current_times < static::$trigger_after_delete_called_limit_times) {
+                if (self::$trigger_after_delete_called_limit_times == 0 || self::$trigger_after_delete_called_current_times < self::$trigger_after_delete_called_limit_times) {
                     static::triggerAfterDelete($items);
                     self::$trigger_after_delete_called_current_times++;
                 }
@@ -564,7 +564,7 @@ class BaseMap extends Query {
                 //设置数据
                 $this->triggerSet($trigger_sql);
                 $this->triggerRemoveCacheCall();
-                if (static::$trigger_after_update_called_limit_times == 0 || self::$trigger_after_update_called_current_times < static::$trigger_after_update_called_limit_times) {
+                if (self::$trigger_after_update_called_limit_times == 0 || self::$trigger_after_update_called_current_times < self::$trigger_after_update_called_limit_times) {
                     static::triggerAfterUpdate(static::$trigger_update_info);
                     self::$trigger_after_update_called_current_times++;
                 }
@@ -596,7 +596,7 @@ class BaseMap extends Query {
         //设置数据
         $this->triggerSet('', $last_id);
         //处理数据
-        if (static::$trigger_after_insert_called_limit_times == 0 || self::$trigger_after_insert_called_current_times < static::$trigger_after_insert_called_limit_times) {
+        if (self::$trigger_after_insert_called_limit_times == 0 || self::$trigger_after_insert_called_current_times < self::$trigger_after_insert_called_limit_times) {
             static::triggerAfterInsert();
             self::$trigger_after_insert_called_limit_times++;
         }
@@ -647,7 +647,7 @@ class BaseMap extends Query {
         }
         $this->triggerSet('', $insert_ids);
         //处理数据
-        if (static::$trigger_after_insert_called_limit_times == 0 || self::$trigger_after_insert_called_current_times < static::$trigger_after_insert_called_limit_times) {
+        if (self::$trigger_after_insert_called_limit_times == 0 || self::$trigger_after_insert_called_current_times < self::$trigger_after_insert_called_limit_times) {
             static::triggerAfterInsert();
             self::$trigger_after_insert_called_current_times++;
         }
