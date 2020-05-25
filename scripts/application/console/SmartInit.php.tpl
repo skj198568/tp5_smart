@@ -525,9 +525,9 @@ class SmartInit extends Command {
      * @throws \think\Exception
      */
     private function dealControllerApiBase($table_name, Output $output) {
-        if ($table_name != 'user') {
-            return;
-        }
+//        if ($table_name != 'user') {
+//            return;
+//        }
         //如果不创建api，则忽略
         $table_comment = $this->getTableComment($table_name);
         $table_info    = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
