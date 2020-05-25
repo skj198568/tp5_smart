@@ -105,7 +105,7 @@ class ApiDoc extends Command {
             $class_doc = $this->getClassDoc($each_file);
 //            echo_info('$class_doc:', $class_doc);
             foreach ($methods as $each_method) {
-//                if ($each_method->name !== 'updatePid') {
+//                if ($each_method->name !== 'updateFieldPid') {
 //                    continue;
 //                }
 //                echo_info($each_method->name, $each_method->class);
@@ -372,6 +372,7 @@ class ApiDoc extends Command {
             } else {
                 $filters = ClString::getBetween($param, 'ClFieldVerify', 'fetchVerifies()');
             }
+//            echo_info('$filters:', $filters);
             $param = str_replace($filters, '', $param);
             if (strpos($param, ',,') === false) {
                 $desc_index = 2;
@@ -451,13 +452,14 @@ class ApiDoc extends Command {
 //                if ($name == 'not_allow_subject_ids') {
 //                    echo_info($name, $filters);
 //                }
-                foreach ($filters as $k_each_filter => $v_each_filter) {
-                    if (strpos($v_each_filter, '$') !== false) {
-                        unset($filters[$k_each_filter]);
-                    }
-                }
+//                foreach ($filters as $k_each_filter => $v_each_filter) {
+//                    if (strpos($v_each_filter, '$') !== false) {
+//                        unset($filters[$k_each_filter]);
+//                    }
+//                }
                 $filters = implode('->', $filters);
                 $filters = '$filters = ClassLibrary\\' . $filters . ";";
+//                echo_info('$filters eval:', $filters);
                 eval($filters);
                 //转换为数组
                 $filters = (array)$filters;

@@ -198,7 +198,7 @@ class {$table_name}BaseApiController extends ApiController {
 <foreach name="fields_update_ready" item="each_update_field">
 
     /**
-     * {$each_update_field['function_desc']}
+     * {$each_update_field['function_desc']}{$wrap_str}
      * @return \think\response\Json|\think\response\Jsonp
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -206,7 +206,7 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function updateField{$each_update_field['function_name']}() {
         $id  = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
-        ${$each_update_field['field_name']} = get_param('{$each_update_field['field_name']}', {$table_name}Model::$fields_verifies['{$each_update_field['field_name']}'], {$table_name}Model::$fields_names['{$each_update_field['field_name']}']);
+        ${$each_update_field['field_name']} = get_param('{$each_update_field['field_name']}', ClFieldVerify::instance()->verifyIsRequire()->verifyMergeConfig({$table_name}Model::$fields_verifies['{$each_update_field['field_name']}'])->fetchVerifies(), {$table_name}Model::$fields_names['{$each_update_field['field_name']}']);
         //更新
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => $id
