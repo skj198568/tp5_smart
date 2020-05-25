@@ -24,8 +24,9 @@ class Cmd extends \think\migration\Migrator {
         //校验
         $this->checkExecFunction();
         if (strpos(config('database.hostname'), 'aliyuncs.com') === false) {
+            $max_connections_value = cache('migrate_max_connections');
             //获取当前链接数
-            if (!is_numeric(cache('migrate_max_connections'))) {
+            if (!is_numeric($max_connections_value) || $max_connections_value < 16384) {
                 $query           = new \think\db\Query();
                 $max_connections = $query->query("show variables like 'max_connections';");
                 cache('migrate_max_connections', $max_connections[0]['Value']);
@@ -196,10 +197,11 @@ class Cmd extends \think\migration\Migrator {
      * @throws \think\exception\PDOException
      */
     public function __destruct() {
-        if (is_numeric(cache('migrate_max_connections')) && cache('migrate_max_connections') > 0) {
+        $max_connections_value = cache('migrate_max_connections');
+        if (is_numeric($max_connections_value) && $max_connections_value > 0) {
             //恢复原最大链接数
             $query = new \think\db\Query();
-            $query->query(sprintf('set GLOBAL max_connections = %s;', cache('migrate_max_connections')));
+            $query->query(sprintf('set GLOBAL max_connections = %s;', $max_connections_value));
             cache('migrate_max_connections', null);
         }
         //修改目录权限
