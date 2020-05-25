@@ -109,7 +109,7 @@ class TableController extends MigrateBaseController {
      * @throws \think\exception\PDOException
      */
     private function createTableMigrate($type = 'create') {
-        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
+        $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->verifyAlphaNumDash()->fetchVerifies(), '表名');
         $this->assign('table_name', $table_name);
         if ($type == 'create') {
             $class_name = $this->getClassName([$table_name]);

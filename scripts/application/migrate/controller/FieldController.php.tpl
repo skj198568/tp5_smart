@@ -47,7 +47,7 @@ class FieldController extends MigrateBaseController {
      */
     public function create() {
         $table_name = get_param('table_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '表名');
-        $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段名');
+        $field_name = get_param('field_name', ClFieldVerify::instance()->verifyIsRequire()->verifyAlphaNumDash()->fetchVerifies(), '字段名');
         get_param('field_desc', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '字段注释');
         $fields = ClArray::getByKeys(input(), $this->all_fields);
         //缓存
