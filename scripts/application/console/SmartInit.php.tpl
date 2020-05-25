@@ -483,7 +483,10 @@ class SmartInit extends Command {
             if (!array_key_exists($table_comment, $table_names)) {
                 $table_names[$table_comment] = $table_name;
             } else {
-                $this->output->error('table_comment:' . $table_comment . ' is exist');
+                if (!isset($comment['partition'])) {
+                    //非分表
+                    $this->output->error('table_comment:' . $table_comment . ' is exist. table_name:' . $table_name);
+                }
             }
         }
         return array_values($table_names);

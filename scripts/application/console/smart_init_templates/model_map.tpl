@@ -146,7 +146,7 @@ class {$table_name_with_format}Map extends BaseModel {
             if (!isset(static::$instances_array[$id])) {
                 static::$instances_array[$id] = new static();
                 //设置分表
-                static::$instances_array[$id]->autoDivideTable(${$table_comment['partition'][0]});
+                static::$instances_array[$id]->autoDivideTable(static::$instances_array[$id], ${$table_comment['partition'][0]});
             }
             return static::$instances_array[$id];
         } else if ($id == -1) {
@@ -577,13 +577,14 @@ class {$table_name_with_format}Map extends BaseModel {
 
     /**
      * 设置分表
+     * @param self $instance
      * @param int ${$table_comment['partition'][0]}<php>echo "\n";</php>
      * @throws \Exception
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */
-    public function autoDivideTable(${$table_comment['partition'][0]} = 0) {
-        $this->is_divide_table = true;
+    public function autoDivideTable(self $instance, ${$table_comment['partition'][0]} = 0) {
+        $instance->is_divide_table = true;
         <if condition="isset($table_comment['partition'][1])">if (!is_numeric(${$table_comment['partition'][0]}) || ${$table_comment['partition'][0]} == 0) {
             exit('{$table_name_with_prefix} instance required valid ${$table_comment['partition'][0]}');
         }
@@ -601,16 +602,16 @@ class {$table_name_with_format}Map extends BaseModel {
             $suffix = '_' . $suffix;
         }
         //分表表名
-        if (substr($this->table, -strlen($suffix), strlen($suffix)) != $suffix) {
-            $source_table_name = $this->table;
+        if (substr($instance->table, -strlen($suffix), strlen($suffix)) != $suffix) {
+            $source_table_name = $instance->table;
             //设置当前表名
-            $this->table .= $suffix;
+            $instance->table .= $suffix;
         } else {
-            $source_table_name = substr($this->table, 0, strlen($this->table) - strlen($suffix));
+            $source_table_name = substr($instance->table, 0, strlen($instance->table) - strlen($suffix));
         }
         //表是否存在
-        if (!$this->tableIsExist($this->table)) {
-            $this->tableCopy($source_table_name, $this->table);
+        if (!$instance->tableIsExist($instance->table)) {
+            $instance->tableCopy($source_table_name, $instance->table);
         }
     }
 </present>
