@@ -162,18 +162,6 @@ class BaseMap extends Query {
     protected static $trigger_update_info = [];
 
     /**
-     * before insert 限制次数，0为不限制次数
-     * @var int
-     */
-    private $trigger_before_insert_called_limit_times = 1;
-
-    /**
-     * before insert 当前调用次数
-     * @var int
-     */
-    private $trigger_before_insert_called_current_times = 0;
-
-    /**
      * after insert 限制次数，0为不限制次数
      * @var int
      */
@@ -184,18 +172,6 @@ class BaseMap extends Query {
      * @var int
      */
     private $trigger_after_insert_called_current_times = 0;
-
-    /**
-     * before update 限制次数，0为不限制次数
-     * @var int
-     */
-    private $trigger_before_update_called_limit_times = 1;
-
-    /**
-     * before update 当前调用次数
-     * @var int
-     */
-    private $trigger_before_update_called_current_times = 0;
 
     /**
      * after update 限制次数，0为不限制次数
@@ -283,14 +259,6 @@ class BaseMap extends Query {
     }
 
     /**
-     * 设置triggerBeforeInsert被调用次数
-     * @param int $limit_times 0/不限制
-     */
-    public function triggerBeforeInsertSetCalledLimitTimes($limit_times = 1) {
-        $this->trigger_before_insert_called_limit_times = $limit_times;
-    }
-
-    /**
      * 在插入之后，处理其他关联业务
      * 如需获取影响的数据:$items = $this->triggerGetItems();
      */
@@ -313,14 +281,6 @@ class BaseMap extends Query {
      */
     protected function triggerBeforeUpdate($info) {
         return $info;
-    }
-
-    /**
-     * 设置triggerBeforeUpdate被调用次数
-     * @param int $limit_times 0/不限制
-     */
-    public function triggerBeforeUpdateSetCalledLimitTimes($limit_times = 1) {
-        $this->trigger_before_update_called_limit_times = $limit_times;
     }
 
     /**
@@ -443,17 +403,9 @@ class BaseMap extends Query {
         }
         //调用预处理
         if ($operate_type == 'insert') {
-            if ($this->trigger_before_insert_called_limit_times == 0 || $this->trigger_before_insert_called_current_times < $this->trigger_before_insert_called_limit_times) {
-                $data = static::triggerBeforeInsert($data);
-                //+1
-                $this->trigger_before_insert_called_current_times++;
-            }
+            $data = static::triggerBeforeInsert($data);
         } else if ($operate_type == 'update') {
-            if ($this->trigger_before_update_called_limit_times == 0 || $this->trigger_before_update_called_current_times < $this->trigger_before_update_called_limit_times) {
-                $data = static::triggerBeforeUpdate($data);
-                //+1
-                $this->trigger_before_update_called_current_times++;
-            }
+            $data = static::triggerBeforeUpdate($data);
             //赋值
             static::$trigger_update_info = $data;
         }
