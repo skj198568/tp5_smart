@@ -72,19 +72,19 @@ class BaseMap extends Query {
      * 不可见字段，去掉view层或接口中的字段
      * @var array
      */
-    protected $fields_invisible = [];
+    protected static $fields_invisible = [];
 
     /**
      * 字段映射
      * @var array
      */
-    protected $fields_show_map_fields = [];
+    protected static $fields_show_map_fields = [];
 
     /**
      * 字段格式化
      * @var array
      */
-    protected $fields_show_format = [];
+    protected static $fields_show_format = [];
 
     /**
      * 字段存储格式
@@ -96,7 +96,7 @@ class BaseMap extends Query {
      * 默认值
      * @var array
      */
-    protected $fields_default_values = [];
+    protected static $fields_default_values = [];
 
     /**
      * 所有字段的注释
@@ -129,7 +129,7 @@ class BaseMap extends Query {
      * 上次插入id
      * @var int
      */
-    protected $last_insert_id = 0;
+    private $last_insert_id = 0;
 
     /**
      * 回调sql

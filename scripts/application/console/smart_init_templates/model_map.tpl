@@ -39,19 +39,19 @@ class {$table_name_with_format}Map extends BaseModel {
      * 不可见字段，去掉view层或接口中的字段
      * @var array
      */
-    protected $fields_invisible = [{$fields_invisible}];
+    protected static $fields_invisible = [{$fields_invisible}];
 
     /**
      * 字段映射
      * @var array
      */
-    protected $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 字段格式化
      * @var array
      */
-    protected $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    protected static $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 字段存储格式
@@ -68,7 +68,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * 默认值
      * @var array
      */
-    protected $fields_default_values = <empty name="fields_default_values">[]<else/>[<foreach name="fields_default_values" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_default_values_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    protected static $fields_default_values = <empty name="fields_default_values">[]<else/>[<foreach name="fields_default_values" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_default_values_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 <present name="table_comment['partition']">
 
     /**
