@@ -20,7 +20,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * 实例对象存放数组
      * @var array
      */
-    protected $instances_array = [];
+    protected static $instances_array = [];
 {$const_fields}
 
     /**
