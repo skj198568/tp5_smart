@@ -17,46 +17,10 @@ use ClassLibrary\ClCache;{$use_content}
 class {$table_name_with_format}Map extends BaseModel {
 
     /**
-     * 上次插入id
-     * @var int
-     */
-    protected static $last_insert_id = 0;
-
-    /**
-     * 回调sql
-     * @var string
-     */
-    protected static $trigger_sql = '';
-
-    /**
-     * 回调ids
-     * @var array
-     */
-    protected static $trigger_id_or_ids = [];
-
-    /**
-     * 回调数据items
-     * @var array
-     */
-    protected static $trigger_items = [];
-
-    /**
-     * 回调更新信息
-     * @var array
-     */
-    protected static $trigger_update_info = [];
-
-    /**
-     * 回调结果items
-     * @var array
-     */
-    protected static $trigger_result_items = [];
-
-    /**
      * 实例对象存放数组
      * @var array
      */
-    protected static $instances_array = [];
+    protected $instances_array = [];
 {$const_fields}
 
     /**
@@ -75,19 +39,19 @@ class {$table_name_with_format}Map extends BaseModel {
      * 不可见字段，去掉view层或接口中的字段
      * @var array
      */
-    protected static $fields_invisible = [{$fields_invisible}];
+    protected $fields_invisible = [{$fields_invisible}];
 
     /**
      * 字段映射
      * @var array
      */
-    protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    protected $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_map_fields_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 字段格式化
      * @var array
      */
-    protected static $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    protected $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n        ";</php>{$key} => {$v}<if condition="$key neq end($fields_show_format_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 
     /**
      * 字段存储格式
@@ -104,7 +68,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * 默认值
      * @var array
      */
-    protected static $fields_default_values = <empty name="fields_default_values">[]<else/>[<foreach name="fields_default_values" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_default_values_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+    protected $fields_default_values = <empty name="fields_default_values">[]<else/>[<foreach name="fields_default_values" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_default_values_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
 <present name="table_comment['partition']">
 
     /**
@@ -297,7 +261,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * @param $id
      * @return bool
      */
-    protected static function getByIdRc(${$table_comment['partition'][0]}, $id) {
+    protected function getByIdRc(${$table_comment['partition'][0]}, $id) {
         return ClCache::remove(${$table_comment['partition'][0]}, $id);
     }
     <else/>
@@ -307,7 +271,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * @param $id
      * @return bool
      */
-    protected static function getByIdRc($id) {
+    protected function getByIdRc($id) {
         return ClCache::remove($id);
     }
 </present>

@@ -72,19 +72,19 @@ class BaseMap extends Query {
      * 不可见字段，去掉view层或接口中的字段
      * @var array
      */
-    protected static $fields_invisible = [];
+    protected $fields_invisible = [];
 
     /**
      * 字段映射
      * @var array
      */
-    protected static $fields_show_map_fields = [];
+    protected $fields_show_map_fields = [];
 
     /**
      * 字段格式化
      * @var array
      */
-    protected static $fields_show_format = [];
+    protected $fields_show_format = [];
 
     /**
      * 字段存储格式
@@ -96,7 +96,7 @@ class BaseMap extends Query {
      * 默认值
      * @var array
      */
-    protected static $fields_default_values = [];
+    protected $fields_default_values = [];
 
     /**
      * 所有字段的注释
@@ -129,37 +129,37 @@ class BaseMap extends Query {
      * 上次插入id
      * @var int
      */
-    protected static $last_insert_id = 0;
+    protected $last_insert_id = 0;
 
     /**
      * 回调sql
      * @var string
      */
-    protected static $trigger_sql = '';
+    private $trigger_sql = '';
 
     /**
      * 回调ids
      * @var array
      */
-    protected static $trigger_id_or_ids = [];
+    private $trigger_id_or_ids = [];
 
     /**
      * 回调数据items
      * @var array
      */
-    protected static $trigger_items = [];
+    private $trigger_items = [];
 
     /**
      * 回调结果items
      * @var array
      */
-    protected static $trigger_result_items = [];
+    private $trigger_result_items = [];
 
     /**
      * 回调更新信息
      * @var array
      */
-    protected static $trigger_update_info = [];
+    private $trigger_update_info = [];
 
     /**
      * after insert 限制次数，0为不限制次数
@@ -235,9 +235,9 @@ class BaseMap extends Query {
      * @param array $items
      */
     private function triggerSet($sql = '', $ids = [], $items = []) {
-        static::$trigger_sql       = $sql;
-        static::$trigger_id_or_ids = $ids;
-        static::$trigger_items     = $items;
+        $this->trigger_sql       = $sql;
+        $this->trigger_id_or_ids = $ids;
+        $this->trigger_items     = $items;
     }
 
     /**
@@ -355,35 +355,35 @@ class BaseMap extends Query {
      * @throws \think\exception\PDOException
      */
     protected function triggerGetItems() {
-        $trigger_key = md5(static::$trigger_sql . json_encode(static::$trigger_id_or_ids) . json_encode(static::$trigger_items));
-        if (isset(self::$trigger_result_items[$trigger_key])) {
-            return self::$trigger_result_items[$trigger_key];
+        $trigger_key = md5($this->trigger_sql . json_encode($this->trigger_id_or_ids) . json_encode($this->trigger_items));
+        if (isset($this->trigger_result_items[$trigger_key])) {
+            return $this->trigger_result_items[$trigger_key];
         }
         $default = [];
-        if (count(static::$trigger_items) > 0) {
-            return static::$trigger_items;
-        } elseif (static::$trigger_sql != '') {
-            $items = $this->query(static::$trigger_sql);
+        if (count($this->trigger_items) > 0) {
+            return $this->trigger_items;
+        } elseif ($this->trigger_sql != '') {
+            $items = $this->query($this->trigger_sql);
             //存储
-            self::$trigger_result_items[$trigger_key] = $items;
+            $this->trigger_result_items[$trigger_key] = $items;
             return $items;
-        } elseif (is_array(static::$trigger_id_or_ids)) {
-            if (empty(static::$trigger_id_or_ids)) {
+        } elseif (is_array($this->trigger_id_or_ids)) {
+            if (empty($this->trigger_id_or_ids)) {
                 return $default;
             }
             $items = $this->where([
-                'id' => ['in', static::$trigger_id_or_ids]
+                'id' => ['in', $this->trigger_id_or_ids]
             ])->select();
             //存储
-            self::$trigger_result_items[$trigger_key] = $items;
+            $this->trigger_result_items[$trigger_key] = $items;
             return $items;
-        } elseif (is_numeric(static::$trigger_id_or_ids)) {
+        } elseif (is_numeric($this->trigger_id_or_ids)) {
             $info  = $this->where([
-                'id' => static::$trigger_id_or_ids
+                'id' => $this->trigger_id_or_ids
             ])->find();
             $items = [$info];
             //存储
-            self::$trigger_result_items[$trigger_key] = $items;
+            $this->trigger_result_items[$trigger_key] = $items;
             return $items;
         } else {
             return $default;
@@ -407,7 +407,7 @@ class BaseMap extends Query {
         } else if ($operate_type == 'update') {
             $data = static::triggerBeforeUpdate($data);
             //赋值
-            static::$trigger_update_info = $data;
+            $this->trigger_update_info = $data;
         }
         //非array数据，不进行处理
         if (!is_array($data) || empty($data)) {
@@ -493,7 +493,7 @@ class BaseMap extends Query {
      */
     public function execute($sql, $bind = []) {
         //清空数据
-        self::$trigger_items = [];
+        $this->trigger_items = [];
         $is_update           = strpos($sql, 'UPDATE') === 0;
         $is_delete           = strpos($sql, 'DELETE') === 0;
         if ($is_update || $is_delete) {
@@ -517,11 +517,11 @@ class BaseMap extends Query {
                 $this->triggerSet($trigger_sql);
                 $this->triggerRemoveCacheCall();
                 if ($this->trigger_after_update_called_limit_times == 0 || $this->trigger_after_update_called_current_times < $this->trigger_after_update_called_limit_times) {
-                    static::triggerAfterUpdate(static::$trigger_update_info);
+                    static::triggerAfterUpdate($this->trigger_update_info);
                     $this->trigger_after_update_called_current_times++;
                 }
                 //清除更新数据
-                static::$trigger_update_info = [];
+                $this->trigger_update_info = [];
             }
             //清除缓存后执行
             ClCache::removeAfter();
@@ -542,9 +542,9 @@ class BaseMap extends Query {
      */
     public function insert(array $data = [], $replace = false, $getLastInsID = true, $sequence = null) {
         //预处理数据
-        $data                   = $this->getDataBeforeExecute($data, 'insert');
-        $last_id                = parent::insert($data, $replace, true, $sequence);
-        static::$last_insert_id = $last_id;
+        $data                 = $this->getDataBeforeExecute($data, 'insert');
+        $last_id              = parent::insert($data, $replace, true, $sequence);
+        $this->last_insert_id = $last_id;
         //设置数据
         $this->triggerSet('', $last_id);
         //处理数据
@@ -568,7 +568,7 @@ class BaseMap extends Query {
     public function getLastInsID($sequence = null) {
         $id = $this->connection->getLastInsID($sequence);
         if (empty($id)) {
-            $id = static::$last_insert_id;
+            $id = $this->last_insert_id;
         }
         return $id;
     }
