@@ -1032,4 +1032,62 @@ class BaseMap extends Query {
         }
     }
 
+    /**
+     * 批量更新
+     * @param array $new_data 新数据数组，例：[['id' => 1, 'price' => 90],['id' => 2, 'price' => 10]]
+     * @param array $old_data 原数据数组，例：[['id' => 1, 'price' => 100],['id' => 2, 'price' => 90]]
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function updateBatch($new_data, $old_data) {
+        if (!is_array($new_data) || !is_array($old_data)) {
+            return;
+        }
+        if (empty($new_data) || empty($old_data)) {
+            return;
+        }
+        $where_ids = array_column($new_data, 'id');
+        $updates   = $this->updateBatchParseData($new_data, $old_data);
+        $where_ids = implode(',', $where_ids);
+        $sql       = sprintf("UPDATE `%s` SET %sWHERE `id` IN (%s)", $this->getTable(), $updates, $where_ids);
+        //执行sql
+        $this->execute($sql);
+    }
+
+    /**
+     * 批量更新 将二维数组转换成CASE WHEN THEN的批量更新条件
+     * @param $new_items
+     * @param $old_items
+     * @return string
+     */
+    private function updateBatchParseData($new_items, $old_items) {
+        $sql  = '';
+        $keys = array_keys(current($new_items));
+        foreach ($keys as $field) {
+            if ($field == 'id') {
+                //忽略主键
+                continue;
+            }
+            $sql .= sprintf("`%s` = \nCASE `%s` \n", $field, $field);
+            foreach ($new_items as $new_item) {
+                foreach ($new_item as $column => $value) {
+                    if ($column == 'id') {
+                        //忽略主键
+                        continue;
+                    }
+                    foreach ($old_items as $old_item) {
+                        foreach ($old_item as $old_column => $old_value) {
+                            if ($column == $old_column && $new_item['id'] == $old_item['id']) {
+                                $sql .= sprintf("WHEN '%s' THEN '%s' \n", $old_value, $value);
+                                break 2;
+                            }
+                        }
+                    }
+                }
+            }
+            $sql .= "END \n,";
+        }
+        return rtrim($sql, ',');
+    }
+
 }
