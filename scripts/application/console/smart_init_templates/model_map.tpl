@@ -79,6 +79,11 @@ class {$table_name_with_format}Map extends BaseModel {
 </present>
 
     /**
+     * 缓存时间
+     */
+    public static $cache_duration = {$table_comment['is_cache']};
+
+    /**
      * 初始化
      */
     public function initialize() {
