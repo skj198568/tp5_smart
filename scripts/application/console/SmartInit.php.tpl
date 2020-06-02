@@ -579,16 +579,18 @@ class SmartInit extends Command {
                 } else {
                     $function_name = ucfirst($function_name);
                 }
-                $fields_config[] = [
-                    'function_desc' => empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'],
-                    'function_name' => $function_name,
-                    'field_name'    => $each['Field'],
-                    'json_return'   => json_encode([
-                        "status"      => 'api/' . $table_name . '/getfieldconfig' . strtolower($function_name) . "/1",
-                        "status_code" => 1,
-                        "items"       => $json_return
-                    ], JSON_UNESCAPED_UNICODE)
-                ];
+                if (in_array('get', $table_comment['create_api'])) {
+                    $fields_config[] = [
+                        'function_desc' => empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'],
+                        'function_name' => $function_name,
+                        'field_name'    => $each['Field'],
+                        'json_return'   => json_encode([
+                            "status"      => 'api/' . $table_name . '/getfieldconfig' . strtolower($function_name) . "/1",
+                            "status_code" => 1,
+                            "items"       => $json_return
+                        ], JSON_UNESCAPED_UNICODE)
+                    ];
+                }
             }
             //添加update只读字段方法
             if (isset($comment['is_read_only'])) {
@@ -604,11 +606,11 @@ class SmartInit extends Command {
                 }
                 $field_comment         = (empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name']);
                 $fields_update_ready[] = [
-                    'function_desc' => '更新字段-' . $field_comment . '（' . $each['Field'] . '）',
-                    'function_name' => $function_name,
-                    'field_name'    => $each['Field'],
-                    'field_name_static'    => 'F_'.strtoupper($each['Field']),
-                    'json_return'   => json_encode([
+                    'function_desc'        => '更新字段-' . $field_comment . '（' . $each['Field'] . '）',
+                    'function_name'        => $function_name,
+                    'field_name'           => $each['Field'],
+                    'field_name_static'    => 'F_' . strtoupper($each['Field']),
+                    'json_return'          => json_encode([
                         "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/1",
                         "status_code" => 1,
                         "info"        => [
@@ -619,7 +621,7 @@ class SmartInit extends Command {
                     'json_return_is_exist' => json_encode([
                         "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/2",
                         "status_code" => 2,
-                        "message"        => "不可重复操作"
+                        "message"     => "不可重复操作"
                     ], JSON_UNESCAPED_UNICODE),
                 ];
             }
