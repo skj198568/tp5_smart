@@ -167,7 +167,7 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function update() {
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
-        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
+        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields(array_merge([{$table_name}Model::F_ID], {$table_name}Model::$fields_read_only))));
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //更新
         {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
@@ -230,7 +230,7 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function updateByIds() {
         $ids    = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键ids数组');
-        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
+        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields(array_merge([{$table_name}Model::F_ID], {$table_name}Model::$fields_read_only))));
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //更新
         {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
