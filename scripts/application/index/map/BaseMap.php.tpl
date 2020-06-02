@@ -961,13 +961,25 @@ class BaseMap extends Query {
      * 校验密码的正确性
      * @param string $db_store_password 数据库存储的真实密码
      * @param string $user_input_password 用户输入的待校验的密码
+     * @param string $field_name 字段名称，如果为空，则从所有字段存储中判断，不为空，则直接获取到存储格式
      * @return bool
      */
-    public static function verifyPassword($db_store_password, $user_input_password) {
-        foreach (static::$fields_store_format as $each_field => $each_field_store_format) {
-            if (is_array($each_field_store_format) && $each_field_store_format[0] == 'password') {
-                if ($db_store_password == md5($user_input_password . $each_field_store_format[1])) {
-                    return true;
+    public static function verifyPassword($db_store_password, $user_input_password, $field_name = '') {
+        if (!empty($field_name)) {
+            if (!isset(static::$fields_store_format[$field_name])) {
+                //不存在存储格式
+                return false;
+            }
+            $store_format = static::$fields_store_format[$field_name];
+            if (is_array($store_format) && $store_format[0] == 'password') {
+                //返回比较结果
+                return $db_store_password == md5($user_input_password . $store_format[1]);
+            }
+        } else {
+            foreach (static::$fields_store_format as $each_field => $each_field_store_format) {
+                if (is_array($each_field_store_format) && $each_field_store_format[0] == 'password') {
+                    //返回比较结果
+                    return $db_store_password == md5($user_input_password . $each_field_store_format[1]);
                 }
             }
         }
