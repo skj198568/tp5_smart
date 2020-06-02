@@ -167,7 +167,7 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function update() {
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
-        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields(array_merge([{$table_name}Model::F_ID], {$table_name}Model::$fields_read_only))));
+        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields(array_merge([{$table_name}Model::F_ID], {$table_name}Model::$fields_read_only)));
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //更新
         {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
@@ -206,17 +206,22 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function updateField{$each_update_field['function_name']}() {
         $id  = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
-        ${$each_update_field['field_name']} = get_param('{$each_update_field['field_name']}', ClFieldVerify::instance()->verifyIsRequire()->verifyMergeConfig({$table_name}Model::$fields_verifies['{$each_update_field['field_name']}'])->fetchVerifies(), {$table_name}Model::$fields_names['{$each_update_field['field_name']}']);
+        ${$each_update_field['field_name']} = get_param({$table_name}Model::{$each_update_field['field_name_static']}, ClFieldVerify::instance()->verifyIsRequire()->verifyMergeConfig({$table_name}Model::$fields_verifies['{$each_update_field['field_name']}'])->fetchVerifies(), {$table_name}Model::$fields_names['{$each_update_field['field_name']}']);
+        //判断是否需要修改
+        $old_{$each_update_field['field_name']} = {$table_name}Model::getValueById($id, {$table_name}Model::{$each_update_field['field_name_static']});
+        if (${$each_update_field['field_name']} == $old_{$each_update_field['field_name']}) {
+            return $this->ar(2, '不可重复操作', '{$each_update_field['json_return_is_exist']}');
+        }
         //更新
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => $id
         ])->setField([
-            '{$each_update_field['field_name']}' => ${$each_update_field['field_name']}{$wrap_str}
+            {$table_name}Model::{$each_update_field['field_name_static']} => ${$each_update_field['field_name']}{$wrap_str}
         ]);
         //获取
         $info = [
-            'id'  => $id,
-            '{$each_update_field['field_name']}' => {$table_name}Model::getValueById($id, '{$each_update_field['field_name']}')
+            {$table_name}Model::F_ID  => $id,
+            {$table_name}Model::{$each_update_field['field_name_static']} => {$table_name}Model::getValueById($id, {$table_name}Model::{$each_update_field['field_name_static']})
         ];
         //拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
@@ -230,7 +235,7 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function updateByIds() {
         $ids    = get_param('ids', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键ids数组');
-        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields(array_merge([{$table_name}Model::F_ID], {$table_name}Model::$fields_read_only))));
+        $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields(array_merge([{$table_name}Model::F_ID], {$table_name}Model::$fields_read_only)));
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //更新
         {$table_name}Model::instance(${$table_comment['partition'][0]})->where([

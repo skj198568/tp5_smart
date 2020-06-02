@@ -607,14 +607,20 @@ class SmartInit extends Command {
                     'function_desc' => '更新字段-' . $field_comment . '（' . $each['Field'] . '）',
                     'function_name' => $function_name,
                     'field_name'    => $each['Field'],
+                    'field_name_static'    => 'F_'.strtoupper($each['Field']),
                     'json_return'   => json_encode([
-                        "status"      => 'api/' . $table_name . '/updateField' . strtolower($function_name) . "/1",
+                        "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/1",
                         "status_code" => 1,
                         "info"        => [
                             'id'           => '主键id',
                             $each['Field'] => $field_comment
                         ]
-                    ], JSON_UNESCAPED_UNICODE)
+                    ], JSON_UNESCAPED_UNICODE),
+                    'json_return_is_exist' => json_encode([
+                        "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/2",
+                        "status_code" => 2,
+                        "message"        => "不可重复操作"
+                    ], JSON_UNESCAPED_UNICODE),
                 ];
             }
             //额外字段
