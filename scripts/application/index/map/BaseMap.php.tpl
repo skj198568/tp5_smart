@@ -735,6 +735,22 @@ class BaseMap extends Query {
     }
 
     /**
+     * 自动拼接域名
+     * @param $value
+     * @return string
+     */
+    public static function autoAppendDomain($value) {
+        if (empty($value)) {
+            return $value;
+        }
+        if (strpos($value, 'http') === 0) {
+            return $value;
+        }
+        //拼接域名
+        return ClHttp::getServerDomain() . $value;
+    }
+
+    /**
      * 字段格式化
      * @param array $items
      * @return array|mixed
@@ -802,26 +818,12 @@ class BaseMap extends Query {
                         if (is_array($field_value)) {
                             //数组存储字段
                             foreach ($field_value as $field_value_key => $field_value_value) {
-                                if (empty($field_value_value)) {
-                                    //忽略
-                                    continue;
-                                }
-                                if (strpos($field_value_value, 'http') !== 0) {
-                                    //需要拼接域名
-                                    $field_value[$field_value_key] = ClHttp::getServerDomain() . $field_value_value;
-                                }
+                                $field_value[$field_value_key] = static::autoAppendDomain($field_value_value);
                             }
                             //覆盖
                             $item[$field_key] = $field_value;
                         } else {
-                            if (empty($field_value)) {
-                                //忽略
-                                continue;
-                            }
-                            if (strpos($field_value, 'http') !== 0) {
-                                //需要拼接域名
-                                $item[$field_key] = ClHttp::getServerDomain() . $field_value;
-                            }
+                            $item[$field_key] = static::autoAppendDomain($field_value);
                         }
                     }
                 }
