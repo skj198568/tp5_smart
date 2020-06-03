@@ -799,9 +799,21 @@ class BaseMap extends Query {
             foreach (static::$fields_append_domain as $append_field) {
                 foreach ($item as $field_key => $field_value) {
                     if ($field_key == $append_field) {
-                        if (strpos($field_value, 'http') !== 0) {
-                            //需要拼接域名
-                            $item[$field_key] = ClHttp::getServerDomain() . $field_value;
+                        if (is_array($field_value)) {
+                            //数组存储字段
+                            foreach ($field_value as $field_value_key => $field_value_value) {
+                                if (strpos($field_value_value, 'http') !== 0) {
+                                    //需要拼接域名
+                                    $field_value[$field_value_key] = ClHttp::getServerDomain() . $field_value_value;
+                                }
+                            }
+                            //覆盖
+                            $item[$field_key] = $field_value;
+                        } else {
+                            if (strpos($field_value, 'http') !== 0) {
+                                //需要拼接域名
+                                $item[$field_key] = ClHttp::getServerDomain() . $field_value;
+                            }
                         }
                     }
                 }
