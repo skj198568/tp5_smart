@@ -765,7 +765,7 @@
                 responseHandler: function (r) {
                     //处理显示
                     $.each(r.items, function (k, v) {
-                        $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_field, v_field) {
+                        $.each(table_info.common_settings.$model, function (k_field, v_field) {
                             if (!v.hasOwnProperty(v_field)) {
                                 if (v_field == 'visible') {
                                     v[v_field] = 1;
@@ -964,6 +964,19 @@
                     {
                         field: 'is_read_only',
                         title: '只读',
+                        visible: false,
+                        formatter: function (value, row, index) {
+                            if (value == 0) {
+                                value = '<span class="text-danger">否</span>';
+                            } else {
+                                value = '<span class="text-primary">是</span>';
+                            }
+                            return value;
+                        }
+                    },
+                    {
+                        field: 'append_domain',
+                        title: '自动拼接域名',
                         visible: false,
                         formatter: function (value, row, index) {
                             if (value == 0) {
