@@ -38,7 +38,8 @@ class FieldController extends MigrateBaseController {
         'show_map_fields',
         'show_format',
         'store_format',
-        'verifies'
+        'verifies',
+        'append_domain',
     ];
 
     /**

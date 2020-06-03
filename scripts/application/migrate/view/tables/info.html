@@ -265,7 +265,12 @@
                                                                     style="margin-left: 0.5em;cursor: pointer;"
                                                                     data-toggle="tooltip"
                                                                     data-placement="top"
-                                                                    title="不可在接口的create方法中创建也不可在update方法中修改，只可在其他后台方法内处理"></i>
+                                                                    title="不可在接口的create方法中创建也不可在update方法中修改，只可在其他后台方法内处理"></i>，append_domain
+                            / <span class="text-danger">自动拼接域名</span><i class="fa fa-question-circle"
+                                                                        style="margin-left: 0.5em;cursor: pointer;"
+                                                                        data-toggle="tooltip"
+                                                                        data-placement="top"
+                                                                        title="资源型字段自动拼接域名"></i>
                         </p>
                     </div>
                     <div class="form-group">
@@ -999,7 +1004,7 @@
         //校验器 ['is_required', 'email', 'mobile', 'ip', 'postcode', 'id_card', 'chinese', 'chinese_alpha', 'chinese_alpha_num', 'chinese_alpha_num_dash', 'alpha', 'alpha_num', 'alpha_num_dash', 'url', 'number', 'array', 'tel', 'is_date', 'unique', 'is_domain', 'store_format_json', 'store_format_password']
         verifies: ['is_required', 'ip', 'postcode', 'id_card', 'number', 'tel', 'is_date', 'unique'],
         verifies_selected: [],
-        common_settings: ['visible', 'is_sortable', 'is_searchable', 'is_read_only'],
+        common_settings: ['visible', 'is_sortable', 'is_searchable', 'is_read_only', 'append_domain'],
         common_settings_selected: ['visible'],
         password: 0,
         password_min_length: 6,
@@ -1330,7 +1335,7 @@
                     });
                     //清空
                     table_info.common_settings_selected.clear();
-                    $.each(['visible', 'is_sortable', 'is_searchable', 'is_read_only'], function (k_common_settings, v_common_settings) {
+                    $.each(table_info.common_settings.$model, function (k_common_settings, v_common_settings) {
                         if (v.hasOwnProperty(v_common_settings) && v[v_common_settings] == 1) {
                             table_info.common_settings_selected.push(v_common_settings);
                         }

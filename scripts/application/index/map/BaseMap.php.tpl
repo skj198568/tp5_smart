@@ -10,6 +10,7 @@ namespace app\index\map;
 use ClassLibrary\ClArray;
 use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
+use ClassLibrary\ClHttp;
 use ClassLibrary\ClString;
 use ClassLibrary\ClVerify;
 use think\db\Connection;
@@ -97,6 +98,12 @@ class BaseMap extends Query {
      * @var array
      */
     protected static $fields_default_values = [];
+
+    /**
+     * 拼接域名
+     * @var array
+     */
+    protected static $fields_append_domain = [];
 
     /**
      * 所有字段的注释
@@ -784,6 +791,17 @@ class BaseMap extends Query {
                                     break;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            //拼接域名
+            foreach (static::$fields_append_domain as $append_field) {
+                foreach ($item as $field_key => $field_value) {
+                    if ($field_key == $append_field) {
+                        if (strpos($field_value, 'http') !== 0) {
+                            //需要拼接域名
+                            $item[$field_key] = ClHttp::getServerDomain() . $field_value;
                         }
                     }
                 }

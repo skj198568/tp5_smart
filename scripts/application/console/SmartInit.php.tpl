@@ -218,6 +218,8 @@ class SmartInit extends Command {
         $fields_names = [];
         //默认值
         $fields_default_values = [];
+        //拼接域名
+        $fields_append_domain = [];
         foreach ($table_info as $k => $each) {
             $all_fields[] = 'self::F_' . strtoupper($each['Field']);
             if ($each['Field'] == 'id') {
@@ -320,6 +322,10 @@ class SmartInit extends Command {
             if (in_array(strtolower($each['Type']), ['text', 'mediumtext', 'longtext'])) {
                 $fields_default_values['self::F_' . strtoupper($each['Field'])] = '';
             }
+            //拼接域名
+            if (isset($field_comment['append_domain'])) {
+                $fields_append_domain[] = 'self::F_' . strtoupper($each['Field']);
+            }
         }
         //校验器
         $fields_verifies_string = '';
@@ -370,6 +376,7 @@ class SmartInit extends Command {
                 'fields_names_keys'             => array_keys($fields_names),
                 'fields_default_values'         => $fields_default_values,
                 'fields_default_values_keys'    => array_keys($fields_default_values),
+                'fields_append_domain'          => empty($fields_append_domain) ? '' : implode(', ', $fields_append_domain),
                 'use_content'                   => $use_content,
                 'functions_content'             => $functions_content,
                 'cache_remove_trigger_content'  => $cache_remove_trigger_content,

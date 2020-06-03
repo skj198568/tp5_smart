@@ -20,6 +20,11 @@ ClMigrateField::instance()
         ->isReadOnly()
     </if>
 </present>
+<present name="field_info['append_domain']">
+    <if condition="$field_info['append_domain']">
+        ->appendDomain()
+    </if>
+</present>
 <present name="field_info['const_values']">
     <notempty name="field_info['const_values']">
         ->constValues({:is_array($field_info['const_values']) ? trim(json_encode($field_info['const_values'], JSON_UNESCAPED_UNICODE), '"') : $field_info['const_values']}

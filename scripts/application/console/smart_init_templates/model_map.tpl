@@ -69,6 +69,12 @@ class {$table_name_with_format}Map extends BaseModel {
      * @var array
      */
     protected static $fields_default_values = <empty name="fields_default_values">[]<else/>[<foreach name="fields_default_values" item="v"><php>echo "\n        ";</php>{$key} => '{$v}'<if condition="$key neq end($fields_default_values_keys)">,</if></foreach><php>echo "\n    ";</php>]</empty>;
+
+    /**
+     * 拼接域名
+     * @var array
+     */
+    protected static $fields_append_domain = [{$fields_append_domain}];
 <present name="table_comment['partition']">
 
     /**
