@@ -127,10 +127,10 @@ class BaseMap extends Query {
     const V_OPERATE_TYPE_UPDATE = 'update';
 
     /**
-     * 是否在备份数据
+     * 是否可执行before trigger，备份数据不执行beforeInsert和beforeUpdate
      * @var bool
      */
-    public static $is_back_data = false;
+    protected $is_can_exec_before_trigger = true;
 
     /**
      * 上次插入id
@@ -405,7 +405,7 @@ class BaseMap extends Query {
      */
     private function getDataBeforeExecute($data, $operate_type) {
         //如果是备份数据，则忽略数据的处理及校验
-        if (static::$is_back_data) {
+        if ($this->is_can_exec_before_trigger) {
             return $data;
         }
         //调用预处理
@@ -1140,6 +1140,28 @@ class BaseMap extends Query {
             $sql .= "END \n,";
         }
         return rtrim($sql, ',');
+    }
+
+    /**
+     * 设置迁移数据状态，不可执行before和after动作
+     */
+    public function setMoveDataBegin() {
+        $this->is_can_exec_before_trigger = false;
+        self::triggerAfterInsertSetCalledLimitTimes(-1);
+        self::triggerAfterUpdateSetLimitCalledTimes(-1);
+        self::triggerAfterDeleteSetLimitCalledTimes(-1);
+        self::triggerRemoveCacheSetCalledLimitTimes(-1);
+    }
+
+    /**
+     * 设置迁移数据状态，恢复可执行before和after动作
+     */
+    public function setMoveDataEnd() {
+        $this->is_can_exec_before_trigger = true;
+        self::triggerAfterInsertSetCalledLimitTimes(1);
+        self::triggerAfterUpdateSetLimitCalledTimes(1);
+        self::triggerAfterDeleteSetLimitCalledTimes(1);
+        self::triggerRemoveCacheSetCalledLimitTimes(1);
     }
 
 }

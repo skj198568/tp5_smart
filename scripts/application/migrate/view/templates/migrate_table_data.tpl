@@ -13,7 +13,7 @@ class {$class_name} extends Cmd {
         //释放数据表信息，防止表结构修改导致的错误
         {$model_name}::tableInfoFree();
         //设置状态
-        {$model_name}::$is_back_data = true;
+        {$model_name}::instance()->setMoveDataBegin();
         //清空
         {$model_name}::instance()->execute('TRUNCATE TABLE `' . config('database.prefix') . '{$table_name}`');
         //db存储文件

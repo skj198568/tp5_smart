@@ -15,7 +15,7 @@ class AreaData20181031155109 extends Cmd {
         //释放数据表信息，防止表结构修改导致的错误错误
         AreaModel::tableInfoFree();
         //设置状态
-        AreaModel::$is_back_data = true;
+        AreaModel::instance()->setMoveDataBegin();
         //清空
         AreaModel::instance()->execute('TRUNCATE TABLE `' . config('database.prefix') . 'area`');
         //db存储文件
