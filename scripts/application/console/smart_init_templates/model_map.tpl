@@ -378,7 +378,7 @@ class {$table_name_with_format}Map extends BaseModel {
             return [];
         }
         if (is_numeric($duration)) {
-            $items = static::getItemsByIds(${$table_comment['partition'][0]}, $ids, [], $duration);
+            $items = static::getItemsByIds(${$table_comment['partition'][0]}, $ids, '', self::V_ORDER_ASC, [], $duration);
             if (!empty($items)) {
                 $items = array_column($items, $field);
             }
@@ -413,7 +413,7 @@ class {$table_name_with_format}Map extends BaseModel {
             return [];
         }
         if (is_numeric($duration)) {
-            $items = static::getItemsByIds($ids, [], $duration);
+            $items = static::getItemsByIds($ids, '', self::V_ORDER_ASC, [], $duration);
             if (!empty($items)) {
                 $items = array_column($items, $field);
             }
