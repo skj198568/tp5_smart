@@ -405,7 +405,7 @@ class BaseMap extends Query {
      */
     private function getDataBeforeExecute($data, $operate_type) {
         //如果是备份数据，则忽略数据的处理及校验
-        if ($this->is_can_exec_before_trigger) {
+        if (!$this->is_can_exec_before_trigger) {
             return $data;
         }
         //调用预处理
