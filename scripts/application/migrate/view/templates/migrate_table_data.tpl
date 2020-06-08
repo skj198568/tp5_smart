@@ -42,7 +42,7 @@ class {$class_name} extends Cmd {
         }
         fclose($f_handle);
         //恢复状态
-        {$model_name}::$is_back_data = false;
+        {$model_name}::instance()->setMoveDataEnd();
     }
 
 }

@@ -39,7 +39,7 @@ class AreaData20181031155109 extends Cmd {
         }
         fclose($f_handle);
         //回复状态
-        AreaModel::$is_back_data = false;
+        AreaModel::instance()->setMoveDataEnd();
     }
 
 }
