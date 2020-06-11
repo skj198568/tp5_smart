@@ -555,7 +555,6 @@ var jCommon = {
                     wi = factor[i];
                     sum += ai * wi;
                 }
-                var last = parity[sum % 11];
                 if (parity[sum % 11] !== code[17]) {
                     tip = "校验位错误";
                     pass = false;
