@@ -746,8 +746,15 @@ class BaseMap extends Query {
         if (strpos($value, 'http') === 0) {
             return $value;
         }
-        //拼接域名
-        return ClHttp::getServerDomain() . $value;
+        $domain = ClHttp::getServerDomain();
+        if (!ClVerify::hasHtmlTag($value)) {
+            //单条记录，拼接域名
+            $value = $domain . $value;
+        } else {
+            //富文本内容，批量替换
+            $value = str_replace(['src="/', 'href="/'], ['src="' . $domain . '/', 'href="' . $domain . '/'], $value);
+        }
+        return $value;
     }
 
     /**
