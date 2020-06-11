@@ -743,11 +743,11 @@ class BaseMap extends Query {
         if (empty($value)) {
             return $value;
         }
-        if (strpos($value, 'http') === 0) {
-            return $value;
-        }
         $domain = ClHttp::getServerDomain();
         if (!ClVerify::hasHtmlTag($value)) {
+            if (strpos($value, 'http') === 0) {
+                return $value;
+            }
             //单条记录，拼接域名
             $value = $domain . $value;
         } else {
