@@ -37,6 +37,12 @@ class BaseApiController extends Controller {
     ];
 
     /**
+     * 被锁的key，防止用户多次请求
+     * @var array
+     */
+    protected $locked_key = [];
+
+    /**
      * 初始化函数
      */
     public function _initialize() {
@@ -44,6 +50,31 @@ class BaseApiController extends Controller {
         if (App::$debug) {
             log_info('input:', input());
         }
+        $id = input('id', 0);
+        if ($id > 0) {
+            //存在id
+            $lock_key          = $this->getLockKey($id);
+            $last_request_time = cache($lock_key);
+            //同一时间请求
+            if ($last_request_time !== false) {
+                $response = $this->ar(-4, '请勿重复请求');
+                $response->send();
+                exit;
+            }
+            //缓存
+            cache($lock_key, time(), 60);
+            //存储
+            $this->locked_key[] = $lock_key;
+        }
+    }
+
+    /**
+     * 获取lock key
+     * @param $id
+     * @return string
+     */
+    protected function getLockKey($id) {
+        return implode('_', [request()->module(), request()->controller(), request()->action(), $id]);
     }
 
     /**
@@ -67,6 +98,10 @@ class BaseApiController extends Controller {
         $status = implode('', $status);
         $status = str_replace('/_', '/', $status);
         $data   = is_array($data) ? $data : ['message' => $data];
+        //清掉locked_key
+        foreach ($this->locked_key as $each_locked_key) {
+            cache($each_locked_key, null);
+        }
         return json_return(array_merge([
             'status'      => $status,
             'status_code' => $code
