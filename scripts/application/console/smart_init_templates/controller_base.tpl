@@ -45,7 +45,7 @@ class {$table_name}BaseApiController extends ApiController {
             $return['items'] = {$table_name}Model::forShow($return['items']);
             //返回
             return $return;
-        }, [], PAGES_NUM, {$table_name}Model::$cache_duration), static::getListReturnExample());
+        }), static::getListReturnExample());
     }
         <else/>$where = [];
         return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($return) {
@@ -53,7 +53,7 @@ class {$table_name}BaseApiController extends ApiController {
             $return['items'] = {$table_name}Model::forShow($return['items']);
             //返回
             return $return;
-        }, [], PAGES_NUM, {$table_name}Model::$cache_duration), static::getListReturnExample());
+        }), static::getListReturnExample());
     }
     </present>
 
