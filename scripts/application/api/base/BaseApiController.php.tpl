@@ -145,7 +145,7 @@ class BaseApiController extends Controller {
         }
         //列表
         $return['items'] = $model_instance
-            ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)
+            ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, $duration, 'items'], $duration)
             ->where($where)
             ->field($model_instance::getAllFields($exclude_fields))
             ->order($order_array)
@@ -157,24 +157,37 @@ class BaseApiController extends Controller {
             $total_count = null;
             if ($duration > 0) {
                 //尝试从缓存中获取
-                $total_key   = ClCache::createKeyByParams($where, $exclude_fields, $order, $offset, $limit, 'total');
+                $total_key   = ClCache::createKeyByParams([$where, $exclude_fields, $order, $offset, $limit, $duration, 'total']);
                 $total_count = cache($total_key);
+                if ($total_count === false) {
+                    $total_count = null;
+                }
             }
             if ($total_count == null) {
                 //上次sql
                 $last_sql = $model_instance->getLastSql();
+                if (strpos($last_sql, 'SELECT ') === false) {
+                    //sql不正确，则拼接一次sql
+                    $last_sql = $model_instance
+                        ->where($where)
+                        ->field($model_instance::getAllFields($exclude_fields))
+                        ->order($order_array)
+                        ->limit($offset, $limit)
+                        ->fetchSql(true)
+                        ->select();
+                }
                 //拼接total sql
-                $total_sql = 'SELECT COUNT(*) FROM ' . ClString::getBetween($last_sql, 'FROM ', ' ORDER', false);
+                $total_sql = 'SELECT COUNT(1) AS all_count FROM ' . ClString::getBetween($last_sql, 'FROM ', ' ORDER', false);
                 //获取总数
-                $total_count = $model_instance->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $offset, $limit, 'items'], $duration)->query($total_sql);
+                $total_count = $model_instance->query($total_sql);
                 if (empty($total_count)) {
                     $total_count = 0;
                 } else {
-                    $total_count = $total_count[0]['COUNT(*)'];
+                    $total_count = $total_count[0]['all_count'];
                 }
                 if ($duration > 0) {
                     //存储，多加10秒进行时间差保障
-                    cache($total_key, $total_count, $duration + 10);
+                    cache($total_key, $total_count, $duration);
                 }
             }
             $return['total'] = $total_count;
