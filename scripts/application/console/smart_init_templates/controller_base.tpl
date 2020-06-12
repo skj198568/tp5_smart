@@ -130,19 +130,24 @@ class {$table_name}BaseApiController extends ApiController {
      */
     public function create() {
         $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
+	    if (empty($fields)) {
+            return $this->ar(2, '提交的数据不可为空');
+        }
         <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //创建
-        {$table_name}Model::instance(${$table_comment['partition'][0]})->insert(${$table_comment['partition'][0]}, $fields);
-        //获取
-        $info = {$table_name}Model::getById(${$table_comment['partition'][0]}, {$table_name}Model::instance(${$table_comment['partition'][0]})->getLastInsID());
+        $last_insert_id = {$table_name}Model::instance(${$table_comment['partition'][0]})->insert(${$table_comment['partition'][0]}, $fields);
         <else/>//创建
-        {$table_name}Model::instance()->insert($fields);
-        //获取
-        $info = {$table_name}Model::getById({$table_name}Model::instance()->getLastInsID());
+        $last_insert_id = {$table_name}Model::instance()->insert($fields);             
         </present>//拼接额外字段 & 格式化相关字段
-        if (empty($info)) {
-            return $this->ar(2, '数据已存在');
+        if (empty($last_insert_id)) {
+            return $this->ar(2, '数据新增失败');
         } else {
+            <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');        
+            //获取
+            $info = {$table_name}Model::getById(${$table_comment['partition'][0]}, $last_insert_id);
+            <else/>//获取
+            $info = {$table_name}Model::getById($last_insert_id);
+            </present>//拼接额外字段 & 格式化相关字段
             $info = {$table_name}Model::forShow($info);
             return $this->ar(1, ['info' => $info], static::createReturnExample());
         }
