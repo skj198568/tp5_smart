@@ -74,14 +74,6 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
     if (strpos($desc, ',') !== false) {
         exit(sprintf('%s含有非法字符","，请改成中文"，"', $desc));
     }
-    //如果默认值为int类型，则过滤器则要添加floatval
-    if ($default !== null) {
-        if (is_numeric($default)) {
-            if (strpos($filter, 'floatval') === false) {
-                $filter .= ',floatval';
-            }
-        }
-    }
     try {
         $value = input($key, $default, $filter);
     } catch (\InvalidArgumentException $exception) {
@@ -95,6 +87,14 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
     //校验参数
     if (is_null($value) || $value !== $default) {
         \ClassLibrary\ClFieldVerify::verifyFields([$key => $value], [$key => $verifies]);
+    }
+    //如果默认值为数字类型，则需要过滤
+    if ($default !== null) {
+        if (is_numeric($default)) {
+            if (strpos($filter, 'floatval') === false) {
+                $value = floatval($value);
+            }
+        }
     }
     return $value;
 }
