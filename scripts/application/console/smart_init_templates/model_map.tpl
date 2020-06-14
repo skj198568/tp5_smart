@@ -213,7 +213,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getById(${$table_comment['partition'][0]}, $id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
-        if (empty($id)) {
+        if (!is_numeric($id)) {
             return [];
         }
         if (is_numeric($duration)) {
@@ -245,7 +245,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getById($id, $exclude_fields = [], $duration = {$table_comment['is_cache']}) {
-        if (empty($id)) {
+        if (!is_numeric($id)) {
             return [];
         }
         if (is_numeric($duration)) {
@@ -302,7 +302,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getValueById(${$table_comment['partition'][0]}, $id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
-        if (empty($id)) {
+        if (!is_numeric($id)) {
             return null;
         }
         if (is_numeric($duration)) {
@@ -338,7 +338,7 @@ class {$table_name_with_format}Map extends BaseModel {
      * @throws \think\exception\DbException
      */
     public static function getValueById($id, $field, $default = '', $is_convert_to_int = false, $duration = {$table_comment['is_cache']}) {
-        if (empty($id)) {
+        if (!is_numeric($id)) {
             return null;
         }
         if (is_numeric($duration)) {
