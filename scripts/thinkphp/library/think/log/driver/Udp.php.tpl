@@ -16,26 +16,41 @@ use ClassLibrary\ClHttp;
  * Class Udp
  * @package think\log\driver
  */
-class Udp {
+class Udp extends File {
 
     /**
-     * 日志写入接口
-     * @access public
-     * @param string $log 日志信息
+     * 日志写入
+     * @access protected
+     * @param array $message 日志信息
+     * @param string $destination 日志文件
+     * @param bool $apart 是否独立文件写入
+     * @param bool $append 是否追加请求信息
      * @return bool
      */
-    public function save($log) {
+    protected function write($message, $destination, $apart = false, $append = false) {
         $report_address = config('REMOTE_UDP_LOG_ADDRESS');
         if (empty($report_address)) {
             exit('please config `REMOTE_UDP_LOG_ADDRESS`');
         }
+        // 日志信息封装
+        $info['timestamp'] = date($this->config['time_format']);
+        foreach ($message as $type => $msg) {
+            $info[$type] = is_array($msg) ? implode("\r\n", $msg) : $msg;
+        }
+        if (PHP_SAPI == 'cli') {
+            $message = $this->parseCliLog($info);
+        } else {
+            // 添加调试日志
+            $this->getDebugLog($info, $append, $apart);
+            $message = $this->parseLog($info);
+        }
         //添加域名、ip
-        $log    = ClHttp::getServerDomain() . ' ' . request()->ip() . "\n" . $log;
-        $socket = stream_socket_client($report_address);
+        $message = ClHttp::getServerDomain(false) . ' ' . request()->ip() . "\n" . $message;
+        $socket  = stream_socket_client($report_address);
         if (!$socket) {
             return false;
         }
-        return stream_socket_sendto($socket, $log) == strlen($log);
+        return stream_socket_sendto($socket, $message) == strlen($message);
     }
 
 }
