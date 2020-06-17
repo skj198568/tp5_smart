@@ -2,9 +2,11 @@
      * 处理任务
      * @param int $id 执行的id
      * @return bool
+     * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
     public static function deal($id = 0) {
         //处理数据
@@ -51,6 +53,15 @@
             if ($id > 0) {
                 echo_info('task-error', $error_msg);
             }
+        }
+        //清除部分历史数据
+        $length = 10000;
+        if ($item[self::F_ID] > $length) {
+            self::instance()->where([
+                self::F_ID         => ['lt', $item[self::F_ID] - $length],
+                self::F_START_TIME => ['gt', 0],
+                self::F_END_TIME   => ['gt', 0]
+            ])->delete();
         }
         //结束
         log_info('task-end-' . $item[self::F_ID]);
