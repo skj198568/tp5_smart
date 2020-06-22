@@ -49,6 +49,8 @@ class BaseApiController extends Controller {
         parent::_initialize();
         if (App::$debug) {
             log_info('input:', input());
+            ini_set('display_errors', 'On');
+            ini_set("error_reporting", E_ALL);
         }
         $id = input('id', 0);
         if ($id > 0) {
