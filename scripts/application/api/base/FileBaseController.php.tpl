@@ -47,7 +47,17 @@ class FileBaseController extends ApiController {
         if ($png2jpg) {
             $result['file'] = ClImage::png2jpg($result['file']);
         }
-        return $this->ar(1, $result, '{"status":"api\/file\/uploadfile\/1","status_code":1,"result":true,"msg":"上传成功","file":"\/upload\/2018\/03\/06\/104945_2748152867.xlsx"}');
+        $is_append_domain = get_param('is_append_domain', ClFieldVerify::instance()->verifyInArray([0, 1])->fetchVerifies(), '返回文件地址是否拼接域名，0/否，1/是，默认0', 0);
+        if ($is_append_domain) {
+            $result['file'] = ClHttp::getServerDomain() . $result['file'];
+        }
+        $return_type = get_param('return_type', ClFieldVerify::instance()->verifyInArray(['json', 'file_url'])->fetchVerifies(), '返回类型，默认json', 'json');
+        if ($return_type == 'file_url') {
+            //直接返回文件内容
+            return $result['file'];
+        } else {
+            return $this->ar(1, $result, '{"status":"api\/file\/uploadfile\/1","status_code":1,"result":true,"msg":"上传成功","file":"\/upload\/2018\/03\/06\/104945_2748152867.xlsx"}');
+        }
     }
 
     /**
