@@ -77,7 +77,7 @@ class ApiDoc extends Command {
         $api      = [];
 //        echo_info('$files:', $files);
         foreach ($files as $each_file) {
-//            if (strpos($each_file, '/UserC') === false) {
+//            if (strpos($each_file, '/Admin') === false) {
 //                continue;
 //            }
             $output->info($each_file);
@@ -105,7 +105,7 @@ class ApiDoc extends Command {
             $class_doc = $this->getClassDoc($each_file);
 //            echo_info('$class_doc:', $class_doc);
             foreach ($methods as $each_method) {
-//                if ($each_method->name !== 'updateFieldPid') {
+//                if ($each_method->name !== 'create') {
 //                    continue;
 //                }
 //                echo_info($each_method->name, $each_method->class);
@@ -508,22 +508,18 @@ class ApiDoc extends Command {
         }
         //获取model静态方法获取参数
         $function_content_array = explode("\n", $function_content);
+//        echo_info($function_content_array);
         foreach ($function_content_array as $each_line) {
             if (strpos($each_line, '::getAllFields') !== false) {
-                $each_line_array = ClString::parseToArray(str_replace('=', ',', $each_line), ',', ')');
-//                echo_info($each_line_array);
-                $params_functions = '';
-                foreach ($each_line_array as $each_line_item) {
-                    if (strpos($each_line_item, '::getAllFields') !== false) {
-                        $params_functions = trim(trim(trim($each_line_item, ';'), ','));
-                        break;
-                    }
-                }
+                $class_name     = ClString::getBetween($each_line, ',', '::getAllFields', false);
+                $field_begin    = $class_name . '::getAllFields';
+                $field_exec_str = ClString::getBetween($each_line, $field_begin);
+                $field_exec_str = ClString::getBetween($field_exec_str, '', ');', false);
+//                echo_info($field_exec_str);
 //                while(strpos($params_functions, ',') !== false){
 //                    $params_functions = ClString::getBetween($params_functions, ',', '', false);
 //                }
 //                echo_info('1', $params_functions);
-                $class_name                    = ClString::getBetween($params_functions, '', '::', false);
                 $class_name_with_namespace     = $this->getWithNameSpace($class_file_absolute_url, $class_name);
                 $class_const_file_absolute_url = $this->getFileAbsoluteUrlByNamespace($class_name_with_namespace);
                 //替换为map文件
@@ -540,7 +536,7 @@ class ApiDoc extends Command {
                 }
                 $class_const_content = array_values($class_const_content);
 //                    le_info($class_const_content);
-                $params_functions = str_replace($class_name, $class_name_with_namespace, $params_functions);
+                $params_functions = str_replace($class_name, $class_name_with_namespace, $field_exec_str);
 //                echo_info(sprintf('$params=%s;', $params_functions));
                 eval(sprintf('$params=%s;', $params_functions));
                 $fields_verifies = sprintf('%s::$fields_verifies', $class_name_with_namespace);
@@ -554,7 +550,7 @@ class ApiDoc extends Command {
 //                    echo_info($fields_read_only);
 //                }
                 if (!empty($fields_read_only)) {
-                    if (in_array($method->name, ['create', 'update'])) {
+                    if (in_array($method->name, ['update'])) {
                         foreach ($params as $k_each => $each_param) {
                             //忽略只读参数
                             if (in_array($each_param, (array)$fields_read_only)) {
