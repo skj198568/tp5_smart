@@ -556,6 +556,36 @@ class SmartInit extends Command {
                     $comment = ['name' => $comment];
                 }
             }
+            //添加update只读字段方法
+            if (isset($comment['is_read_only'])) {
+                $function_name = $each['Field'];
+                if (strpos($function_name, '_') !== false) {
+                    $function_name = explode('_', $function_name);
+                    array_walk($function_name, function (&$each) {
+                        $each = ucfirst($each);
+                    });
+                    $function_name = implode('', $function_name);
+                } else {
+                    $function_name = ucfirst($function_name);
+                }
+                $field_comment         = (empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name']);
+                $fields_update_ready[] = [
+                    'function_desc'        => '更新字段-' . $field_comment . '（' . $each['Field'] . '）',
+                    'function_name'        => $function_name,
+                    'field_name'           => $each['Field'],
+                    'field_name_static'    => 'F_' . strtoupper($each['Field']),
+                    'json_return'          => [
+                        "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/1",
+                        "status_code" => 1,
+                        "info"        => []
+                    ],
+                    'json_return_is_exist' => json_encode([
+                        "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/2",
+                        "status_code" => 2,
+                        "message"     => "不可重复操作"
+                    ], JSON_UNESCAPED_UNICODE),
+                ];
+            }
             //如果是不可见字段，则忽略
             if (isset($comment['visible']) && $comment['visible'] == 0) {
                 continue;
@@ -610,36 +640,6 @@ class SmartInit extends Command {
                 foreach ($comment['show_format'] as $each_field) {
                     $info[$each['Field'] . $each_field[1]] = $comment['name'];
                 }
-            }
-            //添加update只读字段方法
-            if (isset($comment['is_read_only'])) {
-                $function_name = $each['Field'];
-                if (strpos($function_name, '_') !== false) {
-                    $function_name = explode('_', $function_name);
-                    array_walk($function_name, function (&$each) {
-                        $each = ucfirst($each);
-                    });
-                    $function_name = implode('', $function_name);
-                } else {
-                    $function_name = ucfirst($function_name);
-                }
-                $field_comment         = (empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name']);
-                $fields_update_ready[] = [
-                    'function_desc'        => '更新字段-' . $field_comment . '（' . $each['Field'] . '）',
-                    'function_name'        => $function_name,
-                    'field_name'           => $each['Field'],
-                    'field_name_static'    => 'F_' . strtoupper($each['Field']),
-                    'json_return'          => [
-                        "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/1",
-                        "status_code" => 1,
-                        "info"        => []
-                    ],
-                    'json_return_is_exist' => json_encode([
-                        "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/2",
-                        "status_code" => 2,
-                        "message"     => "不可重复操作"
-                    ], JSON_UNESCAPED_UNICODE),
-                ];
             }
         }
         foreach ($fields_update_ready as $k_field_update => $each_field_update) {
