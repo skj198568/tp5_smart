@@ -262,6 +262,27 @@ class BaseMap extends Query {
      * @return array
      */
     protected function triggerBeforeInsert($info) {
+        return $this->triggerBeforeDealDataForAppend($info);
+    }
+
+    /**
+     * 处理拼接字段
+     * @param $info
+     * @return mixed
+     */
+    private function triggerBeforeDealDataForAppend($info) {
+        foreach ($info as $k_info => $v_info) {
+            if (in_array($k_info, static::$fields_append_domain)) {
+                if (is_array($v_info)) {
+                    foreach ($v_info as $k_v_info => $v_v_info) {
+                        $v_info[$k_v_info] = str_replace(ClHttp::getServerDomain(), '', $v_v_info);
+                    }
+                    $info[$k_info] = $v_info;
+                } else {
+                    $info[$k_info] = str_replace(ClHttp::getServerDomain(), '', $v_info);
+                }
+            }
+        }
         return $info;
     }
 
@@ -287,7 +308,7 @@ class BaseMap extends Query {
      * @return array
      */
     protected function triggerBeforeUpdate($info) {
-        return $info;
+        return $this->triggerBeforeDealDataForAppend($info);
     }
 
     /**
