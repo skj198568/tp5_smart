@@ -213,24 +213,43 @@ class {$table_name}BaseApiController extends ApiController {
         $id  = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id');
         ${$each_update_field['field_name']} = get_param({$table_name}Model::{$each_update_field['field_name_static']}, ClFieldVerify::instance()->verifyIsRequire()->verifyMergeConfig({$table_name}Model::$fields_verifies[{$table_name}Model::{$each_update_field['field_name_static']}])->fetchVerifies(), {$table_name}Model::$fields_names[{$table_name}Model::{$each_update_field['field_name_static']}]);
         //判断是否需要修改
-        $old_{$each_update_field['field_name']} = {$table_name}Model::getValueById($id, {$table_name}Model::{$each_update_field['field_name_static']});
-        if (${$each_update_field['field_name']} == $old_{$each_update_field['field_name']}) {
+        <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
+$old_{$each_update_field['field_name']} = {$table_name}Model::getValueById(${$table_comment['partition'][0]}, $id, {$table_name}Model::{$each_update_field['field_name_static']});
+            <else/>
+$old_{$each_update_field['field_name']} = {$table_name}Model::getValueById($id, {$table_name}Model::{$each_update_field['field_name_static']});
+        </present>if (${$each_update_field['field_name']} == $old_{$each_update_field['field_name']}) {
             return $this->ar(2, '不可重复操作', '{$each_update_field['json_return_is_exist']}');
         }
+        <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //更新
+        {$table_name}Model::instance(${$table_comment['partition'][0]})->where([
+            {$table_name}Model::F_ID => $id
+        ])->setField([
+            {$table_name}Model::{$each_update_field['field_name_static']} => ${$each_update_field['field_name']}{$wrap_str}
+        ]);
+        <else/>//更新
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => $id
         ])->setField([
             {$table_name}Model::{$each_update_field['field_name_static']} => ${$each_update_field['field_name']}{$wrap_str}
         ]);
+        </present>
+        <present name="table_comment['partition']">${$table_comment['partition'][0]} = get_param('{$table_comment['partition'][0]}', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '{:isset($table_comment['partition'][1]) ? '字段'.$table_comment['partition'][0] : '日期'}');
         //获取
-        $info = [
-            {$table_name}Model::F_ID  => $id,
-            {$table_name}Model::{$each_update_field['field_name_static']} => {$table_name}Model::getValueById($id, {$table_name}Model::{$each_update_field['field_name_static']})
-        ];
-        //拼接额外字段 & 格式化相关字段
+        $info = {$table_name}Model::getById(${$table_comment['partition'][0]}, $id);
+        <else/>//获取
+        $info = {$table_name}Model::getById($id);
+        </present>//拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::forShow($info);
-        return $this->ar(1, ['info' => $info], '{$each_update_field['json_return']}');
+        return $this->ar(1, ['info' => $info], static::updateField{$each_update_field['function_name']}Example());
+    }
+
+    /**
+     * 返回例子
+     * @return string
+     */
+    protected function updateField{$each_update_field['function_name']}Example() {
+        return '{$each_update_field['json_return']}';
     }
 </foreach>
 

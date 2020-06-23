@@ -599,6 +599,18 @@ class SmartInit extends Command {
                     ];
                 }
             }
+            //额外字段
+            if (isset($comment['show_map_fields'])) {
+                foreach ($comment['show_map_fields'] as $each_field) {
+                    $info[$each_field[1]] = $each_field[2];
+                }
+            }
+            //拼接格式化字段
+            if (isset($comment['show_format'])) {
+                foreach ($comment['show_format'] as $each_field) {
+                    $info[$each['Field'] . $each_field[1]] = $comment['name'];
+                }
+            }
             //添加update只读字段方法
             if (isset($comment['is_read_only'])) {
                 $function_name = $each['Field'];
@@ -617,14 +629,11 @@ class SmartInit extends Command {
                     'function_name'        => $function_name,
                     'field_name'           => $each['Field'],
                     'field_name_static'    => 'F_' . strtoupper($each['Field']),
-                    'json_return'          => json_encode([
+                    'json_return'          => [
                         "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/1",
                         "status_code" => 1,
-                        "info"        => [
-                            'id'           => '主键id',
-                            $each['Field'] => $field_comment
-                        ]
-                    ], JSON_UNESCAPED_UNICODE),
+                        "info"        => []
+                    ],
                     'json_return_is_exist' => json_encode([
                         "status"      => 'api/' . $table_name . '/updatefield' . strtolower($function_name) . "/2",
                         "status_code" => 2,
@@ -632,18 +641,12 @@ class SmartInit extends Command {
                     ], JSON_UNESCAPED_UNICODE),
                 ];
             }
-            //额外字段
-            if (isset($comment['show_map_fields'])) {
-                foreach ($comment['show_map_fields'] as $each_field) {
-                    $info[$each_field[1]] = $each_field[2];
-                }
-            }
-            //拼接格式化字段
-            if (isset($comment['show_format'])) {
-                foreach ($comment['show_format'] as $each_field) {
-                    $info[$each['Field'] . $each_field[1]] = $comment['name'];
-                }
-            }
+        }
+        foreach ($fields_update_ready as $k_field_update => $each_field_update) {
+            $each_field_update['json_return']['info'] = $info;
+            //json
+            $each_field_update['json_return']     = json_encode($each_field_update['json_return'], JSON_UNESCAPED_UNICODE);
+            $fields_update_ready[$k_field_update] = $each_field_update;
         }
         $ar_get_list_json   = [
             'status'      => strtolower(sprintf('api/%s/getList/1', $table_name)),
