@@ -33,6 +33,9 @@ class ToolsBaseController extends Controller {
         if (App::$debug) {
             log_info('$_REQUEST:', $_REQUEST);
         }
+        //打开错误日志
+        ini_set('display_errors', 'On');
+        ini_set("error_reporting", E_ALL);
     }
 
     /**

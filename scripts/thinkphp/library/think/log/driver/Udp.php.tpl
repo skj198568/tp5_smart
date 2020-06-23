@@ -9,8 +9,6 @@
 
 namespace think\log\driver;
 
-use ClassLibrary\ClHttp;
-
 /**
  * udp日志
  * Class Udp
@@ -44,13 +42,31 @@ class Udp extends File {
             $this->getDebugLog($info, $append, $apart);
             $message = $this->parseLog($info);
         }
-        //添加域名、ip
-        $message = ClHttp::getServerDomain(false) . ' ' . request()->ip() . "\n" . $message;
-        $socket  = stream_socket_client($report_address);
+        $socket = stream_socket_client($report_address);
         if (!$socket) {
             return false;
         }
-        return stream_socket_sendto($socket, $message) == strlen($message);
+        //ip
+        $message = request()->ip() . "\n" . $message;
+        //udp包最大65507
+        $max_length = 65000;
+        if (strlen($message) > $max_length) {
+            //分多次上传
+            while (strlen($message) > $max_length) {
+                $temp_message = substr($message, 0, $max_length);
+                stream_socket_sendto($socket, '.=' . $temp_message);
+                $message = substr($message, $max_length - 1);
+            }
+            //剩余部分
+            if (!empty($message)) {
+                $message = '.=' . $message;
+            }
+        }
+        //再次发送
+        if (strlen($message) > 0) {
+            stream_socket_sendto($socket, $message);
+        }
+        return true;
     }
 
 }

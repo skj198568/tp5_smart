@@ -59,6 +59,9 @@ class MigrateBaseController extends Controller {
         if (App::$debug) {
             log_info('$_REQUEST:', request()->request());
         }
+        //打开错误日志
+        ini_set('display_errors', 'On');
+        ini_set("error_reporting", E_ALL);
         foreach (['exec', 'popen'] as $function_name) {
             if (!function_exists($function_name)) {
                 echo '<h1 style="text-align: center;">' . $function_name . '() has been disabled.</h1>';
