@@ -544,6 +544,8 @@ class SmartInit extends Command {
         }
         $table_name_format = $this->tableNameFormat($table_name);
         $info              = [];
+        $info_invisible    = [];
+        $info_ready        = [];
         //字段配置
         $fields_config       = [];
         $fields_update_ready = [];
@@ -585,10 +587,6 @@ class SmartInit extends Command {
                         "message"     => "不可重复操作"
                     ], JSON_UNESCAPED_UNICODE),
                 ];
-            }
-            //如果是不可见字段，则忽略
-            if (isset($comment['visible']) && $comment['visible'] == 0) {
-                continue;
             }
             $info[$each['Field']] = empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'];
             //静态变量
@@ -641,6 +639,18 @@ class SmartInit extends Command {
                     $info[$each['Field'] . $each_field[1]] = $comment['name'];
                 }
             }
+            //如果是不可见字段，则忽略
+            if ((isset($comment['visible']) && $comment['visible'] == 0) || isset($comment['is_read_only'])) {
+                if (isset($comment['visible']) && $comment['visible'] == 0) {
+                    //保存至不可见字段
+                    $info_invisible[] = $info[$each['Field']];
+                }
+                if (isset($comment['is_read_only'])) {
+                    $info_ready[] = $info[$each['Field']];
+                }
+                //删掉
+                unset($info[$each['Field']]);
+            }
         }
         foreach ($fields_update_ready as $k_field_update => $each_field_update) {
             $each_field_update['json_return']['info'] = $info;
@@ -669,12 +679,12 @@ class SmartInit extends Command {
         $ar_create_json     = [
             'status'      => strtolower(sprintf('api/%s/create/1', $table_name)),
             'status_code' => 1,
-            'info'        => $info
+            'info'        => array_merge($info, $info_invisible)
         ];
         $ar_update_json     = [
             'status'      => strtolower(sprintf('api/%s/update/1', $table_name)),
             'status_code' => 1,
-            'info'        => $info
+            'info'        => array_diff(array_merge($info, $info_invisible), $info_ready)
         ];
         $ar_update_ids_json = [
             'status'      => strtolower(sprintf('api/%s/updateByIds/1', $table_name)),
