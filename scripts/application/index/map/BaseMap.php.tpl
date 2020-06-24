@@ -172,7 +172,7 @@ class BaseMap extends Query {
      * after insert 限制次数，0为不限制次数
      * @var int
      */
-    private $trigger_after_insert_called_limit_times = 1;
+    private $trigger_after_insert_called_limit_times = 0;
 
     /**
      * after insert 当前调用次数
@@ -184,7 +184,7 @@ class BaseMap extends Query {
      * after update 限制次数，0为不限制次数
      * @var int
      */
-    private $trigger_after_update_called_limit_times = 1;
+    private $trigger_after_update_called_limit_times = 0;
 
     /**
      * after update 当前调用次数
@@ -196,7 +196,7 @@ class BaseMap extends Query {
      * after delete 限制次数，0为不限制次数
      * @var int
      */
-    private $trigger_after_delete_called_limit_times = 1;
+    private $trigger_after_delete_called_limit_times = 0;
 
     /**
      * after delete 当前调用次数
@@ -208,7 +208,7 @@ class BaseMap extends Query {
      * remove cache 限制次数，0为不限制次数
      * @var int
      */
-    private $trigger_remove_cache_called_limit_times = 1;
+    private $trigger_remove_cache_called_limit_times = 0;
 
     /**
      * remove cache 当前调用次数
@@ -356,7 +356,7 @@ class BaseMap extends Query {
      * 设置triggerRemoveCache被调用次数
      * @param int $limit_times 0/不限制
      */
-    protected function triggerRemoveCacheSetCalledLimitTimes($limit_times = 1) {
+    public function triggerRemoveCacheSetCalledLimitTimes($limit_times = 1) {
         $this->trigger_remove_cache_called_limit_times = $limit_times;
     }
 
