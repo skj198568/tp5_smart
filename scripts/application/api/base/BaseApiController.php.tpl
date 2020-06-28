@@ -64,7 +64,7 @@ class BaseApiController extends Controller {
                 exit;
             }
             //缓存
-            cache($lock_key, time(), 60);
+            cache($lock_key, time(), 3);
             //存储
             $this->locked_key[] = $lock_key;
         }
