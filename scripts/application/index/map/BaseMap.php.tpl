@@ -1186,10 +1186,10 @@ class BaseMap extends Query {
      */
     public function setMoveDataEnd() {
         $this->is_can_exec_before_trigger = true;
-        self::triggerAfterInsertSetCalledLimitTimes(1);
-        self::triggerAfterUpdateSetLimitCalledTimes(1);
-        self::triggerAfterDeleteSetLimitCalledTimes(1);
-        self::triggerRemoveCacheSetCalledLimitTimes(1);
+        self::triggerAfterInsertSetCalledLimitTimes(0);
+        self::triggerAfterUpdateSetLimitCalledTimes(0);
+        self::triggerAfterDeleteSetLimitCalledTimes(0);
+        self::triggerRemoveCacheSetCalledLimitTimes(0);
     }
 
 }
