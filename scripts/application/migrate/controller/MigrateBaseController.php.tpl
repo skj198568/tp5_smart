@@ -344,6 +344,12 @@ class MigrateBaseController extends Controller {
             $field_info['field_values']        = sprintf("'values' => %s, ", str_replace('"', "'", $field_info['field_default_value']));
             $field_info['field_default_value'] = '';
         }
+        //json格式处理
+        if (isset($field_info['show_format'])) {
+            if (is_string($field_info['show_format'])) {
+                $field_info['show_format'] = json_decode($field_info['show_format'], true);
+            }
+        }
         $this->assign('field_info', $field_info);
         return $this->fetch($this->getTemplateFilePath('migrate_field.tpl')) . "\n";
     }
