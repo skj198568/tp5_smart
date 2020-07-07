@@ -105,13 +105,14 @@ class Cmd extends \think\migration\Migrator {
         $result   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
         $tables   = [];
         foreach ($result as $each) {
-            if (strpos($each['table_name'], $table_name_with_prefix) === 0) {
-                $each_table_all_fields = $this->getTableFieldsWithPrefixTableName($each['table_name']);
+            $each_table_name_with_prefix = array_pop($each);
+            if (strpos($each_table_name_with_prefix, $table_name_with_prefix) === 0) {
+                $each_table_all_fields = $this->getTableFieldsWithPrefixTableName($each_table_name_with_prefix);
                 $each_table_all_fields = array_column($each_table_all_fields, 'Field');
                 //排序
                 sort($each_table_all_fields);
                 if ($each_table_all_fields == $table_all_fields) {
-                    $tables[] = $this->getTableNameWithoutPrefix($each['table_name']);
+                    $tables[] = $this->getTableNameWithoutPrefix($each_table_name_with_prefix);
                 }
             }
         }
@@ -176,8 +177,11 @@ class Cmd extends \think\migration\Migrator {
         $database = config('database.database');
         $query    = new \think\db\Query();
         $tables   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
-        $tables   = array_column($tables, 'table_name');
-        return in_array($table_name_with_prefix, $tables);
+        $temp_tables = [];
+        foreach($tables as $each_table){
+            $temp_tables[] = array_pop($each_table);
+        }
+        return in_array($table_name_with_prefix, $temp_tables);
     }
 
     /**
@@ -186,7 +190,7 @@ class Cmd extends \think\migration\Migrator {
     protected function changeDirOwn() {
         //修改目录权限为www
         if (!ClSystem::isWin()) {
-            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+            $cmd = sprintf('cd %s && chown -R www:www *', DOCUMENT_ROOT_PATH . '/../');
             pclose(popen($cmd, 'r'));
         }
     }
