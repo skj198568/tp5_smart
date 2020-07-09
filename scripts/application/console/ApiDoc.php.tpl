@@ -189,8 +189,8 @@ class ApiDoc extends Command {
         file_put_contents($file_absolute_url, $api_content);
         $output->highlight(sprintf('create %s ok.', $file_absolute_url));
         //修改目录权限为www
-        if (!ClSystem::isWin()) {
-            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        if (ClSystem::isLinux()) {
+            $cmd = sprintf('cd %s && chown -R www:www *', DOCUMENT_ROOT_PATH . '/../');
             exec($cmd);
         }
         return true;

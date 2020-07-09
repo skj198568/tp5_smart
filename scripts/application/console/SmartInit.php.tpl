@@ -99,8 +99,8 @@ class SmartInit extends Command {
         //处理api doc
         $this->dealApiDoc($output);
         //修改目录权限为www
-        if (!ClSystem::isWin()) {
-            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        if (ClSystem::isLinux()) {
+            $cmd = sprintf('cd %s && chown -R www:www *', DOCUMENT_ROOT_PATH . '/../');
             exec($cmd);
         }
         $output->highlight('finished');

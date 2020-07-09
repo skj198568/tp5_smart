@@ -112,8 +112,8 @@ class LogCount extends Command {
         //处理慢查询
         $this->dealSqlSlowQuery($input, $output, $files);
         //修改目录权限为www
-        if (!ClSystem::isWin()) {
-            $cmd = sprintf('cd %s && chown www:www * -R', DOCUMENT_ROOT_PATH . '/../');
+        if (ClSystem::isLinux()) {
+            $cmd = sprintf('cd %s && chown -R www:www *', DOCUMENT_ROOT_PATH . '/../');
             exec($cmd);
         }
         return true;
