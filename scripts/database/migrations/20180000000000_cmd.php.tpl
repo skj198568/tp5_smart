@@ -174,11 +174,11 @@ class Cmd extends \think\migration\Migrator {
      * @throws \think\exception\PDOException
      */
     protected function hasTableWithPrefix($table_name_with_prefix) {
-        $database = config('database.database');
-        $query    = new \think\db\Query();
-        $tables   = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
+        $database    = config('database.database');
+        $query       = new \think\db\Query();
+        $tables      = $query->query("select table_name from information_schema.TABLES where TABLE_SCHEMA='$database'");
         $temp_tables = [];
-        foreach($tables as $each_table){
+        foreach ($tables as $each_table) {
             $temp_tables[] = array_pop($each_table);
         }
         return in_array($table_name_with_prefix, $temp_tables);
@@ -189,7 +189,7 @@ class Cmd extends \think\migration\Migrator {
      */
     protected function changeDirOwn() {
         //修改目录权限为www
-        if (!ClSystem::isWin()) {
+        if (ClSystem::isLinux()) {
             $cmd = sprintf('cd %s && chown -R www:www *', DOCUMENT_ROOT_PATH . '/../');
             pclose(popen($cmd, 'r'));
         }
