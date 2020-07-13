@@ -91,8 +91,10 @@ function get_param($key = '', $verifies = [], $desc = '', $default = null, $filt
     //如果默认值为数字类型，则需要过滤
     if ($default !== null) {
         if (is_numeric($default)) {
-            if (strpos($filter, 'floatval') === false) {
-                $value = floatval($value);
+            if (is_string($value)) {
+                if (strpos($filter, 'floatval') === false) {
+                    $value = floatval($value);
+                }
             }
         }
     }
