@@ -149,7 +149,7 @@ class LogCount extends Command {
                 }
                 //.html .htm处理
                 $line = str_replace(['.html', '.htm'], ['', ''], $line);
-                if ($line{0} != '/') {
+                if ($line[0] != '/') {
                     $line = ClString::getBetween($line, '/', '');
                 }
                 //获取请求module/controller/action
