@@ -52,7 +52,12 @@ class BaseApiController extends Controller {
             ini_set('display_errors', 'On');
             ini_set("error_reporting", E_ALL);
         }
-        $id = input('id', 0);
+        try {
+            $id = input('id', 0);
+        } catch (\InvalidArgumentException $exception) {
+            //可能为数组参数，忽略处理
+            $id = 0;
+        }
         if ($id > 0) {
             //存在id
             $lock_key          = $this->getLockKey($id);
