@@ -153,7 +153,8 @@
                                 btn.push('<button class="btn btn-danger btn-xs" onclick="tables.$del(\'' + value + '\')"><i class="fa fa-remove"></i> 删除</button>');
                                 btn.push('<button class="btn btn-info btn-xs" onclick="tables.$backUpData(\'' + value + '\')"><i class="fa fa-copy"></i> 备份数据</button>');
                                 btn.push('<button class="btn btn-danger btn-xs" style="background-color:#0d3349;border-color: #0d3349;" onclick="tables.$dealIndex(\'' + value + '\')"><i class="fa fa-link"></i> 索引</button>');
-                                btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 1)"><i class="fa fa-recycle"></i> 废弃</button>');
+                                //取消废弃功能
+                                // btn.push('<button class="btn btn-default btn-xs" onclick="tables.$dealIgnore(\'' + value + '\', 1)"><i class="fa fa-recycle"></i> 废弃</button>');
                             }
                             return btn.join(' ');
                         }
