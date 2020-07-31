@@ -1121,9 +1121,9 @@
             }
             table_info.show_map_is_show = table_info.$fieldTypeIsInt() || table_info.$storeFormatIsJson();
             $('#id_modal_add_field').modal('show');
-            setTimeout(function () {
+            $('#id_modal_add_field').on('shown.bs.modal', function () {
                 $('#id_field_name').focus();
-            }, 1000);
+            });
         },
         $commonSettingCheckIsChecked: function (function_name) {
             if (table_info.common_settings_selected.indexOf(function_name) == -1) {
