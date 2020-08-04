@@ -99,10 +99,10 @@ class FileBaseController extends ApiController {
         //绝对路径
         $file_url = DOCUMENT_ROOT_PATH . $file_url;
         if (!is_file($file_url)) {
-            return $this->ar(2, '不存在当前文件');
+            return $this->ar(2, '不存在当前文件', '{"status":"api\/file\/delete\/2","status_code":2,"message":"不存在当前文件"}');
         }
         @unlink($file_url);
-        return $this->ar(1, '删除成功');
+        return $this->ar(1, '删除成功', '{"status":"api\/file\/delete\/1","status_code":1,"message":"删除成功"}');
     }
 
 }
