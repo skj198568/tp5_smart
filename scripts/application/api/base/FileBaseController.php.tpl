@@ -34,8 +34,9 @@ class FileBaseController extends ApiController {
      * 上传文件
      */
     public function uploadFile() {
+        $block_name    = get_param('block_name', ClFieldVerify::instance()->fetchVerifies(), '文件存储块名，用于后期管理资源', '');
         $file_save_dir = get_param('file_save_dir', ClFieldVerify::instance()->fetchVerifies(), '文件保存文件夹，相对或绝对路径', '');
-        $result        = ClFile::uploadDealClient($file_save_dir);
+        $result        = ClFile::uploadDealClient($file_save_dir, $block_name);
         $image_width   = get_param('image_width', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '图片宽度，可不传', 0);
         $image_height  = get_param('image_height', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '图片高度，可不传', 0);
         if ($result['result'] && $image_height + $image_width > 0) {
