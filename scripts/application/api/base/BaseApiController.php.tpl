@@ -34,6 +34,7 @@ class BaseApiController extends Controller {
         'UrlShort/jump',
         'File/uploadFile',
         'File/img',
+        'File/delete',
     ];
 
     /**

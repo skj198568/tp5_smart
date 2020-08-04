@@ -84,4 +84,25 @@ class FileBaseController extends ApiController {
         return $this->ar(1, ['url' => $img_url], '{"status":"api\/file\/img\/1","status_code":1,"url":"\/static\/lib\/file_upload\/server\/php\/files\/265286_20180508231249.jpg"}');
     }
 
+    /**
+     * 删除文件
+     * @return \think\response\Json|\think\response\Jsonp
+     * @author SongKeJing qq:597481334 mobile:159-5107-8050
+     * @date 2020/8/4 18:07
+     */
+    public function delete() {
+        $file_url = get_param('file_url', ClFieldVerify::instance()->verifyIsRequire()->fetchVerifies(), '图片地址');
+        //替换当前域名
+        $file_url = str_replace(['http://', 'https://'], ['', ''], $file_url);
+        //截取出路径
+        $file_url = substr($file_url, strpos($file_url, '/'));
+        //绝对路径
+        $file_url = DOCUMENT_ROOT_PATH . $file_url;
+        if (!is_file($file_url)) {
+            return $this->ar(2, '不存在当前文件');
+        }
+        @unlink($file_url);
+        return $this->ar(1, '删除成功');
+    }
+
 }
