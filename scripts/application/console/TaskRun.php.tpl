@@ -34,7 +34,7 @@ class TaskRun extends Command {
     protected function configure() {
         $this->setName('task_run')
             ->addOption('--command', '-c', Option::VALUE_REQUIRED, 'start/启动，start-d/启动（守护进程），status/状态, restart/重启，reload/平滑重启，stop/停止', 'start')
-            ->setDescription(sprintf('执行定时任务，请配置:%s', __DIR__ . '/task_run.ini'));
+            ->setDescription(sprintf('执行定时任务，请配置:%s', __DIR__ . '/task_run_cfg.php'));
     }
 
     /**
@@ -69,11 +69,11 @@ class TaskRun extends Command {
      * @return bool
      */
     private function doExecute(Input $input, Output $output) {
-        $task_ini_file = __DIR__ . '/task_run.ini';
-        if (!is_file($task_ini_file)) {
-            file_put_contents($task_ini_file, ';执行命令=类似crontab的执行时间定义，支持到秒一级任务定义 */秒 */分 */时 */日 */月 */周
+        $task_cfg_file = __DIR__ . '/task_run_cfg.php';
+        if (!is_file($task_cfg_file)) {
+            file_put_contents($task_cfg_file, ';执行命令=类似crontab的执行时间定义，支持到秒一级任务定义 */秒 */分 */时 */日 */月 */周
 ;index/article/capture=*/5 * * * * *');
-            exit(sprintf("%s file is created, please editor it.\n", $task_ini_file));
+            exit(sprintf("%s file is created, please editor it.\n", $task_cfg_file));
         }
         $command = $input->getOption('command');
         $command = trim($command);
@@ -96,10 +96,13 @@ class TaskRun extends Command {
         $task::$pidFile = $pid_file;
         //设置日志文件
         $task::$logFile      = RUNTIME_PATH . 'worker_man/task_run/log.txt';
-        $task->onWorkerStart = function ($task) use ($task_ini_file) {
-            $settings = parse_ini_file($task_ini_file);
-            foreach ($settings as $command => $cron_date) {
-                echo sprintf("[exec command]:%s\n", $command);
+        $task->onWorkerStart = function ($task) use ($task_cfg_file) {
+            $settings = include $task_cfg_file;
+            echo_info($settings);
+            foreach ($settings as $each_setting) {
+                $command   = $each_setting['command'];
+                $cron_date = $each_setting['cron_date'];
+                echo echo_info('command:', $command, 'cron_date:', $cron_date);
                 Timer::add(1, function () use ($command, $cron_date) {
                     if (ClDataCronTab::check(time(), $cron_date) === true) {
                         pclose(popen(sprintf("cd %s && php public/index.php %s &", DOCUMENT_ROOT_PATH . '/../', $command), 'r'));
