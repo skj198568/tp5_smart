@@ -14,7 +14,6 @@ use ClassLibrary\ClFile;
 use ClassLibrary\ClMysql;
 use ClassLibrary\ClString;
 use ClassLibrary\ClSystem;
-use ClassLibrary\ClVerify;
 use think\Config;
 use think\console\Command;
 use think\console\Input;
@@ -641,15 +640,15 @@ class SmartInit extends Command {
             }
             //如果是不可见字段，则忽略
             if ((isset($comment['visible']) && $comment['visible'] == 0) || isset($comment['is_read_only'])) {
-                if (isset($comment['visible']) && $comment['visible'] == 0) {
-                    //保存至不可见字段
-                    $info_invisible[] = $info[$each['Field']];
-                }
                 if (isset($comment['is_read_only'])) {
                     $info_ready[] = $info[$each['Field']];
                 }
-                //删掉
-                unset($info[$each['Field']]);
+                if (isset($comment['visible']) && $comment['visible'] == 0) {
+                    //保存至不可见字段
+                    $info_invisible[] = $info[$each['Field']];
+                    //删掉
+                    unset($info[$each['Field']]);
+                }
             }
         }
         foreach ($fields_update_ready as $k_field_update => $each_field_update) {
