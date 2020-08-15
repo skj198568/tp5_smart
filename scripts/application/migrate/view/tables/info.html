@@ -1445,7 +1445,7 @@
                 if (r.status_code == 1) {
                     table_info.del_loading = false;
                     $('#id_modal_del').modal('hide');
-                    layer.msg('删除成功，' + r.hasOwnProperty('file_name') ? r.file_name : r.message, function () {
+                    layer.msg(r.hasOwnProperty('file_name') ? ('删除成功:' + r.file_name) : r.message, function () {
 
                     });
                     //刷新数据
