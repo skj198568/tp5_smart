@@ -356,6 +356,7 @@ class ApiDoc extends Command {
         }
         $return_array     = [];
         $function_content = $this->getMethodContentWithReflection($method);
+//        echo_info($function_content);
         //获取get_param方式参数
         $params = ClString::parseToArray($function_content, 'get_param', ');', false);
 //        echo_info($params);
@@ -510,92 +511,100 @@ class ApiDoc extends Command {
         $function_content_array = explode("\n", $function_content);
 //        echo_info($function_content_array);
         foreach ($function_content_array as $each_line) {
-            if (strpos($each_line, '::getAllFields') !== false) {
-                $class_name     = ClString::getBetween($each_line, ',', '::getAllFields', false);
-                $field_begin    = $class_name . '::getAllFields';
-                $field_exec_str = ClString::getBetween($each_line, $field_begin);
-                $field_exec_str = ClString::getBetween($field_exec_str, '', ');', false);
-//                echo_info($field_exec_str);
+            if (strpos($each_line, '::getAllFields') === false) {
+                continue;
+            }
+            if (strpos($each_line, 'input') === false) {
+                continue;
+            }
+            $class_name     = ClString::getBetween($each_line, ',', '::getAllFields', false);
+            $field_begin    = $class_name . '::getAllFields';
+            $field_exec_str = ClString::getBetween($each_line, $field_begin);
+            $field_exec_str = ClString::getBetween($field_exec_str, '', ');', false);
+//                echo_info('$field_exec_str:', $field_exec_str);
+            if (empty($field_exec_str)) {
+                continue;
+            }
 //                while(strpos($params_functions, ',') !== false){
 //                    $params_functions = ClString::getBetween($params_functions, ',', '', false);
 //                }
 //                echo_info('1', $params_functions);
-                $class_name_with_namespace     = $this->getWithNameSpace($class_file_absolute_url, $class_name);
-                $class_const_file_absolute_url = $this->getFileAbsoluteUrlByNamespace($class_name_with_namespace);
-                //替换为map文件
-                $class_const_file_absolute_url = str_replace(['Model', 'model'], ['Map', 'map'], $class_const_file_absolute_url);
-                if (!is_file($class_const_file_absolute_url)) {
-                    continue;
+            $class_name_with_namespace     = $this->getWithNameSpace($class_file_absolute_url, $class_name);
+            $class_const_file_absolute_url = $this->getFileAbsoluteUrlByNamespace($class_name_with_namespace);
+            //替换为map文件
+            $class_const_file_absolute_url = str_replace(['Model', 'model'], ['Map', 'map'], $class_const_file_absolute_url);
+            if (!is_file($class_const_file_absolute_url)) {
+                continue;
+            }
+            $class_const_file_absolute_url_content = file_get_contents($class_const_file_absolute_url);
+            $class_const_content                   = ClString::parseToArray($class_const_file_absolute_url_content, '/**', ';');
+            foreach ($class_const_content as $k => $v) {
+                if (strpos($v, 'const F_') === false) {
+                    unset($class_const_content[$k]);
                 }
-                $class_const_file_absolute_url_content = file_get_contents($class_const_file_absolute_url);
-                $class_const_content                   = ClString::parseToArray($class_const_file_absolute_url_content, '/**', ';');
-                foreach ($class_const_content as $k => $v) {
-                    if (strpos($v, 'const F_') === false) {
-                        unset($class_const_content[$k]);
-                    }
-                }
-                $class_const_content = array_values($class_const_content);
+            }
+            $class_const_content = array_values($class_const_content);
 //                    le_info($class_const_content);
-                $params_functions = str_replace($class_name, $class_name_with_namespace, $field_exec_str);
-//                echo_info(sprintf('$params=%s;', $params_functions));
-                eval(sprintf('$params=%s;', $params_functions));
-                $fields_verifies = sprintf('%s::$fields_verifies', $class_name_with_namespace);
+            $params_functions = str_replace($class_name, $class_name_with_namespace, $field_exec_str);
+//            echo_info($class_name, $class_name_with_namespace, $field_exec_str);
+//            echo_info(sprintf('$params=%s;', $params_functions));
+            eval(sprintf('$params=%s;', $params_functions));
+            $fields_verifies = sprintf('%s::$fields_verifies', $class_name_with_namespace);
 //                echo_info($fields_verifies);
-                eval(sprintf('$fields_verifies=%s;', $fields_verifies));
+            eval(sprintf('$fields_verifies=%s;', $fields_verifies));
 //                echo_info($params);
-                //忽略只读参数
-                $fields_read_only = sprintf('%s::$fields_read_only', $class_name_with_namespace);
-                eval(sprintf('$fields_read_only=%s;', $fields_read_only));
+            //忽略只读参数
+            $fields_read_only = sprintf('%s::$fields_read_only', $class_name_with_namespace);
+            eval(sprintf('$fields_read_only=%s;', $fields_read_only));
 //                if (!empty($fields_read_only)) {
 //                    echo_info($fields_read_only);
 //                }
-                if (!empty($fields_read_only)) {
-                    if (in_array($method->name, ['update'])) {
-                        foreach ($params as $k_each => $each_param) {
-                            //忽略只读参数
-                            if (in_array($each_param, (array)$fields_read_only)) {
-                                unset($params[$k_each]);
-                            }
+            if (!empty($fields_read_only)) {
+                if (in_array($method->name, ['update'])) {
+                    foreach ($params as $k_each => $each_param) {
+                        //忽略只读参数
+                        if (in_array($each_param, (array)$fields_read_only)) {
+                            unset($params[$k_each]);
                         }
                     }
                 }
-                foreach ($class_const_content as $each_const_param) {
-                    foreach ($params as $each_param) {
-                        if (strpos($each_const_param, sprintf("'%s'", $each_param)) !== false) {
-                            $each_const_param_temp = ClString::getBetween($each_const_param, '/**', '*/', false);
-                            $each_const_param_temp = trim(str_replace('*', '', $each_const_param_temp));
-                            $each_const_param_temp = explode("\n", $each_const_param_temp);
-                            $remark                = [];
-                            foreach ($each_const_param_temp as $each_const_param_line) {
-                                $each_const_param_line = trim($each_const_param_line);
-                                $remark[]              = $each_const_param_line;
-                            }
-                            //丰富remark信息
-                            if (strpos($class_const_file_absolute_url_content, 'const C_' . strtoupper($each_param) . ' ') !== false) {
-                                $field_config  = sprintf('%s::C_' . strtoupper($each_param), $class_name_with_namespace);
-                                $remark_append = [];
-                                $command       = sprintf('$field_config=%s;', $field_config);
-                                eval($command);
-                                foreach ($field_config as $each_field_key => $each_field_config) {
-                                    $remark_append[] = $each_field_key . '/' . $each_field_config;
-                                }
-                                $remark[] = 'Config: ' . implode('、', $remark_append);
-                            }
-                            //美化
-                            foreach ($remark as $k_remark => $v_remark) {
-                                if (strpos($v_remark, ':') !== false) {
-                                    $v_remark_pre = ClString::getBetween($v_remark, ':', '', false);
-                                    $v_remark     = str_replace($v_remark_pre, '<span style="color: red;">' . $v_remark_pre . '</span>', $v_remark);
-                                }
-                                $remark[$k_remark] = $v_remark;
-                            }
-                            $remark         = implode('<span style="color: blue;">; </span>', $remark);
-                            $return_array[] = [
-                                'name'    => $each_param,
-                                'filters' => isset($fields_verifies[$each_param]) ? ClFieldVerify::getNamesStringByVerifies($fields_verifies[$each_param]) : '无',
-                                'remark'  => $remark
-                            ];
+            }
+            foreach ($class_const_content as $each_const_param) {
+                foreach ($params as $each_param) {
+                    if (strpos($each_const_param, sprintf("'%s'", $each_param)) !== false) {
+                        $each_const_param_temp = ClString::getBetween($each_const_param, '/**', '*/', false);
+                        $each_const_param_temp = trim(str_replace('*', '', $each_const_param_temp));
+                        $each_const_param_temp = explode("\n", $each_const_param_temp);
+                        $remark                = [];
+                        foreach ($each_const_param_temp as $each_const_param_line) {
+                            $each_const_param_line = trim($each_const_param_line);
+                            $remark[]              = $each_const_param_line;
                         }
+                        //丰富remark信息
+                        if (strpos($class_const_file_absolute_url_content, 'const C_' . strtoupper($each_param) . ' ') !== false) {
+                            $field_config  = sprintf('%s::C_' . strtoupper($each_param), $class_name_with_namespace);
+                            $remark_append = [];
+                            $command       = sprintf('$field_config=%s;', $field_config);
+                            eval($command);
+                            foreach ($field_config as $each_field_key => $each_field_config) {
+                                $remark_append[] = $each_field_key . '/' . $each_field_config;
+                            }
+                            $remark[] = 'Config: ' . implode('、', $remark_append);
+                        }
+                        //美化
+                        foreach ($remark as $k_remark => $v_remark) {
+                            if (strpos($v_remark, ':') !== false) {
+                                $v_remark_pre = ClString::getBetween($v_remark, ':', '', false);
+                                $v_remark     = str_replace($v_remark_pre, '<span style="color: red;">' . $v_remark_pre . '</span>', $v_remark);
+                            }
+                            $remark[$k_remark] = $v_remark;
+                        }
+                        $remark         = implode('<span style="color: blue;">; </span>', $remark);
+                        $return_array[] = [
+                            'name'    => $each_param,
+                            'filters' => isset($fields_verifies[$each_param]) ? ClFieldVerify::getNamesStringByVerifies($fields_verifies[$each_param]) : '无',
+                            'remark'  => $remark
+                        ];
                     }
                 }
             }
